@@ -18,11 +18,11 @@ describe('AlbumView', () => {
 
   it('renders the welcome message', () => {
     renderWithRouter(<AlbumView />);
-    expect(screen.getByText('Welcome to my interactive portfolio experience!')).toBeInTheDocument();
+    expect(screen.getByText('Welcome to my interactive portfolio experience! Explore my journey through music-inspired tracks.')).toBeInTheDocument();
   });
 
   it('renders the track list', () => {
     renderWithRouter(<AlbumView />);
-    expect(screen.getByText('Tracks')).toBeInTheDocument();
+    expect(screen.getByText('Album Tracks')).toBeInTheDocument();
   });
 });
