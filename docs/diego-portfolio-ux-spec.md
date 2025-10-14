@@ -10,7 +10,7 @@ The portfolio reimagines the traditional developer portfolio as an immersive mus
 
 | Date | Version | Description | Author |
 |------|---------|-------------|--------|
-| 2025-01-XX | 1.0 | Initial UI/UX specification | Sally (UX Expert) |
+| 2025-01-14 | 1.0 | Initial UI/UX specification | Sally (UX Expert) |
 
 ---
 

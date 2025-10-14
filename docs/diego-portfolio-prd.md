@@ -21,8 +21,8 @@ This portfolio will serve as both a creative showcase and a practical hiring too
 
 | Date | Version | Description | Author |
 |------|---------|-------------|--------|
-| 2025-01-XX | 1.0 | Initial PRD creation | John (PM) |
-| 2025-01-XX | 1.1 | Updated per PO validation - Added Story 5.1 details, audio prep task | Sarah (PO) |
+| 2025-01-14 | 1.0 | Initial PRD creation | John (PM) |
+| 2025-01-14 | 1.1 | Updated per PO validation - Added Story 5.1 details, audio prep task | Sarah (PO) |
 
 ## Requirements
 

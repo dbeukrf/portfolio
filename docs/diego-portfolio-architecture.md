@@ -32,7 +32,7 @@ pip install fastapi uvicorn langchain chromadb openai python-dotenv
 
 | Date | Version | Description | Author |
 |------|---------|-------------|--------|
-| 2025-01-XX | 1.0 | Initial architecture design | Winston (Architect) |
+| 2025-01-14 | 1.0 | Initial architecture design | Winston (Architect) |
 
 ---
 
