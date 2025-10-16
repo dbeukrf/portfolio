@@ -6,9 +6,12 @@ export default function AlbumView() {
 
   const handleStartExperience = () => {
     // Navigate to first track
-    navigate('/track/university');
+    navigate('/track/education');
   };
 
+
+  
+  
   return (
     <div className="min-h-screen bg-background-dark">
       {/* Hero Section with Album Artwork */}
@@ -74,9 +77,6 @@ export default function AlbumView() {
                       <h3 className="text-h4 group-hover:text-primary-500 transition-colors">
                         {track.title}
                       </h3>
-                      <p className="text-body-sm text-text-secondary">
-                        {track.description}
-                      </p>
                     </div>
                     
                     {/* Arrow Icon */}
@@ -101,3 +101,4 @@ export default function AlbumView() {
     </div>
   );
 }
+

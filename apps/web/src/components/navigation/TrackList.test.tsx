@@ -14,21 +14,12 @@ describe('TrackList', () => {
   it('renders all track links', () => {
     renderWithRouter(<TrackList />);
     
-    expect(screen.getByText('University Years')).toBeInTheDocument();
+    expect(screen.getByText('Education')).toBeInTheDocument();
     expect(screen.getByText('Work Experience')).toBeInTheDocument();
     expect(screen.getByText('Projects')).toBeInTheDocument();
-    expect(screen.getByText('Skills')).toBeInTheDocument();
+    expect(screen.getByText('Skills & Languages')).toBeInTheDocument();
     expect(screen.getByText('Hobbies')).toBeInTheDocument();
-  });
-
-  it('renders track descriptions', () => {
-    renderWithRouter(<TrackList />);
-    
-    expect(screen.getByText('Foundation & Learning')).toBeInTheDocument();
-    expect(screen.getByText('Professional Growth')).toBeInTheDocument();
-    expect(screen.getByText('Passion & Innovation')).toBeInTheDocument();
-    expect(screen.getByText('The Tech Stack')).toBeInTheDocument();
-    expect(screen.getByText('Beyond Code')).toBeInTheDocument();
+    expect(screen.getByText('AI DJ')).toBeInTheDocument();
   });
 
   it('renders track numbers', () => {
@@ -39,25 +30,29 @@ describe('TrackList', () => {
     expect(screen.getByText('3')).toBeInTheDocument();
     expect(screen.getByText('4')).toBeInTheDocument();
     expect(screen.getByText('5')).toBeInTheDocument();
+    expect(screen.getByText('6')).toBeInTheDocument();
   });
 
   it('has correct links to track pages', () => {
     renderWithRouter(<TrackList />);
     
-    const universityLink = screen.getByText('University Years');
-    expect(universityLink.closest('a')).toHaveAttribute('href', '/track/university');
+    const educationLink = screen.getByText('Education');
+    expect(educationLink.closest('a')).toHaveAttribute('href', '/track/education');
     
     const workLink = screen.getByText('Work Experience');
-    expect(workLink.closest('a')).toHaveAttribute('href', '/track/work');
+    expect(workLink.closest('a')).toHaveAttribute('href', '/track/workExperience');
     
     const projectsLink = screen.getByText('Projects');
     expect(projectsLink.closest('a')).toHaveAttribute('href', '/track/projects');
     
-    const skillsLink = screen.getByText('Skills');
-    expect(skillsLink.closest('a')).toHaveAttribute('href', '/track/skills');
+    const skillsLink = screen.getByText('Skills & Languages');
+    expect(skillsLink.closest('a')).toHaveAttribute('href', '/track/skillsLanguages');
     
     const hobbiesLink = screen.getByText('Hobbies');
     expect(hobbiesLink.closest('a')).toHaveAttribute('href', '/track/hobbies');
+    
+    const aiDjLink = screen.getByText('AI DJ');
+    expect(aiDjLink.closest('a')).toHaveAttribute('href', '/track/aiDj');
   });
 
   it('renders the album tracks heading', () => {

@@ -3,6 +3,7 @@ export { useAudioStore } from './audioStore';
 export { useUIStore } from './uiStore';
 export { useChatStore } from './chatStore';
 export { useTrackStore } from './trackStore';
+export { useNavigationStore } from './navigationStore';
 
 // Export types for use in components
 export type { AudioStore, AudioState, AudioActions } from './audioStore';

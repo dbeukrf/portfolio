@@ -41,22 +41,16 @@ describe('AlbumView', () => {
     expect(screen.getByText('Album Tracks')).toBeInTheDocument();
   });
 
-  it('displays all five tracks with correct information', () => {
+  it('displays all six tracks with correct information', () => {
     renderWithRouter(<AlbumView />);
     
     // Check all track titles
-    expect(screen.getByText('University Years')).toBeInTheDocument();
+    expect(screen.getByText('Education')).toBeInTheDocument();
     expect(screen.getByText('Work Experience')).toBeInTheDocument();
     expect(screen.getByText('Projects')).toBeInTheDocument();
-    expect(screen.getByText('Skills')).toBeInTheDocument();
+    expect(screen.getByText('Skills & Languages')).toBeInTheDocument();
     expect(screen.getByText('Hobbies')).toBeInTheDocument();
-    
-    // Check all track descriptions
-    expect(screen.getByText('Foundation & Learning')).toBeInTheDocument();
-    expect(screen.getByText('Professional Growth')).toBeInTheDocument();
-    expect(screen.getByText('Passion & Innovation')).toBeInTheDocument();
-    expect(screen.getByText('The Tech Stack')).toBeInTheDocument();
-    expect(screen.getByText('Beyond Code')).toBeInTheDocument();
+    expect(screen.getByText('AI DJ')).toBeInTheDocument();
     
     // Check track numbers
     expect(screen.getByText('1')).toBeInTheDocument();
@@ -64,6 +58,7 @@ describe('AlbumView', () => {
     expect(screen.getByText('3')).toBeInTheDocument();
     expect(screen.getByText('4')).toBeInTheDocument();
     expect(screen.getByText('5')).toBeInTheDocument();
+    expect(screen.getByText('6')).toBeInTheDocument();
   });
 
   it('has a start button that navigates to first track', () => {
@@ -73,34 +68,34 @@ describe('AlbumView', () => {
     expect(startButton).toBeInTheDocument();
     
     fireEvent.click(startButton);
-    expect(mockNavigate).toHaveBeenCalledWith('/track/university');
+    expect(mockNavigate).toHaveBeenCalledWith('/track/education');
   });
 
   it('allows navigation to individual tracks when clicked', () => {
     renderWithRouter(<AlbumView />);
     
-    const universityTrack = screen.getByText('University Years');
-    fireEvent.click(universityTrack);
-    expect(mockNavigate).toHaveBeenCalledWith('/track/university');
+    const educationTrack = screen.getByText('Education');
+    fireEvent.click(educationTrack);
+    expect(mockNavigate).toHaveBeenCalledWith('/track/education');
     
     const workTrack = screen.getByText('Work Experience');
     fireEvent.click(workTrack);
-    expect(mockNavigate).toHaveBeenCalledWith('/track/work');
+    expect(mockNavigate).toHaveBeenCalledWith('/track/workExperience');
   });
 
   it('supports keyboard navigation for track cards', () => {
     renderWithRouter(<AlbumView />);
     
-    const universityTrack = screen.getByText('University Years').closest('[role="button"]');
-    expect(universityTrack).toBeInTheDocument();
+    const educationTrack = screen.getByText('Education').closest('[role="button"]');
+    expect(educationTrack).toBeInTheDocument();
     
     // Test Enter key
-    fireEvent.keyDown(universityTrack!, { key: 'Enter' });
-    expect(mockNavigate).toHaveBeenCalledWith('/track/university');
+    fireEvent.keyDown(educationTrack!, { key: 'Enter' });
+    expect(mockNavigate).toHaveBeenCalledWith('/track/education');
     
     // Test Space key
-    fireEvent.keyDown(universityTrack!, { key: ' ' });
-    expect(mockNavigate).toHaveBeenCalledWith('/track/university');
+    fireEvent.keyDown(educationTrack!, { key: ' ' });
+    expect(mockNavigate).toHaveBeenCalledWith('/track/education');
   });
 
   it('displays album artwork/hero visual', () => {
@@ -121,18 +116,19 @@ describe('AlbumView', () => {
     
     // Check for track cards - they should be focusable divs with role="button"
     const trackCards = screen.getAllByRole('button');
-    expect(trackCards.length).toBe(6); // 5 track cards + 1 start button
+    expect(trackCards.length).toBe(7); // 6 track cards + 1 start button
     
     // Filter out the start button to check only track cards
     const trackCardButtons = trackCards.filter(card => 
-      card.textContent?.includes('University Years') || 
+      card.textContent?.includes('Education') || 
       card.textContent?.includes('Work Experience') ||
       card.textContent?.includes('Projects') ||
-      card.textContent?.includes('Skills') ||
-      card.textContent?.includes('Hobbies')
+      card.textContent?.includes('Skills & Languages') ||
+      card.textContent?.includes('Hobbies') ||
+      card.textContent?.includes('AI DJ')
     );
     
-    expect(trackCardButtons.length).toBe(5);
+    expect(trackCardButtons.length).toBe(6);
     
     // Check that track cards have proper accessibility attributes
     trackCardButtons.forEach(card => {
