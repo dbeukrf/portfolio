@@ -1,0 +1,13 @@
+Useless facts:
+https://uselessfacts.jsph.pl/
+
+Check if its a holiday:
+https://marketplace.apilayer.com/checkiday-api
+
+Get location from IP Address:
+https://www.abstractapi.com/api/ip-geolocation-api
+https://country.is/
+
+Real-time air quality and weather updates:
+https://www.iqair.com/commercial-air-quality-monitors/api
+

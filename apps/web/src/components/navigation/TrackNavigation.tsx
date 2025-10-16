@@ -1,11 +1,12 @@
 import { useParams, useNavigate } from 'react-router-dom';
 
 const tracks = [
-  { id: 'university', title: 'University Years', number: 1 },
-  { id: 'work', title: 'Work Experience', number: 2 },
+  { id: 'education', title: 'Education', number: 1 },
+  { id: 'workExperience', title: 'Work Experience', number: 2 },
   { id: 'projects', title: 'Projects', number: 3 },
-  { id: 'skills', title: 'Skills', number: 4 },
+  { id: 'skillsLanguages', title: 'Skills & Languages', number: 4 },
   { id: 'hobbies', title: 'Hobbies', number: 5 },
+  { id: 'aiDj', title: 'AI DJ', number: 6 }
 ];
 
 export default function TrackNavigation() {
