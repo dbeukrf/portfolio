@@ -1,61 +1,121 @@
 import { useNavigate } from 'react-router-dom';
 import { TRACKS } from '../data/tracks';
+import { FaLinkedin, FaGithub } from 'react-icons/fa';
+import UnicornScene from 'unicornstudio-react';
 
 export default function AlbumView() {
   const navigate = useNavigate();
 
-  const handleStartExperience = () => {
-    // Navigate to first track
-    navigate('/track/education');
-  };
 
 
-  
-  
   return (
     <div className="min-h-screen bg-background-dark">
       {/* Hero Section with Album Artwork */}
-      <div className="relative bg-gradient-to-br from-primary-900 via-primary-800 to-secondary-900 py-16 lg:py-24">
-        <div className="container mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="text-center">
-            {/* Album Artwork/Visual */}
-            <div className="mb-8">
-              <div className="w-48 h-48 mx-auto bg-gradient-to-br from-accent-400 to-accent-600 rounded-full flex items-center justify-center shadow-2xl">
-                <div className="text-6xl font-bold text-white">D</div>
+      <div className="relative w-screen bg-gradient-to-b from-[#1f2937] to-[#6b7280] flex flex-col md:flex-row items-start md:items-end gap-8 px-6 md:px-12 py-12 overflow-hidden">
+
+        {/* 🦄 Unicorn Studio Background */}
+        <div className="absolute inset-0 z-0 h-full w-full">
+          <UnicornScene
+            projectId="fHeYPizB1tOZJngcOsES"
+            width="100%"
+            height="100%"
+
+          />
+        </div>
+
+        {/* Album cover image */}
+        <img
+          src="/images/album-cover.jpg"
+          alt="Album cover"
+          className="w-52 h-52 object-cover shadow-2xl rounded relative z-10"
+        />
+
+        {/* Album title and description */}
+        <div className="text-left flex-1 relative z-10">
+          <p className="text-sm font-semibold text-white/70 mb-2">Album</p>
+          <h1 className="text-6xl font-extrabold text-white mb-4 flex items-center justify-between">
+            City, Country - Weather
+          </h1>
+          <p className="text-white/80 mb-4">
+            Diego Beuk • 2025 • 6 songs, 11 min
+          </p>
+
+          {/* Contact info*/}
+          <div className="flex flex-col md:absolute md:right-12 md:top-[63%] md:transform md:-translate-y-1/2 md:items-end gap-4 text-white text-sm">
+            {/* Mobile: horizontal row */}
+            <div className="flex flex-row md:flex-col items-center md:items-end gap-4">
+              {/* Email and Phone */}
+              <div className="flex flex-col md:text-right space-y-1 md:space-y-1">
+                <span>beuk.diego@gmail.com</span>
+                <span>+61 448 092 338</span>
+              </div>
+
+              {/* LinkedIn and GitHub icons */}
+              <div className="flex space-x-3.5">
+                <a
+                  href="https://www.linkedin.com/in/diego-beuk-8a9100288/"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="hover:text-primary-500 transition-colors focus:outline-none focus:ring-2 focus:ring-primary-500 rounded"
+                  aria-label="Diego Beuk LinkedIn profile"
+                >
+                  <FaLinkedin size={25} color="white" />
+                </a>
+                <a
+                  href="https://github.com/dbeukrf"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="hover:text-primary-500 transition-colors focus:outline-none focus:ring-2 focus:ring-primary-500 rounded"
+                  aria-label="Diego Beuk Github profile"
+                >
+                  <FaGithub size={25} color="white" />
+                </a>
               </div>
             </div>
-            
-            {/* Portfolio Title */}
-            <h1 className="text-h1 mb-6 text-white">Diego Portfolio</h1>
-            
-            {/* Description */}
-            <p className="text-body-lg text-white/90 max-w-2xl mx-auto mb-8">
-              Welcome to my interactive portfolio experience! Explore my journey through music-inspired tracks.
-            </p>
-            
-            {/* Start Button */}
-            <button
-              onClick={handleStartExperience}
-              className="btn-accent text-lg px-8 py-4 rounded-lg font-semibold hover:scale-105 transform transition-all duration-200 focus:outline-none focus:ring-4 focus:ring-accent-500/50"
-            >
-              Start Experience
-            </button>
           </div>
         </div>
       </div>
 
+
       {/* Track List Section */}
-      <div className="py-16 lg:py-24">
-        <div className="container mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="max-w-4xl mx-auto">
-            <h2 className="text-h2 mb-12 text-center text-text-primary">Album Tracks</h2>
-            
-            {/* Track List */}
-            <div className="space-y-4">
-              {TRACKS.map((track) => (
+      <div className="bg-[#0f0f0f] py-16 lg:py-12 w-screen">
+        <div className="px-6 md:px-12 max-w-[1600px] mx-auto">
+          {/* Table Header */}
+          <div className="grid grid-cols-12 text-white/70 text-sm font-semibold border-b border-white/20 pb-3 mb-4 px-4">
+            <div className="col-span-1 text-middle">#</div>
+            <div className="col-span-6 text-middle">Title</div>
+            <div className="col-span-3 text-middle">Artist</div>
+            <div className="col-span-2 flex items-center justify-end gap-1">
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                className="w-4 h-4"
+                fill="none"
+                viewBox="0 0 24 24"
+                stroke="currentColor"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"
+                />
+              </svg>
+            </div>
+          </div>
+
+          {/* Track List */}
+          <div className="space-y-4">
+            {TRACKS.map((track) => {
+              const isAIDJ = track.id === 'aiDj';
+              const totalSeconds = track.duration || 0;
+              const minutes = Math.floor(totalSeconds / 60);
+              const seconds = String(totalSeconds % 60).padStart(2, '0');
+              const formattedDuration = `${minutes}:${seconds}`;
+
+              return (
                 <div
                   key={track.id}
-                  className="track-card group"
+                  className={`grid grid-cols-12 items-center text-white hover:bg-white/5 rounded-lg px-4 py-3 transition-colors cursor-pointer`}
                   onClick={() => navigate(`/track/${track.id}`)}
                   role="button"
                   tabIndex={0}
@@ -66,35 +126,40 @@ export default function AlbumView() {
                     }
                   }}
                 >
-                  <div className="flex items-center space-x-4">
-                    {/* Track Number */}
-                    <div className="flex-shrink-0 w-12 h-12 bg-primary-500 rounded-full flex items-center justify-center text-white font-bold text-lg group-hover:bg-primary-600 transition-colors">
-                      {track.number}
+                  {/* Track Number */}
+                  <div className="col-span-1 text-white/80">{track.number}</div>
+
+                  {/* AI DJ Track Layout */}
+                  {isAIDJ ? (
+                    <div className="col-span-11 flex justify-center items-end gap-2">
+                      <img
+                        src={'/images/ai-dj.jpg'}
+                        alt="AI DJ"
+                        className="w-10 h-10 object-cover rounded mr-5"
+                      />
+                      <h3 className="text-lg font-semibold text-center">{track.title}</h3>
                     </div>
-                    
-                    {/* Track Info */}
-                    <div className="flex-1">
-                      <h3 className="text-h4 group-hover:text-primary-500 transition-colors">
+                  ) : (
+                    <>
+                      {/* Title */}
+                      <div className="col-span-6 text-white font-semibold">
                         {track.title}
-                      </h3>
-                    </div>
-                    
-                    {/* Arrow Icon */}
-                    <div className="flex-shrink-0">
-                      <svg 
-                        className="w-6 h-6 text-text-secondary group-hover:text-primary-500 transition-colors" 
-                        fill="none" 
-                        stroke="currentColor" 
-                        viewBox="0 0 24 24"
-                        aria-hidden="true"
-                      >
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
-                      </svg>
-                    </div>
-                  </div>
+                      </div>
+
+                      {/* Artist */}
+                      <div className="col-span-3 text-white/70">
+                        {track.artist || 'Diego Beuk'}
+                      </div>
+
+                      {/* Duration */}
+                      <div className="col-span-2 text-right text-white/70">
+                        {formattedDuration}
+                      </div>
+                    </>
+                  )}
                 </div>
-              ))}
-            </div>
+              );
+            })}
           </div>
         </div>
       </div>

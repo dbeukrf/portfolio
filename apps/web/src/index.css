@@ -4,6 +4,9 @@
 @tailwind components;
 @tailwind utilities;
 
+
+
+
 @layer base {
   /* CSS Reset and Base Styles */
   *,
@@ -152,6 +155,32 @@
 }
 
 @layer components {
+  /* Custom Minimal Gradient Scrollbar */
+  .scrollbar-custom {
+    scrollbar-width: thin; /* Firefox */
+    scrollbar-color: #334257 #1f2937; /* Firefox thumb / track */
+
+    &::-webkit-scrollbar {
+      width: 8px;  /* Thin scrollbar */
+      height: 8px; /* Horizontal scrollbar if any */
+    }
+
+    &::-webkit-scrollbar-track {
+      background: theme('colors.background.dark'); /* Match your site bg */
+      border-radius: 9999px; /* Fully rounded track */
+    }
+
+    &::-webkit-scrollbar-thumb {
+      background: linear-gradient(180deg, #ff4500, #ff6347); /* Gradient thumb */
+      border-radius: 9999px; /* Fully rounded thumb */
+      transition: background 0.3s ease; /* Smooth hover transition */
+    }
+
+    &::-webkit-scrollbar-thumb:hover {
+      background: linear-gradient(180deg, #ffa500, #ff7f50); /* Lighter hover gradient */
+    }
+  }
+
   /* Button Components */
   .btn-primary {
     @apply bg-primary-500 hover:bg-primary-700 text-white font-medium py-2 px-4 rounded-base transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:ring-offset-2 focus:ring-offset-background-dark;

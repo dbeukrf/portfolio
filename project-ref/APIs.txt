@@ -11,3 +11,6 @@ https://country.is/
 Real-time air quality and weather updates:
 https://www.iqair.com/commercial-air-quality-monitors/api
 
+
+Black:
+0A0A0A
