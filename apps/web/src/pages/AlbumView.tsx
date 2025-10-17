@@ -1,7 +1,9 @@
 import { useNavigate } from 'react-router-dom';
 import { TRACKS } from '../data/tracks';
 import { FaLinkedin, FaGithub } from 'react-icons/fa';
+import { FaPlay, FaRandom, FaUserPlus } from 'react-icons/fa';
 import UnicornScene from 'unicornstudio-react';
+import Shuffle from '../components/ui/Shuffle';
 
 export default function AlbumView() {
   const navigate = useNavigate();
@@ -13,7 +15,7 @@ export default function AlbumView() {
       {/* Hero Section with Album Artwork */}
       <div className="relative w-screen bg-gradient-to-b from-[#1f2937] to-[#6b7280] flex flex-col md:flex-row items-start md:items-end gap-8 px-6 md:px-12 py-12 overflow-hidden">
 
-        {/* 🦄 Unicorn Studio Background */}
+        {/* Unicorn Studio Background */}
         <div className="absolute inset-0 z-0 h-full w-full">
           <UnicornScene
             projectId="fHeYPizB1tOZJngcOsES"
@@ -32,13 +34,42 @@ export default function AlbumView() {
 
         {/* Album title and description */}
         <div className="text-left flex-1 relative z-10">
-          <p className="text-sm font-semibold text-white/70 mb-2">Album</p>
-          <h1 className="text-6xl font-extrabold text-white mb-4 flex items-center justify-between">
-            City, Country - Weather
-          </h1>
-          <p className="text-white/80 mb-4">
-            Diego Beuk • 2025 • 6 songs, 11 min
-          </p>
+          <Shuffle
+            tag="p"
+            className="text-sm font-semibold text-white/70 mb-2"
+            text="Album"
+            duration={0.35}
+            animationMode="evenodd"
+            triggerOnHover
+            triggerOnce
+            threshold={0.1}
+            rootMargin="-100px"
+            textAlign="left"
+          />
+          <Shuffle
+            tag="h1"
+            className="text-6xl font-extrabold text-white mb-4 flex items-center justify-between"
+            text="City, Country - Weather"
+            duration={0.5}
+            animationMode="evenodd"
+            triggerOnHover
+            triggerOnce
+            threshold={0.1}
+            rootMargin="-100px"
+            textAlign="left"
+          />
+          <Shuffle
+            tag="p"
+            className="text-white/80 mb-4"
+            text="Diego Beuk • 2025 • 6 songs, 11 min"
+            duration={0.4}
+            animationMode="random"
+            triggerOnHover
+            triggerOnce
+            threshold={0.1}
+            rootMargin="-100px"
+            textAlign="left"
+          />
 
           {/* Contact info*/}
           <div className="flex flex-col md:absolute md:right-12 md:top-[63%] md:transform md:-translate-y-1/2 md:items-end gap-4 text-white text-sm">
@@ -46,8 +77,8 @@ export default function AlbumView() {
             <div className="flex flex-row md:flex-col items-center md:items-end gap-4">
               {/* Email and Phone */}
               <div className="flex flex-col md:text-right space-y-1 md:space-y-1">
-                <span>beuk.diego@gmail.com</span>
-                <span>+61 448 092 338</span>
+                <Shuffle tag="span" className="" text="beuk.diego@gmail.com" duration={0.35} triggerOnHover triggerOnce textAlign="right" />
+                <Shuffle tag="span" className="" text="+61 448 092 338" duration={0.35} triggerOnHover triggerOnce textAlign="right" />
               </div>
 
               {/* LinkedIn and GitHub icons */}
@@ -75,6 +106,44 @@ export default function AlbumView() {
           </div>
         </div>
       </div>
+
+
+
+
+      {/* Action Buttons above Track List */}
+<div className="bg-[#0f0f0f] flex items-center gap-4 px-6 md:px-12 mt-1">
+  {/* Play Button */}
+  <div className="relative group">
+    <button className="flex items-center justify-center w-12 h-12 rounded-full bg-white/5 hover:bg-white/20 text-white transition-colors">
+      <FaPlay size={20} />
+    </button>
+    {/* Tooltip */}
+    <span className="absolute bottom-full mb-2 left-1/2 -translate-x-1/2 bg-black text-white text-xs px-2 py-1 rounded opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap">
+      Play
+    </span>
+  </div>
+
+  {/* Shuffle Button */}
+  <div className="relative group">
+    <button className="flex items-center justify-center w-12 h-12 rounded-full bg-white/5 hover:bg-white/20 text-white transition-colors">
+      <FaRandom size={20} />
+    </button>
+    <span className="absolute bottom-full mb-2 left-1/2 -translate-x-1/2 bg-black text-white text-xs px-2 py-1 rounded opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap">
+      Shuffle
+    </span>
+  </div>
+
+  {/* Invite Collaborator Button */}
+  <div className="relative group">
+    <button className="flex items-center justify-center w-12 h-12 rounded-full bg-white/5 hover:bg-white/20 text-white transition-colors">
+      <FaUserPlus size={20} />
+    </button>
+    <span className="absolute bottom-full mb-2 left-1/2 -translate-x-1/2 bg-black text-white text-xs px-2 py-1 rounded opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap">
+      Invite Collaborator
+    </span>
+  </div>
+</div>
+
 
 
       {/* Track List Section */}

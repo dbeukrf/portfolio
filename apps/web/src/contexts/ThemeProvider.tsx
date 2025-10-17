@@ -59,7 +59,7 @@ export const ThemeProvider: React.FC<ThemeProviderProps> = ({
     } else {
       // Light theme (future implementation)
       root.style.setProperty('--theme-background', '#ffffff');
-      root.style.setProperty('--theme-text-primary', '#171717');
+      root.style.setProperty('--theme-text-primary', '#0f0f0f');
       root.style.setProperty('--theme-text-secondary', '#6b7280');
     }
 
