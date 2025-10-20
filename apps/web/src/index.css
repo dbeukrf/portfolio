@@ -23,6 +23,7 @@
     -webkit-text-size-adjust: 100%;
     -moz-text-size-adjust: 100%;
     text-size-adjust: 100%;
+    overflow: hidden; /* Hide scrollbar globally */
   }
 
   body {
@@ -37,6 +38,7 @@
     text-rendering: optimizeLegibility;
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
+    overflow: hidden; /* Hide scrollbar globally */
   }
 
   /* Typography Hierarchy */
@@ -155,30 +157,14 @@
 }
 
 @layer components {
-  /* Custom Minimal Gradient Scrollbar */
-  .scrollbar-custom {
-    scrollbar-width: thin; /* Firefox */
-    scrollbar-color: #334257 #1f2937; /* Firefox thumb / track */
+  /* Hide all scrollbars globally */
+  * {
+    scrollbar-width: none; /* Firefox */
+    -ms-overflow-style: none; /* Internet Explorer 10+ */
+  }
 
-    &::-webkit-scrollbar {
-      width: 8px;  /* Thin scrollbar */
-      height: 8px; /* Horizontal scrollbar if any */
-    }
-
-    &::-webkit-scrollbar-track {
-      background: theme('colors.background.dark'); /* Match your site bg */
-      border-radius: 9999px; /* Fully rounded track */
-    }
-
-    &::-webkit-scrollbar-thumb {
-      background: linear-gradient(180deg, #ff4500, #ff6347); /* Gradient thumb */
-      border-radius: 9999px; /* Fully rounded thumb */
-      transition: background 0.3s ease; /* Smooth hover transition */
-    }
-
-    &::-webkit-scrollbar-thumb:hover {
-      background: linear-gradient(180deg, #ffa500, #ff7f50); /* Lighter hover gradient */
-    }
+  *::-webkit-scrollbar {
+    display: none; /* WebKit browsers */
   }
 
   /* Button Components */
