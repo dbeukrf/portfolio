@@ -7,16 +7,17 @@ import Shuffle from '../components/ui/Shuffle';
 export default function AlbumView() {
   // Scrolling state
   const [heroHeight, setHeroHeight] = useState<number>(0);
+  const [controlsHeight, setControlsHeight] = useState<number>(0);
   const [scrollProgress, setScrollProgress] = useState<number>(0); // 0..1 overall scroll progress
   const [clipPathReveal, setClipPathReveal] = useState<number>(0); // Reveal value for clipPath (0..1, can be unclamped when scrolling up)
   const [contentVisible, setContentVisible] = useState<boolean>(false); // Track content visibility
   const [frozenScrollProgress, setFrozenScrollProgress] = useState<number>(0); // Frozen scroll progress when reveal completes
   const [viewportHeight, setViewportHeight] = useState<number>(0); // Viewport height for calculations
   const [manualRevealProgress, setManualRevealProgress] = useState<number>(0); // Manual reveal progress during reveal phase
-  const [trackListMaxHeight, setTrackListMaxHeight] = useState<number>(0); // Max height for track list container
 
   // Refs
   const heroRef = useRef<HTMLDivElement | null>(null);
+  const controlsRef = useRef<HTMLDivElement | null>(null);
   const scrollContainerRef = useRef<HTMLDivElement | null>(null);
   const announceRef = useRef<HTMLDivElement | null>(null);
   const prevScrollTopRef = useRef<number>(0);
@@ -49,6 +50,33 @@ export default function AlbumView() {
     };
   }, []);
 
+  // Compute controls height (progress + buttons)
+  useEffect(() => {
+    const compute = () => {
+      const controlsH = controlsRef.current?.offsetHeight ?? 0;
+      setControlsHeight(controlsH);
+    };
+    
+    const timeoutId = setTimeout(compute, 0);
+    window.addEventListener('resize', compute);
+    
+    const observer = new ResizeObserver(compute);
+    const checkAndObserve = () => {
+      if (controlsRef.current) {
+        observer.observe(controlsRef.current);
+      } else {
+        requestAnimationFrame(checkAndObserve);
+      }
+    };
+    checkAndObserve();
+    
+    return () => {
+      clearTimeout(timeoutId);
+      window.removeEventListener('resize', compute);
+      observer.disconnect();
+    };
+  }, []);
+
   // Update viewport height
   useEffect(() => {
     const updateViewportHeight = () => {
@@ -58,26 +86,6 @@ export default function AlbumView() {
     window.addEventListener('resize', updateViewportHeight);
     return () => window.removeEventListener('resize', updateViewportHeight);
   }, []);
-
-  // Calculate track list max height based on available viewport space
-  useEffect(() => {
-    const calculateMaxHeight = () => {
-      const vh = window.innerHeight;
-      const heroH = heroHeight;
-      const progressBarHeight = 1; // Progress bar height
-      const actionButtonsHeight = 64; // Approximate height of action buttons (48px button + padding)
-      const padding = 32; // Top and bottom padding for track list section
-      const headerHeight = 60; // Table header height
-      
-      // Calculate available height: viewport - hero - progress - buttons - padding - header
-      const availableHeight = vh - heroH - progressBarHeight - actionButtonsHeight - padding - headerHeight;
-      setTrackListMaxHeight(Math.max(200, availableHeight)); // Minimum 200px
-    };
-    
-    calculateMaxHeight();
-    window.addEventListener('resize', calculateMaxHeight);
-    return () => window.removeEventListener('resize', calculateMaxHeight);
-  }, [heroHeight, viewportHeight]);
 
   // Handle wheel events to control parallax reveal during reveal phase
   useEffect(() => {
@@ -286,67 +294,71 @@ export default function AlbumView() {
       <div ref={announceRef} aria-live="polite" className="sr-only" />
 
       {/* Hero Section with Album Artwork - Fixed at top */}
-      <div ref={heroRef} className="sticky top-0 z-40 w-full bg-gradient-to-b from-[#1f2937] to-[#6b7280] flex flex-col md:flex-row items-start md:items-end gap-8 px-6 md:px-12 py-12 overflow-hidden">
+      <div ref={heroRef} className="sticky top-0 z-40 w-full bg-gradient-to-b from-[#1f2937] to-[#6b7280] flex flex-col md:flex-row items-start md:items-center gap-3 md:gap-8 px-4 md:px-12 py-3 md:py-12 overflow-hidden max-h-[40vh] md:max-h-none">
 
         {/* Album cover image */}
         <img
           src="/images/album-cover.jpg"
           alt="Album cover"
-          className="w-52 h-52 object-cover shadow-2xl rounded relative z-10 cursor-pointer"
+          className="w-24 h-24 md:w-52 md:h-52 object-cover shadow-2xl rounded relative z-10 cursor-pointer flex-shrink-0"
           onClick={scrollToTop}
         />
 
         {/* Album title and description */}
-        <div className="text-left flex-1 relative z-10">
-          <Shuffle
-            tag="p"
-            className="text-sm font-semibold text-white/70 mb-2"
-            text="Album"
-            duration={0.35}
-            animationMode="evenodd"
-            triggerOnHover
-            triggerOnce
-            threshold={0.1}
-            rootMargin="-100px"
-            textAlign="left"
-          />
-          <Shuffle
-            tag="h1"
-            className="text-6xl font-extrabold text-white mb-4 flex items-center justify-between"
-            text="City, Country - Weather"
-            duration={0.5}
-            animationMode="evenodd"
-            triggerOnHover
-            triggerOnce
-            threshold={0.1}
-            rootMargin="-100px"
-            textAlign="left"
-          />
-          <Shuffle
-            tag="p"
-            className="text-white/80 mb-4"
-            text="Diego Beuk • 2025 • 6 songs, 11 min"
-            duration={0.4}
-            animationMode="random"
-            triggerOnHover
-            triggerOnce
-            threshold={0.1}
-            rootMargin="-100px"
-            textAlign="left"
-          />
+        <div className="text-left flex-1 relative z-10 min-w-0 flex flex-col justify-center md:mt-8">
+          {/* Title section - only as wide as content */}
+          <div className="w-fit">
+            <Shuffle
+              tag="p"
+              className="text-xs md:text-sm font-semibold text-white/70 mb-1 md:mb-2"
+              text="Album"
+              duration={0.35}
+              animationMode="evenodd"
+              triggerOnHover
+              triggerOnce
+              threshold={0.1}
+              rootMargin="0px"
+              textAlign="left"
+            />
+            <Shuffle
+              tag="h1"
+              className="text-2xl md:text-6xl font-extrabold text-white mb-1 md:mb-4 leading-tight md:leading-normal"
+              text="City, Country - Weather"
+              duration={0.5}
+              animationMode="evenodd"
+              triggerOnHover
+              triggerOnce
+              threshold={0.1}
+              rootMargin="-100px"
+              textAlign="left"
+            />
+          </div>
+          
+          {/* Description and Contact info container */}
+          <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-2 md:gap-6">
+            <Shuffle
+              tag="p"
+              className="text-white/80 mb-2 md:mb-0 text-xs md:text-base"
+              text="Diego Beuk • 2025 • 6 songs, 11 min"
+              duration={0.4}
+              animationMode="random"
+              triggerOnHover
+              triggerOnce
+              threshold={0.1}
+              rootMargin="-100px"
+              textAlign="left"
+            />
 
-          {/* Contact info*/}
-          <div className="flex flex-col md:absolute md:right-12 md:top-[63%] md:transform md:-translate-y-1/2 md:items-end gap-4 text-white text-sm">
-            {/* Mobile: horizontal row */}
-            <div className="flex flex-row md:flex-col items-center md:items-end gap-4">
+            {/* Contact info*/}
+            <div className="flex flex-row items-center gap-5 md:gap-6 text-white text-xs md:text-sm">
               {/* Email and Phone */}
-              <div className="flex flex-col md:text-right space-y-1 md:space-y-1">
-                <Shuffle tag="span" className="" text="beuk.diego@gmail.com" duration={0.35} triggerOnHover triggerOnce textAlign="right" />
-                <Shuffle tag="span" className="" text="+61 448 092 338" duration={0.35} triggerOnHover triggerOnce textAlign="right" />
+              <div className="flex flex-col md:text-right space-y-0.5 md:space-y-1">
+                <Shuffle tag="span" className="text-xs" text="beuk.diego@gmail.com" duration={0.35} triggerOnHover triggerOnce textAlign="right" />
+                <Shuffle tag="span" className="text-xs" text="+61 448 092 338" duration={0.35} triggerOnHover triggerOnce textAlign="right" />
               </div>
 
               {/* LinkedIn and GitHub icons */}
-              <div className="flex space-x-3.5">
+              <div className="flex space-x-5 md:space-x-3.5">
                 <a
                   href="https://www.linkedin.com/in/diego-beuk-8a9100288/"
                   target="_blank"
@@ -354,7 +366,7 @@ export default function AlbumView() {
                   className="hover:text-primary-500 transition-colors focus:outline-none focus:ring-2 focus:ring-primary-500 rounded"
                   aria-label="Diego Beuk LinkedIn profile"
                 >
-                  <FaLinkedin size={25} color="white" />
+                  <FaLinkedin size={18} className="md:w-[25px] md:h-[25px]" color="white" />
                 </a>
                 <a
                   href="https://github.com/dbeukrf"
@@ -363,7 +375,7 @@ export default function AlbumView() {
                   className="hover:text-primary-500 transition-colors focus:outline-none focus:ring-2 focus:ring-primary-500 rounded"
                   aria-label="Diego Beuk Github profile"
                 >
-                  <FaGithub size={25} color="white" />
+                  <FaGithub size={18} className="md:w-[25px] md:h-[25px]" color="white" />
                 </a>
               </div>
             </div>
@@ -371,83 +383,95 @@ export default function AlbumView() {
         </div>
       </div>
 
-      {/* Progress indicator just below hero */}
-      <div className="sticky z-40 w-full bg-transparent px-6 md:px-12" style={{ top: `${heroHeight}px` }}>
-        <div className="h-1 w-full bg-white/10 rounded overflow-hidden">
-          <div
-            className="h-full bg-white/70 transition-[width] duration-300"
-            style={{ width: `${scrollProgress * 100}%` }}
-            aria-hidden="true"
-          />
-        </div>
-      </div>
-
-      {/* Action Buttons above Track List */}
-      <div className="sticky z-40 bg-transparent flex items-center gap-4 px-6 md:px-12 py-4" style={{ top: `${heroHeight}px` }}>
-        {/* Play Button */}
-        <div className="relative group">
-          <button className="flex items-center justify-center w-12 h-12 rounded-full bg-white/5 hover:bg-white/20 text-white transition-colors">
-            <FaPlay size={20} />
-          </button>
-          {/* Tooltip */}
-          <span className="absolute bottom-full mb-2 left-1/2 -translate-x-1/2 bg-black text-white text-xs px-2 py-1 rounded opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap">
-            Play
-          </span>
+      {/* Progress indicator and Action Buttons - Combined for mobile */}
+      <div ref={controlsRef} className="sticky z-40 w-full bg-transparent" style={{ top: `${heroHeight}px` }}>
+        {/* Progress indicator */}
+        <div className="px-4 md:px-12">
+          <div className="h-0.5 md:h-1 w-full bg-white/10 rounded overflow-hidden">
+            <div
+              className="h-full bg-white/70 transition-[width] duration-300"
+              style={{ width: `${scrollProgress * 100}%` }}
+              aria-hidden="true"
+            />
+          </div>
         </div>
 
-        {/* Shuffle Button */}
-        <div className="relative group">
-          <button className="flex items-center justify-center w-12 h-12 rounded-full bg-white/5 hover:bg-white/20 text-white transition-colors">
-            <FaRandom size={20} />
-          </button>
-          <span className="absolute bottom-full mb-2 left-1/2 -translate-x-1/2 bg-black text-white text-xs px-2 py-1 rounded opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap">
-            Shuffle
-          </span>
-        </div>
+        {/* Action Buttons above Track List */}
+        <div className="flex items-center gap-2 md:gap-4 px-4 md:px-12 py-2 md:py-4">
+          {/* Play Button */}
+          <div className="relative group">
+            <button className="flex items-center justify-center w-8 h-8 md:w-12 md:h-12 rounded-full bg-white/5 hover:bg-white/20 text-white transition-colors">
+              <FaPlay size={16} className="md:w-5 md:h-5" />
+            </button>
+            {/* Tooltip */}
+            <span className="absolute bottom-full mb-2 left-1/2 -translate-x-1/2 bg-black text-white text-xs px-2 py-1 rounded opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap">
+              Play
+            </span>
+          </div>
 
-        {/* Invite Collaborator Button */}
-        <div className="relative group">
-          <button className="flex items-center justify-center w-12 h-12 rounded-full bg-white/5 hover:bg-white/20 text-white transition-colors">
-            <FaUserPlus size={20} />
-          </button>
-          <span className="absolute bottom-full mb-2 left-1/2 -translate-x-1/2 bg-black text-white text-xs px-2 py-1 rounded opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap">
-            Invite Collaborator
-          </span>
+          {/* Shuffle Button */}
+          <div className="relative group">
+            <button className="flex items-center justify-center w-8 h-8 md:w-12 md:h-12 rounded-full bg-white/5 hover:bg-white/20 text-white transition-colors">
+              <FaRandom size={16} className="md:w-5 md:h-5" />
+            </button>
+            <span className="absolute bottom-full mb-2 left-1/2 -translate-x-1/2 bg-black text-white text-xs px-2 py-1 rounded opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap">
+              Shuffle
+            </span>
+          </div>
+
+          {/* Invite Collaborator Button */}
+          <div className="relative group">
+            <button className="flex items-center justify-center w-8 h-8 md:w-12 md:h-12 rounded-full bg-white/5 hover:bg-white/20 text-white transition-colors">
+              <FaUserPlus size={16} className="md:w-5 md:h-5" />
+            </button>
+            <span className="absolute bottom-full mb-2 left-1/2 -translate-x-1/2 bg-black text-white text-xs px-2 py-1 rounded opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap">
+              Invite Collaborator
+            </span>
+          </div>
         </div>
       </div>
 
       {/* Track List Section */}
-      <div className="sticky z-40 bg-transparent py-8 lg:py-6 w-full" style={{ top: `${heroHeight}px` }}>
-        <div className="px-6 md:px-12 max-w-[1600px] mx-auto">
-        {/* Table Header */}
-        <div className="grid grid-cols-12 text-white/70 text-sm font-semibold border-b border-white/20 pb-3 mb-4 px-4">
-          <div className="col-span-1 text-middle">#</div>
-          <div className="col-span-6 text-middle">Title</div>
-          <div className="col-span-3 text-middle">Artist</div>
-          <div className="col-span-2 flex items-center justify-end gap-1">
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              className="w-4 h-4"
-              fill="none"
-              viewBox="0 0 24 24"
-              stroke="currentColor"
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth={2}
-                d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"
-              />
-            </svg>
-          </div>
-        </div>
-
-        {/* Track List - Scrollable Container */}
+      <div 
+        className="sticky z-40 bg-transparent w-full overflow-hidden"
+        style={{ 
+          top: `${heroHeight + controlsHeight}px`,
+          height: `calc(100vh - ${heroHeight + controlsHeight}px)`,
+          maxHeight: `calc(100vh - ${heroHeight + controlsHeight}px)`
+        }}
+      >
         <div 
-          className="track-list-scrollable overflow-y-auto overflow-x-hidden pr-2"
-          style={{ maxHeight: `${trackListMaxHeight}px` }}
+          className="h-full flex flex-col px-4 md:px-12 max-w-[1600px] mx-auto overflow-y-auto"
+          style={{
+            paddingTop: '0.5rem',
+            paddingBottom: '0.5rem'
+          }}
         >
-          <div className="space-y-4">
+          {/* Table Header */}
+          <div className="grid grid-cols-12 text-white/70 text-xs md:text-sm font-semibold border-b border-white/20 pb-2 md:pb-3 mb-2 md:mb-4 px-2 md:px-4 flex-shrink-0">
+            <div className="col-span-1 text-middle">#</div>
+            <div className="col-span-6 text-middle">Title</div>
+            <div className="col-span-3 text-middle hidden sm:block">Artist</div>
+            <div className="col-span-3 sm:col-span-2 flex items-center justify-end gap-1">
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                className="w-3 h-3 md:w-4 md:h-4"
+                fill="none"
+                viewBox="0 0 24 24"
+                stroke="currentColor"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"
+                />
+              </svg>
+            </div>
+          </div>
+
+          {/* Track List */}
+          <div className="space-y-2 md:space-y-4 flex-1 min-h-0">
             {TRACKS.map((track) => {
               const isAIDJ = track.id === 'aiDj';
               const totalSeconds = track.duration || 0;
@@ -458,12 +482,12 @@ export default function AlbumView() {
               return (
                 <div
                   key={track.id}
-                  className={`grid grid-cols-12 items-center text-white hover:bg-white/5 rounded-lg px-4 py-3 transition-colors cursor-pointer`}
+                  className={`grid grid-cols-12 items-center text-white hover:bg-white/5 rounded-lg px-2 md:px-4 py-2 md:py-3 transition-colors cursor-pointer`}
                   role="button"
                   tabIndex={0}
                 >
                   {/* Track Number */}
-                  <div className="col-span-1 text-white/80">{track.number}</div>
+                  <div className="col-span-1 text-white/80 text-sm md:text-base">{track.number}</div>
 
                   {/* AI DJ Track Layout */}
                   {isAIDJ ? (
@@ -471,24 +495,24 @@ export default function AlbumView() {
                       <img
                         src={'/images/ai-dj.jpg'}
                         alt="AI DJ"
-                        className="w-10 h-10 object-cover rounded mr-5"
+                        className="w-8 h-8 md:w-10 md:h-10 object-cover rounded mr-2 md:mr-5"
                       />
-                      <h3 className="text-lg font-semibold text-center">{track.title}</h3>
+                      <h3 className="text-sm md:text-lg font-semibold text-center">{track.title}</h3>
                     </div>
                   ) : (
                     <>
                       {/* Title */}
-                      <div className="col-span-6 text-white font-semibold">
+                      <div className="col-span-6 sm:col-span-6 text-white font-semibold text-sm md:text-base truncate">
                         {track.title}
                       </div>
 
                       {/* Artist */}
-                      <div className="col-span-3 text-white/70">
+                      <div className="col-span-3 text-white/70 text-xs md:text-sm hidden sm:block truncate">
                         {track.artist || 'Diego Beuk'}
                       </div>
 
                       {/* Duration */}
-                      <div className="col-span-2 text-right text-white/70">
+                      <div className="col-span-3 sm:col-span-2 text-right text-white/70 text-xs md:text-sm">
                         {formattedDuration}
                       </div>
                     </>
@@ -498,7 +522,6 @@ export default function AlbumView() {
             })}
           </div>
         </div>
-      </div>
       </div>
 
       {/* Parallax Scrolling Content Area */}
