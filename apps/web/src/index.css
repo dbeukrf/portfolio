@@ -304,4 +304,34 @@
   .glass-effect {
     @apply bg-background-light/80 backdrop-blur-sm border border-border;
   }
+
+  /* Track List Scrollbar - Shows on hover */
+  .track-list-scrollable {
+    scrollbar-width: thin; /* Firefox */
+    scrollbar-color: rgba(255, 255, 255, 0.3) transparent; /* Firefox */
+    -ms-overflow-style: -ms-autohiding-scrollbar; /* IE and Edge */
+  }
+
+  .track-list-scrollable::-webkit-scrollbar {
+    width: 8px !important; /* WebKit browsers */
+    display: block !important;
+  }
+
+  .track-list-scrollable::-webkit-scrollbar-track {
+    background: transparent;
+  }
+
+  .track-list-scrollable::-webkit-scrollbar-thumb {
+    background-color: transparent;
+    border-radius: 4px;
+    transition: background-color 0.2s ease;
+  }
+
+  .track-list-scrollable:hover::-webkit-scrollbar-thumb {
+    background-color: rgba(255, 255, 255, 0.3);
+  }
+
+  .track-list-scrollable:hover::-webkit-scrollbar-thumb:hover {
+    background-color: rgba(255, 255, 255, 0.5);
+  }
 }

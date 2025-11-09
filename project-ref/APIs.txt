@@ -11,26 +11,3 @@ https://country.is/
 Real-time air quality and weather updates:
 https://www.iqair.com/commercial-air-quality-monitors/api
 
-Black:
-0A0A0A
-
-Excluded Prompt:
-Avoid autoplaying any audio. If audio is present, provide clear play/pause and mute/unmute controls, with the spacebar toggling play/pause.
-
-
-Prompt Notes:
-Do not change the home album view landing page as it is currently right now. Add a scroll mechanic so the track list content area scrolls horizontally by scrolling up and down with a mouse. All interactions happen within the same URL (no routing changes).
-
-Scroll-based navigation: Scrolling down moves the view to the next track and scrolling up moves the view to the previous track. We start on the main album view landing page where you have the list of tracks and then as you scroll you go through all the tracks. The motion should feel smooth and cinematic, using diagonal parallax transitions that mimic sliding diagonaly left to the right.
-
-Click navigation: Clicking a track in the track list on the home landing page jumps directly to that slide position along the scroll. Clicking left/right arrows skips directly to adjacent slides without the smooth scrolling animation (for faster navigation).
-
-Mobile gestures: On mobile, users can swipe left or right by touch to move between slides. Implement debounce logic to prevent accidental multiple swipes.
-
-Returning home: Clicking the album cover image in the hero section returns to the main album landing page view in the beginning, showing the track list.
-
-Visual & motion design: The hero section must remain visually anchored while the track slides move behind or beneath it. Include a thin progress indicator bar just below the hero section to represent the user’s position in the track sequence. Each slide can have unique accent colour to give every track its own mood.
-
-Accessibility & interaction details: Each slide should announce itself to screen readers as “Track X of Y — [Track Title]” when active. The left and right arrow keys navigate between slides. Ensure focus management doesn’t trap users unnecessarily — transitions should feel fluid and natural.
-
-Performance & optimization: Prefetch or lazy-load slide content (images, videos, or media) to prevent performance bottlenecks when scrolling. Use GPU-accelerated transforms (e.g., translate3d, will-change: transform) for smooth animations. Maintain all state and transitions without changing routes, keeping everything within a single React component or layout context.

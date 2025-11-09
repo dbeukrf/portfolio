@@ -131,3 +131,12 @@ This backend is designed to support:
 2. Add type hints to all functions
 3. Write tests for new features
 4. Update documentation as needed
+
+
+
+cd ./apps/backend
+venv/scripts/activate
+py main.py
+
+cd ./apps/web
+pnpm dev

@@ -1,0 +1,9 @@
+
+Baby Powder - Background Colour - #F3F4EF
+Eerie Black - Text Colour - #191B20
+Gray - 2nd Text Colour - #757677
+
+
+PP Editorial New by Pangram Pangram 1st font (main body, navigation items, larger headings)
+GT America Mono by Frilli Type 2nd font (timestamp, location, monospaced, technical-looking elements)
+Gilroy Light font ?
