@@ -9,9 +9,8 @@ export default function AlbumView() {
   const [heroHeight, setHeroHeight] = useState<number>(0);
   const [controlsHeight, setControlsHeight] = useState<number>(0);
   const [scrollProgress, setScrollProgress] = useState<number>(0); // 0..1 overall scroll progress
-  const [clipPathReveal, setClipPathReveal] = useState<number>(0); // Reveal value for clipPath (0..1, can be unclamped when scrolling up)
+  const [clipPathReveal, setClipPathReveal] = useState<number>(0); // Reveal value for clipPath (0..1)
   const [contentVisible, setContentVisible] = useState<boolean>(false); // Track content visibility
-  const [frozenScrollProgress, setFrozenScrollProgress] = useState<number>(0); // Frozen scroll progress when reveal completes
   const [viewportHeight, setViewportHeight] = useState<number>(0); // Viewport height for calculations
   const [manualRevealProgress, setManualRevealProgress] = useState<number>(0); // Manual reveal progress during reveal phase
 
@@ -20,8 +19,11 @@ export default function AlbumView() {
   const controlsRef = useRef<HTMLDivElement | null>(null);
   const scrollContainerRef = useRef<HTMLDivElement | null>(null);
   const announceRef = useRef<HTMLDivElement | null>(null);
-  const prevScrollTopRef = useRef<number>(0);
   const maxScrollTopRef = useRef<number>(0);
+  const prevScrollTopRef = useRef<number>(0);
+  const prevScrollProgressRef = useRef<number>(0);
+  const prevRevealRef = useRef<number>(0); // Track previous reveal value to prevent expansion when scrolling up
+  const maxRevealReachedRef = useRef<number>(0); // Track maximum reveal reached to ensure scrolling up only shrinks
 
   // Compute hero height
   useEffect(() => {
@@ -98,7 +100,7 @@ export default function AlbumView() {
       
       // During reveal phase, control reveal manually for both directions
       if (scrollTop < revealDistance) {
-        // Scrolling down: prevent scrolling and control reveal manually
+        // Scrolling down: expand reveal
         if (manualRevealProgress < 1 && e.deltaY > 0) {
           e.preventDefault();
           
@@ -118,7 +120,7 @@ export default function AlbumView() {
             return newProgress;
           });
         }
-        // Scrolling up: prevent scrolling and control reveal manually to shrink
+        // Scrolling up: shrink reveal
         else if (manualRevealProgress > 0 && e.deltaY < 0) {
           e.preventDefault();
           
@@ -168,98 +170,141 @@ export default function AlbumView() {
         maxScrollTopRef.current = scrollTop;
       }
       
-      // Calculate reveal from scroll position
-      let reveal = Math.max(0, scrollTop / revealDistance);
+      // Calculate reveal: expands from center when scrolling down, shrinks when scrolling up (in specific conditions)
+      let reveal: number;
       
-      // When scrolling up from past reveal distance, calculate reveal to allow smooth shrinking
-      if (isScrollingUp && scrollTop >= revealDistance && maxScrollTopRef.current > revealDistance) {
-        // When scrolling up from past reveal distance, map scroll position to reveal
-        // We want reveal to decrease smoothly as scrollTop decreases
-        // Map scrollTop from [revealDistance, maxScrollTop] to reveal [0, 1]
-        // As we scroll back from maxScrollTop towards revealDistance, reveal decreases from 1 to 0
-        const scrollBack = maxScrollTopRef.current - scrollTop;
-        const totalScrollBack = maxScrollTopRef.current - revealDistance;
-        if (totalScrollBack > 0) {
-          // Reveal decreases linearly as we scroll back
-          // When scrollTop = maxScrollTop, reveal = 1 (fully expanded)
-          // When scrollTop = revealDistance, reveal = 0 (fully shrunk)
-          reveal = Math.max(0, Math.min(1, 1 - (scrollBack / totalScrollBack)));
-        } else {
-          reveal = 1;
-        }
-      } else if (!isScrollingUp && scrollTop >= revealDistance) {
-        // When scrolling down past reveal distance, keep reveal at 1
-        reveal = 1;
-      } else if (scrollTop < revealDistance) {
-        // During reveal phase (scrollTop < revealDistance)
-        // If we've scrolled past revealDistance before and are now scrolling up, continue shrinking
-        if (isScrollingUp && maxScrollTopRef.current > revealDistance) {
-          // Continue shrinking using the same formula as the "scrolling up from past" branch
-          // This ensures smooth transition: when scrollTop = revealDistance, reveal = 0
-          // As we scroll further up, reveal stays at 0 (fully shrunk)
-          const scrollBack = maxScrollTopRef.current - scrollTop;
-          const totalScrollBack = maxScrollTopRef.current - revealDistance;
-          if (totalScrollBack > 0) {
-            // Use the same shrinking formula for consistency
-            reveal = Math.max(0, Math.min(1, 1 - (scrollBack / totalScrollBack)));
+      // Calculate shrink distance for first track (used for smooth transition)
+      const contentScrollMax = scrollContainerRef.current?.scrollHeight ?? 0;
+      const maxContentScroll = contentScrollMax - vh - revealDistance;
+      const shrinkDistance = Math.min(maxContentScroll * 0.1, revealDistance * 0.3); // Shrink over first 10% of content or 30% of reveal distance
+      
+      if (scrollTop < revealDistance) {
+        // During reveal phase (album header and track list view)
+        const scrollBasedReveal = Math.max(0, Math.min(1, scrollTop / revealDistance));
+        
+        if (isScrollingUp) {
+          // Scrolling up: continue shrinking from first track
+          // Use the same shrinkDistance mapping for smooth transition
+          // Map scrollTop from [revealDistance - shrinkDistance, revealDistance] to reveal [0, 1]
+          // When scrollTop = revealDistance, reveal = 1 (matches first track boundary)
+          // When scrollTop = revealDistance - shrinkDistance, reveal = 0 (fully shrunk)
+          const scrollBack = revealDistance - scrollTop; // Distance from revealDistance going up
+          let calculatedReveal: number;
+          
+          if (scrollBack >= 0 && scrollBack <= shrinkDistance && shrinkDistance > 0) {
+            // Smoothly map from [0, shrinkDistance] to [1, 0] for reveal
+            // When scrollBack = 0 (at revealDistance): reveal = 1
+            // When scrollBack = shrinkDistance: reveal = 0
+            calculatedReveal = Math.max(0, Math.min(1, 1 - (scrollBack / shrinkDistance)));
+          } else if (scrollBack > shrinkDistance) {
+            // Beyond shrink distance going up: fully shrunk
+            calculatedReveal = 0;
           } else {
-            reveal = Math.max(0, Math.min(1, scrollTop / revealDistance));
+            // At or past revealDistance: fully expanded
+            calculatedReveal = 1;
           }
+          
+          // Ensure reveal never increases when scrolling up (only shrinks)
+          reveal = Math.min(calculatedReveal, maxRevealReachedRef.current);
           setManualRevealProgress(reveal);
         } else {
-          // During reveal phase, use manual progress when it's ahead of scroll-based reveal
-          // This handles the case when wheel events control the reveal
-          const scrollBasedReveal = Math.max(0, Math.min(1, scrollTop / revealDistance));
-          
+          // Scrolling down: reveal increases from 0 to 1
+          // Use manual progress when it's ahead of scroll-based reveal (wheel-controlled)
           if (manualRevealProgress > scrollBasedReveal) {
-            // Use manual progress when scrolling down during reveal phase (wheel-controlled)
             reveal = manualRevealProgress;
           } else {
-            // When scrolling up or when scroll position catches up, use scroll-based reveal
-            // This allows natural scrolling to control the reveal when scrolling up
             reveal = scrollBasedReveal;
-            // Sync manual progress with scroll position for consistency
             setManualRevealProgress(scrollBasedReveal);
           }
         }
-        // Clamp reveal to 0-1 during reveal phase
-        reveal = Math.max(0, Math.min(1, reveal));
+      } else {
+        // Past reveal distance: check if we're on first track
+        const contentScroll = scrollTop - revealDistance;
+        const currentScrollProgress = maxContentScroll > 0 
+          ? Math.max(0, Math.min(1, contentScroll / maxContentScroll)) 
+          : 0;
+        
+        // Check if we're on first track (scrollProgress is 0 or very small)
+        const isOnFirstTrack = currentScrollProgress < 0.1;
+        
+        if (isScrollingUp && isOnFirstTrack) {
+          // Scrolling up on first track: at top of first track (scrollTop = revealDistance), background is fully expanded (reveal = 1)
+          // As user scrolls up from revealDistance, background shrinks
+          // Map scrollTop from [revealDistance - shrinkDistance, revealDistance] to reveal [0, 1]
+          // When scrollTop = revealDistance, reveal = 1 (fully expanded - at top of first track)
+          // When scrollTop = revealDistance - shrinkDistance, reveal = 0 (fully shrunk)
+          const scrollBack = revealDistance - scrollTop; // Distance from revealDistance going up
+          let calculatedReveal: number;
+          
+          if (scrollBack >= 0 && scrollBack <= shrinkDistance && shrinkDistance > 0) {
+            // Smoothly map from [0, shrinkDistance] to [1, 0] for reveal
+            // When scrollBack = 0 (at revealDistance): reveal = 1
+            // When scrollBack = shrinkDistance: reveal = 0
+            // As scrollBack increases (scrolling up), reveal decreases
+            calculatedReveal = Math.max(0, Math.min(1, 1 - (scrollBack / shrinkDistance)));
+          } else if (scrollBack > shrinkDistance) {
+            // Beyond shrink distance going up: fully shrunk
+            calculatedReveal = 0;
+          } else {
+            // At or past revealDistance: fully expanded (at top of first track)
+            calculatedReveal = 1;
+          }
+          
+          // Ensure reveal never increases when scrolling up (only shrinks)
+          reveal = Math.min(calculatedReveal, maxRevealReachedRef.current);
+        } else if (isOnFirstTrack) {
+          // Scrolling down on first track: keep reveal at 1 (fully expanded)
+          reveal = 1;
+        } else {
+          // Not on first track: keep reveal at 1 (fully expanded)
+          reveal = 1;
+        }
       }
       
       // Update previous scroll position
       prevScrollTopRef.current = scrollTop;
       
-      // Clamp reveal to 0-1 range for clipPath calculation
-      const clampedReveal = Math.max(0, Math.min(1, reveal));
-      
       // Throttle updates using requestAnimationFrame for smoother animation
       if (rafId === null) {
         rafId = requestAnimationFrame(() => {
-          // Update clipPath reveal - allow smooth shrinking when scrolling up
-          // When scrolling up from past reveal distance, use the calculated reveal (which decreases)
-          // Otherwise use clamped reveal
-          setClipPathReveal(clampedReveal);
+          // Update clipPath reveal - expands from center when scrolling down, shrinks when scrolling up
+          setClipPathReveal(reveal);
+          
+          // Store reveal value for next frame to prevent expansion when scrolling up
+          prevRevealRef.current = reveal;
+          
+          // Track maximum reveal reached (always update when reveal increases)
+          // This ensures scrolling up can only shrink from the maximum reached
+          if (reveal > maxRevealReachedRef.current) {
+            maxRevealReachedRef.current = reveal;
+          }
+          
+          // Reset max reveal when we reach the top (scrollTop = 0) to allow fresh expansion
+          if (scrollTop === 0) {
+            maxRevealReachedRef.current = 0;
+          }
           
           // Phase 2: Content becomes visible after reveal completes
           if (reveal >= 1 && scrollTop >= revealDistance) {
             setContentVisible(true);
-            // Freeze scroll progress at the moment reveal completes (when reveal = 1)
-            if (frozenScrollProgress === 0) {
-              setFrozenScrollProgress(1); // Freeze at full reveal progress
-            }
+            
             // Calculate scroll progress for content (starts after reveal phase)
             const contentScroll = scrollTop - revealDistance;
             const contentScrollMax = scrollContainerRef.current?.scrollHeight ?? 0;
             const maxContentScroll = contentScrollMax - vh - revealDistance;
-            setScrollProgress(maxContentScroll > 0 ? contentScroll / maxContentScroll : 0);
+            
+            // Simple linear scroll progress calculation - works for both directions
+            const newScrollProgress = maxContentScroll > 0 
+              ? Math.max(0, Math.min(1, contentScroll / maxContentScroll)) 
+              : 0;
+            
+            setScrollProgress(newScrollProgress);
+            prevScrollProgressRef.current = newScrollProgress;
           } else {
             setContentVisible(false);
-            // Use reveal progress for background animation during reveal phase
+            // Use reveal progress during reveal phase
             setScrollProgress(reveal);
-            // Reset frozen progress when reveal reverses
-            if (reveal < 1) {
-              setFrozenScrollProgress(0);
-            }
+            prevScrollProgressRef.current = reveal;
           }
           
           rafId = null;
@@ -281,7 +326,7 @@ export default function AlbumView() {
         cancelAnimationFrame(rafId);
       }
     };
-  }, [manualRevealProgress, frozenScrollProgress]);
+  }, [manualRevealProgress]);
 
   // Hide body scrollbar while this view is mounted
   useEffect(() => {
@@ -546,7 +591,7 @@ export default function AlbumView() {
           style={{
             opacity: contentVisible ? 1 : 0,
             transform: contentVisible 
-              ? `translate3d(0, ${Math.max(0, (viewportHeight || window.innerHeight) - (scrollProgress * (viewportHeight || window.innerHeight) * 1.5))}px, 0)` 
+              ? `translate3d(0, ${(viewportHeight || window.innerHeight) - (scrollProgress * (viewportHeight || window.innerHeight) * 1.5)}px, 0)` 
               : `translate3d(0, ${viewportHeight || window.innerHeight}px, 0)`, // Start below viewport, scroll up as user scrolls
             transition: 'opacity 0.5s cubic-bezier(0.4, 0, 0.2, 1)',
             willChange: contentVisible ? 'transform, opacity' : 'opacity'
