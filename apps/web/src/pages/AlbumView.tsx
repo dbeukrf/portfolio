@@ -4,6 +4,8 @@ import { FaLinkedin, FaGithub } from 'react-icons/fa';
 import { FaPlay, FaRandom, FaUserPlus } from 'react-icons/fa';
 import Shuffle from '../components/ui/Shuffle';
 
+const clamp = (value: number, min = 0, max = 1) => Math.max(min, Math.min(max, value));
+
 export default function AlbumView() {
   // Scrolling state
   const [heroHeight, setHeroHeight] = useState<number>(0);
@@ -13,6 +15,8 @@ export default function AlbumView() {
   const [contentVisible, setContentVisible] = useState<boolean>(false); // Track content visibility
   const [viewportHeight, setViewportHeight] = useState<number>(0); // Viewport height for calculations
   const [manualRevealProgress, setManualRevealProgress] = useState<number>(0); // Manual reveal progress during reveal phase
+  const [currentTrackIndex, setCurrentTrackIndex] = useState<number>(0);
+  const [currentTrackProgress, setCurrentTrackProgress] = useState<number>(0);
 
   // Refs
   const heroRef = useRef<HTMLDivElement | null>(null);
@@ -24,6 +28,7 @@ export default function AlbumView() {
   const prevScrollProgressRef = useRef<number>(0);
   const prevRevealRef = useRef<number>(0); // Track previous reveal value to prevent expansion when scrolling up
   const maxRevealReachedRef = useRef<number>(0); // Track maximum reveal reached to ensure scrolling up only shrinks
+  const trackSectionRefs = useRef<(HTMLDivElement | null)[]>([]);
 
   // Compute hero height
   useEffect(() => {
@@ -150,7 +155,7 @@ export default function AlbumView() {
         container.removeEventListener('wheel', handleWheel);
       }
     };
-  }, [manualRevealProgress]);
+  }, [manualRevealProgress, viewportHeight]);
 
   // Handle scroll to create parallax effect
   useEffect(() => {
@@ -306,6 +311,53 @@ export default function AlbumView() {
             setScrollProgress(reveal);
             prevScrollProgressRef.current = reveal;
           }
+
+          // Track-specific progress + active track calculation
+          const viewportY = viewportHeight || vh;
+          if (viewportY > 0 && trackSectionRefs.current.length) {
+            const rects = trackSectionRefs.current.map((section) =>
+              section ? section.getBoundingClientRect() : null
+            );
+            const viewportCenter = viewportY / 2;
+
+            let activeIndex = -1;
+            rects.forEach((rect, index) => {
+              if (!rect) return;
+              if (rect.top <= viewportCenter && rect.bottom >= viewportCenter && activeIndex === -1) {
+                activeIndex = index;
+              }
+            });
+
+            if (activeIndex === -1) {
+              let closestDistance = Number.POSITIVE_INFINITY;
+              rects.forEach((rect, index) => {
+                if (!rect) return;
+                const trackCenter = rect.top + rect.height / 2;
+                const distance = Math.abs(trackCenter - viewportCenter);
+                if (distance < closestDistance) {
+                  closestDistance = distance;
+                  activeIndex = index;
+                }
+              });
+            }
+
+            const activeRect = activeIndex >= 0 ? rects[activeIndex] : null;
+            if (activeRect) {
+              const progress = clamp((viewportCenter - activeRect.top) / activeRect.height);
+
+              if (activeIndex >= 0) {
+                setCurrentTrackIndex((prev) =>
+                  prev !== activeIndex ? activeIndex : prev
+                );
+              }
+
+              setCurrentTrackProgress((prev) =>
+                Math.abs(prev - progress) > 0.01 ? clamp(progress) : prev
+              );
+            } else {
+              setCurrentTrackProgress(0);
+            }
+          }
           
           rafId = null;
         });
@@ -326,7 +378,7 @@ export default function AlbumView() {
         cancelAnimationFrame(rafId);
       }
     };
-  }, [manualRevealProgress]);
+  }, [manualRevealProgress, viewportHeight]);
 
   // Hide body scrollbar while this view is mounted
   useEffect(() => {
@@ -370,6 +422,9 @@ export default function AlbumView() {
       // Already past reveal, just scroll to track
       scrollContainerRef.current.scrollTo({ top: trackScrollPosition, behavior: 'smooth' });
     }
+
+    setCurrentTrackIndex(trackIndex);
+    setCurrentTrackProgress(0);
   };
 
   return (
@@ -557,7 +612,7 @@ export default function AlbumView() {
               return (
                 <div
                   key={track.id}
-                  className={`grid grid-cols-12 items-center text-white hover:bg-white/5 rounded-lg px-2 md:px-4 py-1 md:py-2 transition-colors cursor-pointer`}
+                  className={`grid grid-cols-12 items-center text-white hover:bg-white/5 rounded-lg px-2 md:px-4 py-1 md:py-2 transition-colors cursor-pointer focus:outline-none focus-visible:outline-none`}
                   role="button"
                   tabIndex={0}
                   onClick={() => scrollToTrack(index)}
@@ -610,7 +665,7 @@ export default function AlbumView() {
       <div className="relative w-full">
         {/* Parallax Background - Expands equally up and down from center */}
         <div
-          className="fixed inset-0 pointer-events-none"
+          className="fixed inset-0"
           style={{
             top: 0,
             bottom: 0,
@@ -618,7 +673,8 @@ export default function AlbumView() {
             transition: 'clip-path 0.1s cubic-bezier(0.4, 0, 0.2, 1)',
             willChange: 'clip-path',
             zIndex: 50,
-            backgroundColor: '#191B20'
+            backgroundColor: '#191B20',
+            pointerEvents: contentVisible ? 'auto' : 'none'
           }}
         />
 
@@ -634,9 +690,12 @@ export default function AlbumView() {
             willChange: contentVisible ? 'transform, opacity' : 'opacity'
           }}
         >
-          {TRACKS.map((track) => (
+          {TRACKS.map((track, index) => (
             <div 
               key={track.id} 
+              ref={(el) => {
+                trackSectionRefs.current[index] = el;
+              }}
               className="min-h-screen flex items-center justify-center px-8 py-24"
               style={{ backgroundColor: '#191B20' }}
             >
@@ -677,6 +736,46 @@ export default function AlbumView() {
               </div>
             </div>
           ))}
+        </div>
+      </div>
+
+      {/* Track Progress Grid */}
+      <div
+        className={`fixed top-6 left-6 z-[80] transition-all duration-500 ease-out ${
+          contentVisible ? 'opacity-100 translate-y-0 pointer-events-auto' : 'opacity-0 -translate-y-6 pointer-events-none'
+        }`}
+      >
+        <div className="grid gap-1.5">
+          {TRACKS.map((track, index) => {
+            const isActive = index === currentTrackIndex;
+            const label = `${String(track.number).padStart(2, '0')} ${track.title}`;
+            const width = isActive ? `${Math.round(clamp(currentTrackProgress) * 100)}%` : '0%';
+
+            return (
+              <button
+                key={track.id}
+                onClick={() => scrollToTrack(index)}
+                onKeyDown={(e) => {
+                  if (e.key === 'Enter' || e.key === ' ') {
+                    e.preventDefault();
+                    scrollToTrack(index);
+                  }
+                }}
+                className={`relative min-w-[160px] px-3 py-1.5 text-left text-white text-xs font-semibold rounded-md overflow-hidden transition-transform duration-300 focus:outline-none focus-visible:outline-none focus:ring-0 ring-0 ${
+                  isActive ? 'shadow-lg scale-[1.02]' : 'opacity-80 hover:opacity-100 hover:scale-[1.01]'
+                }`}
+                aria-pressed={isActive}
+              >
+                <span className="relative z-10 drop-shadow-[0_0_6px_rgba(0,0,0,0.6)]">{label}</span>
+                <div className="pointer-events-none absolute inset-0 overflow-hidden">
+                  <div
+                    className="absolute inset-y-0 left-0 bg-orange-500 transition-all duration-300 ease-out"
+                    style={{ width, opacity: isActive ? 1 : 0 }}
+                  />
+                </div>
+              </button>
+            );
+          })}
         </div>
       </div>
     </div>
