@@ -568,7 +568,7 @@ export default function AlbumView() {
                 </div>
                 
                 {/* Track Content */}
-                <div className="text-left space-y-6 text-white/90">
+                <div className="text-left space-y-6 text-white/90" style={{ fontFamily: "'Ubuntu', sans-serif" }}>
                   <p className="text-lg leading-relaxed">
                     Content for {track.title}. Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed non risus. Suspendisse lectus tortor, dignissim sit amet, adipiscing nec.
                   </p>

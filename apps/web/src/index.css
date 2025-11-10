@@ -1,4 +1,4 @@
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Fira+Code:wght@400;500;600&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Roboto+Mono:wght@400;500;600;700&family=Ubuntu:wght@400;500;700&display=swap');
 
 @tailwind base;
 @tailwind components;
@@ -15,6 +15,7 @@
     box-sizing: border-box;
     margin: 0;
     padding: 0;
+    cursor: none !important; /* Hide default cursor globally */
   }
 
   html {
@@ -27,7 +28,7 @@
   }
 
   body {
-    font-family: 'Inter', system-ui, -apple-system, sans-serif;
+    font-family: 'Roboto Mono', monospace;
     font-weight: 400;
     line-height: 1.6;
     color: theme('colors.text.primary');
@@ -39,6 +40,7 @@
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
     overflow: hidden; /* Hide scrollbar globally */
+    cursor: none; /* Hide default cursor */
   }
 
   /* Typography Hierarchy */
