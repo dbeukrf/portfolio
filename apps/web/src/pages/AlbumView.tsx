@@ -342,6 +342,36 @@ export default function AlbumView() {
     }
   };
 
+  const scrollToTrack = (trackIndex: number) => {
+    if (!scrollContainerRef.current) return;
+    
+    const vh = viewportHeight || window.innerHeight;
+    const revealDistance = vh * 1.5;
+    
+    // Calculate scroll position for the track
+    // Each track is min-h-screen, so we need to scroll to revealDistance + (trackIndex * vh)
+    // For the first track (Education), add an offset so it appears lower in the viewport
+    const offset = trackIndex === 0 ? vh * 0.25 : 0; // First track appears 25% lower
+    const trackScrollPosition = revealDistance + (trackIndex * vh) + offset;
+    
+    // First, ensure reveal is complete if we're not past revealDistance
+    const currentScrollTop = scrollContainerRef.current.scrollTop;
+    if (currentScrollTop < revealDistance) {
+      // Complete the reveal first, then scroll to track
+      scrollContainerRef.current.scrollTo({ top: revealDistance, behavior: 'smooth' });
+      
+      // Wait for reveal to complete, then scroll to track
+      setTimeout(() => {
+        if (scrollContainerRef.current) {
+          scrollContainerRef.current.scrollTo({ top: trackScrollPosition, behavior: 'smooth' });
+        }
+      }, 500); // Adjust timing based on reveal animation
+    } else {
+      // Already past reveal, just scroll to track
+      scrollContainerRef.current.scrollTo({ top: trackScrollPosition, behavior: 'smooth' });
+    }
+  };
+
   return (
     <div 
       ref={scrollContainerRef}
@@ -517,7 +547,7 @@ export default function AlbumView() {
 
           {/* Track List */}
           <div className="space-y-1 md:space-y-2 flex-1 min-h-0">
-            {TRACKS.map((track) => {
+            {TRACKS.map((track, index) => {
               const isAIDJ = track.id === 'aiDj';
               const totalSeconds = track.duration || 0;
               const minutes = Math.floor(totalSeconds / 60);
@@ -530,6 +560,13 @@ export default function AlbumView() {
                   className={`grid grid-cols-12 items-center text-white hover:bg-white/5 rounded-lg px-2 md:px-4 py-1 md:py-2 transition-colors cursor-pointer`}
                   role="button"
                   tabIndex={0}
+                  onClick={() => scrollToTrack(index)}
+                  onKeyDown={(e) => {
+                    if (e.key === 'Enter' || e.key === ' ') {
+                      e.preventDefault();
+                      scrollToTrack(index);
+                    }
+                  }}
                 >
                   {/* Track Number */}
                   <div className="col-span-1 text-white/80 text-sm md:text-base">{track.number}</div>
