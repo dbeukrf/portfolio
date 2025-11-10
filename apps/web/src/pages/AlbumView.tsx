@@ -152,6 +152,8 @@ export default function AlbumView() {
 
   // Handle scroll to create parallax effect
   useEffect(() => {
+    let rafId: number | null = null;
+
     const handleScroll = () => {
       if (!scrollContainerRef.current) return;
       
@@ -230,30 +232,38 @@ export default function AlbumView() {
       // Clamp reveal to 0-1 range for clipPath calculation
       const clampedReveal = Math.max(0, Math.min(1, reveal));
       
-      // Update clipPath reveal - allow smooth shrinking when scrolling up
-      // When scrolling up from past reveal distance, use the calculated reveal (which decreases)
-      // Otherwise use clamped reveal
-      setClipPathReveal(clampedReveal);
-      
-      // Phase 2: Content becomes visible after reveal completes
-      if (reveal >= 1 && scrollTop >= revealDistance) {
-        setContentVisible(true);
-        // Freeze scroll progress at the moment reveal completes (when reveal = 1)
-        if (frozenScrollProgress === 0) {
-          setFrozenScrollProgress(1); // Freeze at full reveal progress
-        }
-        // Calculate scroll progress for content (starts after reveal phase)
-        const contentScroll = scrollTop - revealDistance;
-        const contentScrollMax = scrollContainerRef.current.scrollHeight - vh - revealDistance;
-        setScrollProgress(contentScrollMax > 0 ? contentScroll / contentScrollMax : 0);
-      } else {
-        setContentVisible(false);
-        // Use reveal progress for background animation during reveal phase
-        setScrollProgress(reveal);
-        // Reset frozen progress when reveal reverses
-        if (reveal < 1) {
-          setFrozenScrollProgress(0);
-        }
+      // Throttle updates using requestAnimationFrame for smoother animation
+      if (rafId === null) {
+        rafId = requestAnimationFrame(() => {
+          // Update clipPath reveal - allow smooth shrinking when scrolling up
+          // When scrolling up from past reveal distance, use the calculated reveal (which decreases)
+          // Otherwise use clamped reveal
+          setClipPathReveal(clampedReveal);
+          
+          // Phase 2: Content becomes visible after reveal completes
+          if (reveal >= 1 && scrollTop >= revealDistance) {
+            setContentVisible(true);
+            // Freeze scroll progress at the moment reveal completes (when reveal = 1)
+            if (frozenScrollProgress === 0) {
+              setFrozenScrollProgress(1); // Freeze at full reveal progress
+            }
+            // Calculate scroll progress for content (starts after reveal phase)
+            const contentScroll = scrollTop - revealDistance;
+            const contentScrollMax = scrollContainerRef.current?.scrollHeight ?? 0;
+            const maxContentScroll = contentScrollMax - vh - revealDistance;
+            setScrollProgress(maxContentScroll > 0 ? contentScroll / maxContentScroll : 0);
+          } else {
+            setContentVisible(false);
+            // Use reveal progress for background animation during reveal phase
+            setScrollProgress(reveal);
+            // Reset frozen progress when reveal reverses
+            if (reveal < 1) {
+              setFrozenScrollProgress(0);
+            }
+          }
+          
+          rafId = null;
+        });
       }
     };
 
@@ -266,6 +276,9 @@ export default function AlbumView() {
     return () => {
       if (container) {
         container.removeEventListener('scroll', handleScroll as any);
+      }
+      if (rafId !== null) {
+        cancelAnimationFrame(rafId);
       }
     };
   }, [manualRevealProgress, frozenScrollProgress]);
@@ -294,114 +307,101 @@ export default function AlbumView() {
       <div ref={announceRef} aria-live="polite" className="sr-only" />
 
       {/* Hero Section with Album Artwork - Fixed at top */}
-      <div ref={heroRef} className="sticky top-0 z-40 w-full bg-gradient-to-b from-[#1f2937] to-[#6b7280] flex flex-col md:flex-row items-start md:items-center gap-3 md:gap-8 px-4 md:px-12 py-3 md:py-12 overflow-hidden max-h-[40vh] md:max-h-none">
+      <div ref={heroRef} className="sticky top-0 z-40 w-full bg-gradient-to-b from-[#1f2937] to-[#6b7280] flex flex-row items-center gap-2 md:gap-6 px-4 md:px-8 py-2 md:py-4" style={{ maxHeight: '30vh' }}>
 
         {/* Album cover image */}
         <img
           src="/images/album-cover.jpg"
           alt="Album cover"
-          className="w-24 h-24 md:w-52 md:h-52 object-cover shadow-2xl rounded relative z-10 cursor-pointer flex-shrink-0"
+          className="w-16 h-16 md:w-32 md:h-32 object-cover shadow-2xl rounded relative z-10 cursor-pointer flex-shrink-0"
           onClick={scrollToTop}
         />
 
         {/* Album title and description */}
-        <div className="text-left flex-1 relative z-10 min-w-0 flex flex-col justify-center md:mt-8">
+        <div className="text-left flex-1 relative z-10 min-w-0 flex flex-col justify-center overflow-visible">
           {/* Title section - only as wide as content */}
-          <div className="w-fit">
+          <div className="min-w-0">
             <Shuffle
               tag="p"
-              className="text-xs md:text-sm font-semibold text-white/70 mb-1 md:mb-2"
+              className="text-xs md:text-sm font-semibold text-white/70 mb-0.5 md:mb-2"
               text="Album"
               duration={0.35}
               animationMode="evenodd"
               triggerOnHover
-              triggerOnce
-              threshold={0.1}
+              triggerOnce={false}
+              threshold={0}
               rootMargin="0px"
               textAlign="left"
             />
             <Shuffle
               tag="h1"
-              className="text-2xl md:text-6xl font-extrabold text-white mb-1 md:mb-4 leading-tight md:leading-normal"
+              className="text-sm md:text-3xl font-extrabold text-white mb-0.5 md:mb-2 leading-tight truncate"
               text="City, Country - Weather"
               duration={0.5}
               animationMode="evenodd"
               triggerOnHover
-              triggerOnce
-              threshold={0.1}
-              rootMargin="-100px"
+              triggerOnce={false}
+              threshold={0}
+              rootMargin="0px"
               textAlign="left"
             />
           </div>
           
-          {/* Description and Contact info container */}
-          <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-2 md:gap-6">
-            <Shuffle
-              tag="p"
-              className="text-white/80 mb-2 md:mb-0 text-xs md:text-base"
-              text="Diego Beuk • 2025 • 6 songs, 11 min"
-              duration={0.4}
-              animationMode="random"
-              triggerOnHover
-              triggerOnce
-              threshold={0.1}
-              rootMargin="-100px"
-              textAlign="left"
-            />
+          {/* Description */}
+          <Shuffle
+            tag="p"
+            className="text-white/80 mb-0 md:mb-0 text-xs md:text-sm truncate"
+            text="Diego Beuk • 2025 • 6 songs, 11 min"
+            duration={0.4}
+            animationMode="random"
+            triggerOnHover
+            triggerOnce
+            threshold={0}
+            rootMargin="0px"
+            textAlign="left"
+          />
+        </div>
 
-            {/* Contact info*/}
-            <div className="flex flex-row items-center gap-5 md:gap-6 text-white text-xs md:text-sm">
-              {/* Email and Phone */}
-              <div className="flex flex-col md:text-right space-y-0.5 md:space-y-1">
-                <Shuffle tag="span" className="text-xs" text="beuk.diego@gmail.com" duration={0.35} triggerOnHover triggerOnce textAlign="right" />
-                <Shuffle tag="span" className="text-xs" text="+61 448 092 338" duration={0.35} triggerOnHover triggerOnce textAlign="right" />
-              </div>
+        {/* Contact info - Right side */}
+        <div className="flex flex-col items-end justify-center gap-1 md:gap-2 text-white text-xs md:text-sm flex-shrink-0 relative z-10">
+          {/* Email and Phone */}
+          <div className="flex flex-col items-end space-y-0 md:space-y-1">
+            <Shuffle tag="span" className="text-xs md:text-xs truncate" text="beuk.diego@gmail.com" duration={0.35} triggerOnHover triggerOnce threshold={0} rootMargin="0px" textAlign="right" />
+            <Shuffle tag="span" className="text-xs md:text-xs" text="+61 448 092 338" duration={0.35} triggerOnHover triggerOnce threshold={0} rootMargin="0px" textAlign="right" />
+          </div>
 
-              {/* LinkedIn and GitHub icons */}
-              <div className="flex space-x-5 md:space-x-3.5">
-                <a
-                  href="https://www.linkedin.com/in/diego-beuk-8a9100288/"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="hover:text-primary-500 transition-colors focus:outline-none focus:ring-2 focus:ring-primary-500 rounded"
-                  aria-label="Diego Beuk LinkedIn profile"
-                >
-                  <FaLinkedin size={18} className="md:w-[25px] md:h-[25px]" color="white" />
-                </a>
-                <a
-                  href="https://github.com/dbeukrf"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="hover:text-primary-500 transition-colors focus:outline-none focus:ring-2 focus:ring-primary-500 rounded"
-                  aria-label="Diego Beuk Github profile"
-                >
-                  <FaGithub size={18} className="md:w-[25px] md:h-[25px]" color="white" />
-                </a>
-              </div>
-            </div>
+          {/* LinkedIn and GitHub icons - Below text */}
+          <div className="flex space-x-2 md:space-x-3.5">
+            <a
+              href="https://www.linkedin.com/in/diego-beuk-8a9100288/"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="hover:text-primary-500 transition-colors focus:outline-none focus:ring-2 focus:ring-primary-500 rounded flex-shrink-0"
+              aria-label="Diego Beuk LinkedIn profile"
+            >
+              <FaLinkedin size={14} className="md:w-[25px] md:h-[25px]" color="white" />
+            </a>
+            <a
+              href="https://github.com/dbeukrf"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="hover:text-primary-500 transition-colors focus:outline-none focus:ring-2 focus:ring-primary-500 rounded flex-shrink-0"
+              aria-label="Diego Beuk Github profile"
+            >
+              <FaGithub size={14} className="md:w-[25px] md:h-[25px]" color="white" />
+            </a>
           </div>
         </div>
       </div>
 
       {/* Progress indicator and Action Buttons - Combined for mobile */}
       <div ref={controlsRef} className="sticky z-40 w-full bg-transparent" style={{ top: `${heroHeight}px` }}>
-        {/* Progress indicator */}
-        <div className="px-4 md:px-12">
-          <div className="h-0.5 md:h-1 w-full bg-white/10 rounded overflow-hidden">
-            <div
-              className="h-full bg-white/70 transition-[width] duration-300"
-              style={{ width: `${scrollProgress * 100}%` }}
-              aria-hidden="true"
-            />
-          </div>
-        </div>
-
         {/* Action Buttons above Track List */}
-        <div className="flex items-center gap-2 md:gap-4 px-4 md:px-12 py-2 md:py-4">
+        <div className="flex items-center gap-2 md:gap-4 px-4 md:px-8 py-4 md:py-6">
           {/* Play Button */}
           <div className="relative group">
-            <button className="flex items-center justify-center w-8 h-8 md:w-12 md:h-12 rounded-full bg-white/5 hover:bg-white/20 text-white transition-colors">
-              <FaPlay size={16} className="md:w-5 md:h-5" />
+            <button className="flex items-center justify-center w-7 h-7 md:w-10 md:h-10 rounded-full bg-white/5 hover:bg-white/20 text-white transition-colors">
+              <FaPlay size={14} className="md:w-4 md:h-4" />
             </button>
             {/* Tooltip */}
             <span className="absolute bottom-full mb-2 left-1/2 -translate-x-1/2 bg-black text-white text-xs px-2 py-1 rounded opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap">
@@ -411,8 +411,8 @@ export default function AlbumView() {
 
           {/* Shuffle Button */}
           <div className="relative group">
-            <button className="flex items-center justify-center w-8 h-8 md:w-12 md:h-12 rounded-full bg-white/5 hover:bg-white/20 text-white transition-colors">
-              <FaRandom size={16} className="md:w-5 md:h-5" />
+            <button className="flex items-center justify-center w-7 h-7 md:w-10 md:h-10 rounded-full bg-white/5 hover:bg-white/20 text-white transition-colors">
+              <FaRandom size={14} className="md:w-4 md:h-4" />
             </button>
             <span className="absolute bottom-full mb-2 left-1/2 -translate-x-1/2 bg-black text-white text-xs px-2 py-1 rounded opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap">
               Shuffle
@@ -421,8 +421,8 @@ export default function AlbumView() {
 
           {/* Invite Collaborator Button */}
           <div className="relative group">
-            <button className="flex items-center justify-center w-8 h-8 md:w-12 md:h-12 rounded-full bg-white/5 hover:bg-white/20 text-white transition-colors">
-              <FaUserPlus size={16} className="md:w-5 md:h-5" />
+            <button className="flex items-center justify-center w-7 h-7 md:w-10 md:h-10 rounded-full bg-white/5 hover:bg-white/20 text-white transition-colors">
+              <FaUserPlus size={14} className="md:w-4 md:h-4" />
             </button>
             <span className="absolute bottom-full mb-2 left-1/2 -translate-x-1/2 bg-black text-white text-xs px-2 py-1 rounded opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap">
               Invite Collaborator
@@ -441,14 +441,14 @@ export default function AlbumView() {
         }}
       >
         <div 
-          className="h-full flex flex-col px-4 md:px-12 max-w-[1600px] mx-auto overflow-y-auto"
+          className="h-full flex flex-col px-4 md:px-8 max-w-[1600px] mx-auto overflow-y-auto"
           style={{
-            paddingTop: '0.5rem',
-            paddingBottom: '0.5rem'
+            paddingTop: '0.25rem',
+            paddingBottom: '0.25rem'
           }}
         >
           {/* Table Header */}
-          <div className="grid grid-cols-12 text-white/70 text-xs md:text-sm font-semibold border-b border-white/20 pb-2 md:pb-3 mb-2 md:mb-4 px-2 md:px-4 flex-shrink-0">
+          <div className="grid grid-cols-12 text-white/70 text-xs md:text-sm font-semibold border-b border-white/20 pb-1 md:pb-2 mb-1 md:mb-2 px-2 md:px-4 flex-shrink-0">
             <div className="col-span-1 text-middle">#</div>
             <div className="col-span-6 text-middle">Title</div>
             <div className="col-span-3 text-middle hidden sm:block">Artist</div>
@@ -471,7 +471,7 @@ export default function AlbumView() {
           </div>
 
           {/* Track List */}
-          <div className="space-y-2 md:space-y-4 flex-1 min-h-0">
+          <div className="space-y-1 md:space-y-2 flex-1 min-h-0">
             {TRACKS.map((track) => {
               const isAIDJ = track.id === 'aiDj';
               const totalSeconds = track.duration || 0;
@@ -482,7 +482,7 @@ export default function AlbumView() {
               return (
                 <div
                   key={track.id}
-                  className={`grid grid-cols-12 items-center text-white hover:bg-white/5 rounded-lg px-2 md:px-4 py-2 md:py-3 transition-colors cursor-pointer`}
+                  className={`grid grid-cols-12 items-center text-white hover:bg-white/5 rounded-lg px-2 md:px-4 py-1 md:py-2 transition-colors cursor-pointer`}
                   role="button"
                   tabIndex={0}
                 >
@@ -533,7 +533,8 @@ export default function AlbumView() {
             top: 0,
             bottom: 0,
             clipPath: `inset(${50 - Math.max(0, Math.min(1, clipPathReveal)) * 50}% 0% ${50 - Math.max(0, Math.min(1, clipPathReveal)) * 50}% 0%)`, // Expand equally up and down from center, can reverse
-            transition: 'clip-path 0.05s linear',
+            transition: 'clip-path 0.1s cubic-bezier(0.4, 0, 0.2, 1)',
+            willChange: 'clip-path',
             zIndex: 50,
             backgroundColor: '#191B20'
           }}
@@ -545,9 +546,10 @@ export default function AlbumView() {
           style={{
             opacity: contentVisible ? 1 : 0,
             transform: contentVisible 
-              ? `translateY(${Math.max(0, (viewportHeight || window.innerHeight) - (scrollProgress * (viewportHeight || window.innerHeight) * 1.5))}px)` 
-              : `translateY(${viewportHeight || window.innerHeight}px)`, // Start below viewport, scroll up as user scrolls
-            transition: 'opacity 0.5s ease-out'
+              ? `translate3d(0, ${Math.max(0, (viewportHeight || window.innerHeight) - (scrollProgress * (viewportHeight || window.innerHeight) * 1.5))}px, 0)` 
+              : `translate3d(0, ${viewportHeight || window.innerHeight}px, 0)`, // Start below viewport, scroll up as user scrolls
+            transition: 'opacity 0.5s cubic-bezier(0.4, 0, 0.2, 1)',
+            willChange: contentVisible ? 'transform, opacity' : 'opacity'
           }}
         >
           {TRACKS.map((track) => (
