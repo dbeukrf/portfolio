@@ -7,6 +7,7 @@ import { api } from '../services/api';
 import { fetchWeatherApi } from 'openmeteo';
 
 const clamp = (value: number, min = 0, max = 1) => Math.max(min, Math.min(max, value));
+const GOOGLE_WEATHER_ICON_BASE = 'https://maps.gstatic.com/weather/v1/';
 
 export default function AlbumView() {
   // Scrolling state
@@ -22,6 +23,116 @@ export default function AlbumView() {
   
   // Location state
   const [locationText, setLocationText] = useState<string>('Melbourne, Australia');
+  const [weatherCurrent, setWeatherCurrent] = useState<{
+    time: Date;
+    temperatureC: number;
+    apparentTemperatureC: number;
+    isDay: number;
+    rainMm: number;
+    cloudCoverPct?: number;
+    weatherCode?: number;
+    windSpeed10m?: number;
+    source: 'current' | 'latest-hourly';
+  } | null>(null);
+  const [weatherDaily, setWeatherDaily] = useState<{
+    time: Date[];
+    temperatureMaxC: number[];
+    temperatureMinC: number[];
+    precipitationSumMm?: number[];
+  } | null>(null);
+  
+  const mapToGoogleCondition = (w: {
+    weatherCode?: number;
+    rainMm?: number;
+    cloudCoverPct?: number;
+    isDay?: number;
+    windSpeed10m?: number;
+  }): { condition: string; label: string } => {
+    const code = w.weatherCode ?? -1;
+    const rain = w.rainMm ?? 0;
+    const cloud = w.cloudCoverPct ?? 0;
+    const isDay = (w.isDay ?? 1) === 1;
+    const wind = w.windSpeed10m ?? 0;
+    const isWindy = wind >= 35 && rain < 0.1;
+    // WMO code mapping (https://open-meteo.com/en/docs#weathervariables)
+    // Core sky state
+    if (code === 0) return { condition: isDay ? 'clear' : 'clear_night', label: isDay ? 'Clear' : 'Clear night' };
+    if (code === 1) return { condition: 'mostly_clear', label: 'Mostly clear' };
+    if (code === 2) return { condition: 'partly_cloudy', label: 'Partly cloudy' };
+    if (code === 3) return { condition: 'cloudy', label: 'Cloudy' };
+    // Fog: approximate as mostly_cloudy (no direct fog icon in provided list)
+    if (code === 45 || code === 48) return { condition: 'mostly_cloudy', label: 'Fog' };
+    // Drizzle
+    if (code === 51) return { condition: 'light_rain', label: 'Light drizzle' };
+    if (code === 53) return { condition: 'light_to_moderate_rain', label: 'Drizzle' };
+    if (code === 55) return { condition: 'rain', label: 'Dense drizzle' };
+    if (code === 56 || code === 57) return { condition: 'rain', label: 'Freezing drizzle' };
+    // Rain
+    if (code === 61) return { condition: 'light_rain', label: 'Light rain' };
+    if (code === 63) return { condition: 'light_to_moderate_rain', label: 'Moderate rain' };
+    if (code === 65) return { condition: 'heavy_rain', label: 'Heavy rain' };
+    // Freezing rain/mixed precip — approximate as rain_and_snow
+    if (code === 66 || code === 67) return { condition: 'rain_and_snow', label: 'Freezing rain' };
+    // Snow
+    if (code === 71) return { condition: 'light_snow', label: 'Light snow' };
+    if (code === 73) return { condition: 'light_to_moderate_snow', label: 'Moderate snow' };
+    if (code === 75) {
+      // Very windy + heavy snow -> snowstorm variants
+      if (wind >= 40) return { condition: 'heavy_snow_storm', label: 'Heavy snow storm' };
+      if (wind >= 28) return { condition: 'snowstorm', label: 'Snowstorm' };
+      return { condition: 'heavy_snow', label: 'Heavy snow' };
+    }
+    if (code === 77) return { condition: 'snow', label: 'Snow grains' };
+    // Showers
+    if (code === 80) return { condition: 'scattered_showers', label: 'Scattered showers' };
+    if (code === 81) return { condition: 'rain_showers', label: 'Rain showers' };
+    if (code === 82) return { condition: 'heavy_rain_showers', label: 'Violent rain showers' };
+    if (code === 85) return { condition: 'scattered_snow_showers', label: 'Scattered snow showers' };
+    if (code === 86) return { condition: 'heavy_snow_showers', label: 'Heavy snow showers' };
+    // Thunder
+    if (code === 95) {
+      if (rain > 0.1) return { condition: 'thundershower', label: 'Thundershower' };
+      // scattered thunderstorms if not raining heavily
+      if (cloud >= 50) return { condition: 'scattered_thunderstorms', label: 'Scattered thunderstorms' };
+      return { condition: 'thunderstorm', label: 'Thunderstorm' };
+    }
+    if (code === 96 || code === 99) return { condition: 'hail', label: 'Hail' };
+    // Heuristics when code missing
+    if (rain >= 12) return { condition: 'moderate_to_heavy_rain', label: 'Moderate to heavy rain' };
+    if (rain >= 10) return { condition: 'rain_periodically_heavy', label: 'Heavy rain' };
+    if (rain >= 7) return { condition: 'heavy_rain', label: 'Heavy rain' };
+    if (rain >= 2.5) return { condition: 'light_to_moderate_rain', label: 'Light to moderate rain' };
+    if (rain >= 0.5) return { condition: 'chance_of_showers', label: 'Chance of showers' };
+    if (rain > 0) return { condition: 'light_rain', label: 'Light rain' };
+    if (isWindy && rain > 0.1) return { condition: 'wind_and_rain', label: 'Wind and rain' };
+    // Blowing snow heuristic (no code + windy and likely snowy cloud cover)
+    if (wind >= 35 && cloud >= 60 && !isDay) return { condition: 'blowing_snow', label: 'Blowing snow' };
+    if (isWindy) return { condition: 'windy', label: 'Windy' };
+    if (cloud >= 85) return { condition: 'cloudy', label: 'Cloudy' };
+    if (cloud >= 65) return { condition: 'mostly_cloudy', label: 'Mostly cloudy' };
+    if (cloud >= 35) return { condition: 'partly_cloudy', label: 'Partly cloudy' };
+    if (cloud >= 15) return { condition: 'mostly_clear', label: 'Mostly clear' };
+    return { condition: isDay ? 'clear' : 'clear_night', label: isDay ? 'Clear' : 'Clear night' };
+  };
+  
+  const renderWeatherIcon = () => {
+    if (!weatherCurrent) return null;
+    const { condition, label } = mapToGoogleCondition(weatherCurrent);
+    const iconUrl = `${GOOGLE_WEATHER_ICON_BASE}${condition}.svg`;
+    return (
+      <div
+        className={`ml-1 md:ml-2 inline-flex items-center transition-opacity duration-1500 ${weatherCurrent ? 'opacity-100' : 'opacity-0'}`}
+        aria-hidden={!weatherCurrent}
+      >
+        <img
+          src={iconUrl}
+          alt={`${label} weather icon`}
+          className="w-[18px] h-[18px] md:w-[26px] md:h-[26px] -translate-y-[4.5px] md:-translate-y-[4.5px]"
+          loading="lazy"
+        />
+      </div>
+    );
+  };
 
   // Refs
   const heroRef = useRef<HTMLDivElement | null>(null);
@@ -104,75 +215,154 @@ export default function AlbumView() {
     // Check if geolocation is enabled via environment variable
     // Defaults to 'true' if not set (backward compatible)
     const enableGeolocation = import.meta.env.VITE_ENABLE_GEOLOCATION !== 'false';
+    const DEFAULT_LOCATION = 'Melbourne, Australia';
+    const MELBOURNE = { lat: -37.8136, lon: 144.9631 };
     
     const fetchWeather = async (latitude: number, longitude: number, locationStr: string) => {
       try {
-        const params = {
-          "latitude": latitude,
-          "longitude": longitude,
-          "current": ["temperature_2m", "apparent_temperature", "is_day", "rain"],
-          "timezone": "auto",
-        };
-        
         const url = "https://api.open-meteo.com/v1/forecast";
-        
-        if (import.meta.env.DEV) {
-          console.log('Fetching weather for:', latitude, longitude, params);
-        }
-        
-        const responses = await fetchWeatherApi(url, params);
-        
-        if (!responses || responses.length === 0) {
-          throw new Error('No weather response received');
-        }
-        
-        // Process first location
-        const response = responses[0];
-        if (!response) {
-          throw new Error('Invalid weather response');
-        }
-        
-        const utcOffsetSeconds = response.utcOffsetSeconds();
-        const current = response.current();
-        
-        if (!current) {
-          throw new Error('No current weather data available');
-        }
-        
-        // Extract weather data
-        // Note: The order of weather variables in the URL query and the indices below need to match!
-        const temperature_2m = current.variables(0);
-        const apparent_temperature = current.variables(1);
-        const is_day = current.variables(2);
-        const rain = current.variables(3);
-        
-        if (!temperature_2m || !is_day) {
-          throw new Error('Missing required weather variables');
-        }
-        
-        const weatherData = {
-          time: new Date((Number(current.time()) + utcOffsetSeconds) * 1000),
-          temperature_2m: temperature_2m.value(),
-          apparent_temperature: apparent_temperature?.value() ?? temperature_2m.value(),
-          is_day: is_day.value(),
-          rain: rain?.value() ?? 0,
+        // First try: get current + daily
+        const primaryParams: any = {
+          latitude,
+          longitude,
+          current: ["temperature_2m", "apparent_temperature", "is_day", "rain", "cloud_cover", "weather_code", "wind_speed_10m"],
+          daily: ["temperature_2m_max", "temperature_2m_min", "precipitation_sum"],
+          timezone: "auto",
         };
+        if (import.meta.env.DEV) console.log('Fetching weather (primary):', latitude, longitude, primaryParams);
+        const primaryResponses = await fetchWeatherApi(url, primaryParams);
+        if (!primaryResponses || primaryResponses.length === 0) throw new Error('No weather response received');
+        const primary = primaryResponses[0];
+        if (!primary) throw new Error('Invalid weather response');
+        const utcOffsetSeconds = primary.utcOffsetSeconds?.() ?? 0;
+        let currentBlock = primary.current?.();
+        let dailyBlock = primary.daily?.();
         
-        if (import.meta.env.DEV) {
-          console.log('Weather data received:', weatherData);
+        // Fallback: if current missing, try latest hourly (including last 10 days)
+        let finalCurrent: {
+          time: Date;
+          temperatureC: number;
+          apparentTemperatureC: number;
+          isDay: number;
+          rainMm: number;
+          cloudCoverPct?: number;
+          weatherCode?: number;
+          windSpeed10m?: number;
+          source: 'current' | 'latest-hourly';
+        } | null = null;
+        
+        if (currentBlock) {
+          const temperature_2m = currentBlock.variables(0);
+          const apparent_temperature = currentBlock.variables(1);
+          const is_day = currentBlock.variables(2);
+          const rain = currentBlock.variables(3);
+          const cloud_cover = currentBlock.variables(4);
+          const weather_code = currentBlock.variables(5);
+          const wind_speed_10m = currentBlock.variables(6);
+          if (temperature_2m && is_day) {
+            finalCurrent = {
+              time: new Date((Number(currentBlock.time()) + utcOffsetSeconds) * 1000),
+              temperatureC: temperature_2m.value(),
+              apparentTemperatureC: apparent_temperature?.value() ?? temperature_2m.value(),
+              isDay: is_day.value(),
+              rainMm: rain?.value() ?? 0,
+              cloudCoverPct: cloud_cover?.value(),
+              weatherCode: weather_code?.value(),
+              windSpeed10m: wind_speed_10m?.value(),
+              source: 'current',
+            };
+          }
         }
         
-        // Format weather information
-        const temp = Math.round(weatherData.temperature_2m);
-        const timeOfDay = weatherData.is_day === 1 ? 'Day' : 'Night';
-        const rainStatus = weatherData.rain > 0 ? `, ${Math.round(weatherData.rain)}mm rain` : '';
+        if (!finalCurrent) {
+          const fallbackParams: any = {
+            latitude,
+            longitude,
+            hourly: ["temperature_2m", "relative_humidity_2m", "wind_speed_10m"],
+            past_days: 10,
+            timezone: "auto",
+          };
+          if (import.meta.env.DEV) console.log('Fetching weather (fallback hourly):', fallbackParams);
+          const fbResponses = await fetchWeatherApi(url, fallbackParams);
+          if (fbResponses && fbResponses.length > 0 && fbResponses[0]) {
+            const fb = fbResponses[0];
+            const fbUtcOffset = fb.utcOffsetSeconds?.() ?? 0;
+            const hourly = fb.hourly?.();
+            if (hourly) {
+            const timesRaw = hourly.time?.();
+            const timesArr: number[] = timesRaw ? Array.from(timesRaw as any).map((t: any) => Number(t)) : [];
+            const tempVar = hourly.variables(0);
+            const tempValuesRaw = tempVar?.valuesArray?.();
+            const tempValues: number[] = tempValuesRaw ? Array.from(tempValuesRaw as any).map((v: any) => Number(v)) : [];
+            const lastIndex = timesArr.length > 0 ? timesArr.length - 1 : -1;
+            if (lastIndex >= 0) {
+              const lastTime = timesArr[lastIndex];
+              const lastTemp = tempValues[lastIndex];
+              if (typeof lastTemp === 'number' && !Number.isNaN(lastTemp)) {
+                  finalCurrent = {
+                    time: new Date((Number(lastTime) + fbUtcOffset) * 1000),
+                    temperatureC: lastTemp,
+                    apparentTemperatureC: lastTemp,
+                  isDay: 1,
+                    rainMm: 0,
+                    source: 'latest-hourly',
+                  };
+                }
+              }
+            }
+          }
+        }
         
-        // Update location text with weather info
-        const weatherText = `${temp}°C ${timeOfDay}${rainStatus}`;
-        if (locationStr) {
-          setLocationText(`${locationStr} - ${weatherText}`);
-        } else {
-          setLocationText(weatherText);
+        // Prepare daily
+        let finalDaily: {
+          time: Date[];
+          temperatureMaxC: number[];
+          temperatureMinC: number[];
+          precipitationSumMm?: number[];
+        } | null = null;
+        if (dailyBlock) {
+          const timeArrRaw = dailyBlock.time(); // usually epoch seconds array (typed)
+          const tmax = dailyBlock.variables(0);
+          const tmin = dailyBlock.variables(1);
+          const psum = dailyBlock.variables(2);
+          const timeNums: number[] = timeArrRaw ? Array.from(timeArrRaw as any).map((t: any) => Number(t)) : [];
+          const times: Date[] = timeNums.map((t: number) => new Date((Number(t) + utcOffsetSeconds) * 1000));
+          const maxRaw = tmax?.valuesArray?.();
+          const minRaw = tmin?.valuesArray?.();
+          const pRaw = psum?.valuesArray?.();
+          const maxArr: number[] = maxRaw ? Array.from(maxRaw as any).map((v: any) => Number(v)) : [];
+          const minArr: number[] = minRaw ? Array.from(minRaw as any).map((v: any) => Number(v)) : [];
+          const pArr: number[] | undefined = pRaw ? Array.from(pRaw as any).map((v: any) => Number(v)) : undefined;
+          if (times.length && maxArr.length && minArr.length) {
+            finalDaily = {
+              time: times,
+              temperatureMaxC: maxArr,
+              temperatureMinC: minArr,
+              precipitationSumMm: pArr,
+            };
+          }
+        }
+        
+        // Save to state for UI usage
+        if (finalCurrent) setWeatherCurrent(finalCurrent);
+        if (finalDaily) setWeatherDaily(finalDaily);
+        
+        // Compose header text (current + optional daily first day)
+        if (finalCurrent) {
+          const temp = Math.round(finalCurrent.temperatureC);
+          // const timeOfDay = finalCurrent.isDay === 1 ? 'Day' : 'Night';
+          const rainStatus = finalCurrent.rainMm > 0 ? `, ${Math.round(finalCurrent.rainMm)}mm rain` : '';
+          const currentText = `${temp}°C ${rainStatus}`;
+          let dailyText = '';
+          if (finalDaily && finalDaily.temperatureMaxC.length > 0 && finalDaily.temperatureMinC.length > 0) {
+            const hi = Math.round(finalDaily.temperatureMaxC[0]);
+            const lo = Math.round(finalDaily.temperatureMinC[0]);
+            dailyText = ` • H/L ${hi}/${lo}°C`;
+          }
+          const full = `${currentText}${dailyText}`;
+          if (locationStr) setLocationText(`${locationStr} - ${full}`); else setLocationText(full);
+        } else if (locationStr) {
+          setLocationText(locationStr);
         }
       } catch (weatherError) {
         console.error('Failed to fetch weather:', weatherError);
@@ -185,10 +375,7 @@ export default function AlbumView() {
     
     if (!enableGeolocation) {
       // Geolocation is disabled, use default location (Melbourne, Australia)
-      const defaultLocation = 'Melbourne, Australia';
-      const melbourneLat = -37.814;
-      const melbourneLon = 144.9633;
-      fetchWeather(melbourneLat, melbourneLon, defaultLocation);
+      fetchWeather(MELBOURNE.lat, MELBOURNE.lon, DEFAULT_LOCATION);
       return;
     }
     
@@ -218,18 +405,21 @@ export default function AlbumView() {
         if (latitude !== null && longitude !== null) {
           await fetchWeather(latitude, longitude, locationStr);
         } else {
-          // No coordinates, just use location
-          if (locationStr) {
-            setLocationText(locationStr);
-          }
+          // No coordinates, fallback to default Melbourne weather
+          const defaultLocation = locationStr || DEFAULT_LOCATION;
+          await fetchWeather(MELBOURNE.lat, MELBOURNE.lon, defaultLocation);
         }
       } catch (error) {
         console.error('Failed to fetch location:', error);
-        // Keep default text on error
+        // Fallback to default Melbourne on error
+        await fetchWeather(MELBOURNE.lat, MELBOURNE.lon, DEFAULT_LOCATION);
       }
     };
     
-    fetchLocationAndWeather();
+    // Fast-first paint: fetch default Melbourne immediately, then refine with geolocation
+    fetchWeather(MELBOURNE.lat, MELBOURNE.lon, DEFAULT_LOCATION).finally(() => {
+      fetchLocationAndWeather();
+    });
   }, []);
 
   // Handle wheel events to control parallax reveal during reveal phase
@@ -575,7 +765,7 @@ export default function AlbumView() {
       <div ref={announceRef} aria-live="polite" className="sr-only" />
 
       {/* Hero Section with Album Artwork - Fixed at top */}
-      <div ref={heroRef} className="sticky top-0 z-40 w-full bg-gradient-to-b from-[#1f2937] to-[#6b7280] flex flex-row items-center gap-2 md:gap-6 px-4 md:px-8 py-2 md:py-4" style={{ maxHeight: '30vh' }}>
+      <div ref={heroRef} className="sticky top-0 z-40 w-full bg-gradient-to-b from-[#1f2937] to-[#6b7280] flex flex-row items-center gap-2 md:gap-6 px-4 md:px-8 py-2 md:py-4 overflow-hidden max-h-[40vh] md:max-h-[30vh]">
 
         {/* Album cover image */}
         <img
@@ -586,12 +776,12 @@ export default function AlbumView() {
         />
 
         {/* Album title and description */}
-        <div className="text-left flex-1 relative z-10 min-w-0 flex flex-col justify-center overflow-visible">
+        <div className="text-left flex-1 relative z-10 min-w-0 flex flex-col justify-center overflow-visible max-w-[60%] sm:max-w-none">
           {/* Title section - only as wide as content */}
           <div className="min-w-0">
             <Shuffle
               tag="p"
-              className="text-xs md:text-sm font-semibold text-white/70 mb-0.5 md:mb-2"
+              className="text-[clamp(9px,2.8vw,12px)] md:text-sm font-semibold text-white/70 mb-0.5 md:mb-2 md:whitespace-nowrap"
               text="Album"
               duration={0.35}
               animationMode="evenodd"
@@ -601,24 +791,27 @@ export default function AlbumView() {
               rootMargin="0px"
               textAlign="left"
             />
-            <Shuffle
-              tag="h1"
-              className="text-sm md:text-3xl font-extrabold text-white mb-0.5 md:mb-2 leading-tight truncate"
-              text={locationText}
-              duration={0.5}
-              animationMode="evenodd"
-              triggerOnHover
-              triggerOnce={false}
-              threshold={0}
-              rootMargin="0px"
-              textAlign="left"
-            />
+            <div className="flex items-center gap-1 md:gap-2 min-w-0">
+              <Shuffle
+                tag="h1"
+                className="text-[clamp(10px,3.8vw,14px)] sm:text-sm md:text-3xl font-extrabold text-white mb-0.5 md:mb-2 leading-tight break-words md:truncate md:whitespace-nowrap"
+                text={locationText}
+                duration={0.5}
+                animationMode="evenodd"
+                triggerOnHover
+                triggerOnce={false}
+                threshold={0}
+                rootMargin="0px"
+                textAlign="left"
+              />
+              {weatherCurrent ? renderWeatherIcon() : null}
+            </div>
           </div>
           
           {/* Description */}
           <Shuffle
             tag="p"
-            className="text-white/90 mb-0 md:mb-0 text-xs md:text-sm truncate"
+            className="text-white/90 mb-0 md:mb-0 text-[clamp(9px,3.2vw,12px)] md:text-sm break-words md:truncate md:whitespace-nowrap leading-snug"
             text="Diego Beuk • 2025 • 6 songs, 11 min"
             duration={0.4}
             animationMode="random"
@@ -631,11 +824,11 @@ export default function AlbumView() {
         </div>
 
         {/* Contact info - Right side */}
-        <div className="flex flex-col items-end justify-center gap-1 md:gap-2 text-white text-xs md:text-sm flex-shrink-0 relative z-10">
+        <div className="flex flex-col items-end justify-center gap-1 md:gap-2 text-white text-[10px] md:text-sm sm:flex-shrink-0 relative z-10 max-w-[40%] sm:max-w-none">
           {/* Email and Phone */}
           <div className="flex flex-col items-end space-y-0 md:space-y-1">
-            <Shuffle tag="span" className="text-xs md:text-xs truncate" text="beuk.diego@gmail.com" duration={0.35} triggerOnHover triggerOnce threshold={0} rootMargin="0px" textAlign="right" />
-            <Shuffle tag="span" className="text-xs md:text-xs" text="+61 448 092 338" duration={0.35} triggerOnHover triggerOnce threshold={0} rootMargin="0px" textAlign="right" />
+            <Shuffle tag="span" className="text-[10px] md:text-xs truncate max-w-full" text="beuk.diego@gmail.com" duration={0.35} triggerOnHover triggerOnce threshold={0} rootMargin="0px" textAlign="right" />
+            <Shuffle tag="span" className="text-[10px] md:text-xs truncate max-w-full" text="+61 448 092 338" duration={0.35} triggerOnHover triggerOnce threshold={0} rootMargin="0px" textAlign="right" />
           </div>
 
           {/* LinkedIn and GitHub icons - Below text */}
@@ -647,7 +840,7 @@ export default function AlbumView() {
               className="hover:text-primary-500 transition-colors focus:outline-none focus:ring-2 focus:ring-primary-500 rounded flex-shrink-0"
               aria-label="Diego Beuk LinkedIn profile"
             >
-              <FaLinkedin size={14} className="md:w-[25px] md:h-[25px]" color="white" />
+              <FaLinkedin size={18} className="md:w-[25px] md:h-[25px]" color="white" />
             </a>
             <a
               href="https://github.com/dbeukrf"
@@ -656,7 +849,7 @@ export default function AlbumView() {
               className="hover:text-primary-500 transition-colors focus:outline-none focus:ring-2 focus:ring-primary-500 rounded flex-shrink-0"
               aria-label="Diego Beuk Github profile"
             >
-              <FaGithub size={14} className="md:w-[25px] md:h-[25px]" color="white" />
+              <FaGithub size={18} className="md:w-[25px] md:h-[25px]" color="white" />
             </a>
           </div>
         </div>
