@@ -7,3 +7,105 @@ Gray - 2nd Text Colour - #757677
 PP Editorial New by Pangram Pangram 1st font (main body, navigation items, larger headings)
 GT America Mono by Frilli Type 2nd font (timestamp, location, monospaced, technical-looking elements)
 Gilroy Light font ?
+
+
+
+using ipstack for ip geolocation currently (100 requests/month)
+other options: ipify (500 requests in total), Abstract API (2,400,000/year for $17/month or $209 yearly)
+
+TODO: could take language from: "location": {
+    "geoname_id": 3448439,
+    "capital": "Brasília",
+    "capital": "Brasília",
+    "languages": [
+    "languages": [
+      {
+        "code": "pt",
+        "name": "Portuguese",
+        "native": "Português"
+      }
+    ],
+and use it to change the language of the site...
+
+entire JSON IP Location example content:
+==================================================
+Full JSON Response:
+==================================================
+{
+  "ip": "149.102.233.144",
+  "type": "ipv4",
+  "continent_code": "SA",
+  "continent_name": "South America",
+  "country_code": "BR",
+  "country_name": "Brazil",
+  "region_code": "SP",
+  "region_name": "Sao Paulo",
+  "city": "Sao Paulo",
+  "zip": "01001-000",
+  "latitude": -23.547500610351562,
+  "longitude": -46.6361083984375,
+  "msa": null,
+  "dma": null,
+  "radius": "0",
+  "ip_routing_type": "fixed",
+  "connection_type": "tx",
+  "region_name": "Sao Paulo",
+  "city": "Sao Paulo",
+  "zip": "01001-000",
+  "latitude": -23.547500610351562,
+  "longitude": -46.6361083984375,
+  "msa": null,
+  "dma": null,
+  "radius": "0",
+  "ip_routing_type": "fixed",
+  "connection_type": "tx",
+  "latitude": -23.547500610351562,
+  "longitude": -46.6361083984375,
+  "msa": null,
+  "dma": null,
+  "radius": "0",
+  "ip_routing_type": "fixed",
+  "connection_type": "tx",
+  "longitude": -46.6361083984375,
+  "msa": null,
+  "dma": null,
+  "radius": "0",
+  "ip_routing_type": "fixed",
+  "connection_type": "tx",
+  "msa": null,
+  "dma": null,
+  "radius": "0",
+  "ip_routing_type": "fixed",
+  "connection_type": "tx",
+  "dma": null,
+  "radius": "0",
+  "ip_routing_type": "fixed",
+  "connection_type": "tx",
+  "radius": "0",
+  "ip_routing_type": "fixed",
+  "connection_type": "tx",
+  "connection_type": "tx",
+  "location": {
+    "geoname_id": 3448439,
+    "capital": "Brasília",
+  "location": {
+    "geoname_id": 3448439,
+    "capital": "Brasília",
+    "capital": "Brasília",
+    "languages": [
+    "languages": [
+      {
+        "code": "pt",
+        "name": "Portuguese",
+        "native": "Português"
+      }
+    ],
+    "country_flag": "https://assets.ipstack.com/flags/br.svg",
+    "country_flag_emoji": "🇧🇷",
+    "country_flag_emoji_unicode": "U+1F1E7 U+1F1F7",
+    "calling_code": "55",
+    "is_eu": false
+  }
+}
+
+

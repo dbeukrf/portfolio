@@ -3,6 +3,7 @@ import { TRACKS } from '../data/tracks';
 import { FaLinkedin, FaGithub } from 'react-icons/fa';
 import { FaPlay, FaRandom, FaUserPlus } from 'react-icons/fa';
 import Shuffle from '../components/ui/Shuffle';
+import { api } from '../services/api';
 
 const clamp = (value: number, min = 0, max = 1) => Math.max(min, Math.min(max, value));
 
@@ -17,6 +18,9 @@ export default function AlbumView() {
   const [manualRevealProgress, setManualRevealProgress] = useState<number>(0); // Manual reveal progress during reveal phase
   const [currentTrackIndex, setCurrentTrackIndex] = useState<number>(0);
   const [currentTrackProgress, setCurrentTrackProgress] = useState<number>(0);
+  
+  // Location state
+  const [locationText, setLocationText] = useState<string>('Melbourne, Australia - Weather');
 
   // Refs
   const heroRef = useRef<HTMLDivElement | null>(null);
@@ -92,6 +96,39 @@ export default function AlbumView() {
     updateViewportHeight();
     window.addEventListener('resize', updateViewportHeight);
     return () => window.removeEventListener('resize', updateViewportHeight);
+  }, []);
+
+  // Fetch visitor location (only if enabled via environment variable)
+  useEffect(() => {
+    // Check if geolocation is enabled via environment variable
+    // Defaults to 'true' if not set (backward compatible)
+    const enableGeolocation = import.meta.env.VITE_ENABLE_GEOLOCATION !== 'false';
+    
+    if (!enableGeolocation) {
+      // Geolocation is disabled, keep default text
+      return;
+    }
+    
+    const fetchLocation = async () => {
+      try {
+        const response = await api.get<{ city: string | null; country_name: string | null }>('/geo');
+        const { city, country_name } = response.data;
+        
+        if (city && country_name) {
+          setLocationText(`${city}, ${country_name}`);
+        } else if (city) {
+          setLocationText(city);
+        } else if (country_name) {
+          setLocationText(country_name);
+        }
+        // If both are null, keep the default text
+      } catch (error) {
+        console.error('Failed to fetch location:', error);
+        // Keep default text on error
+      }
+    };
+    
+    fetchLocation();
   }, []);
 
   // Handle wheel events to control parallax reveal during reveal phase
@@ -466,7 +503,7 @@ export default function AlbumView() {
             <Shuffle
               tag="h1"
               className="text-sm md:text-3xl font-extrabold text-white mb-0.5 md:mb-2 leading-tight truncate"
-              text="City, Country - Weather"
+              text={locationText}
               duration={0.5}
               animationMode="evenodd"
               triggerOnHover
@@ -480,7 +517,7 @@ export default function AlbumView() {
           {/* Description */}
           <Shuffle
             tag="p"
-            className="text-white/80 mb-0 md:mb-0 text-xs md:text-sm truncate"
+            className="text-white/90 mb-0 md:mb-0 text-xs md:text-sm truncate"
             text="Diego Beuk • 2025 • 6 songs, 11 min"
             duration={0.4}
             animationMode="random"

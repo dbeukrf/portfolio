@@ -10,9 +10,27 @@ from fastapi.middleware.cors import CORSMiddleware
 from dotenv import load_dotenv
 import os
 from typing import Dict, Any
+from contextlib import asynccontextmanager
+from api.routes import geo
 
 # Load environment variables
 load_dotenv()
+
+
+# Lifespan event handler
+@asynccontextmanager
+async def lifespan(app: FastAPI):
+    """Manage application lifespan events."""
+    # Startup
+    print("Diego Portfolio API is starting up...")
+    print(f"Environment: {os.getenv('ENVIRONMENT', 'development')}")
+    print(f"Debug mode: {os.getenv('DEBUG', 'false')}")
+    
+    yield
+    
+    # Shutdown
+    print("Diego Portfolio API is shutting down...")
+
 
 # Initialize FastAPI app
 app = FastAPI(
@@ -21,6 +39,7 @@ app = FastAPI(
     version="1.0.0",
     docs_url="/docs",
     redoc_url="/redoc",
+    lifespan=lifespan,
 )
 
 # Configure CORS middleware
@@ -34,20 +53,6 @@ app.add_middleware(
     allow_methods=["GET", "POST", "PUT", "DELETE", "OPTIONS"],
     allow_headers=["Content-Type", "Authorization"],
 )
-
-# Application startup event
-@app.on_event("startup")
-async def startup_event() -> None:
-    """Initialize application on startup."""
-    print("🚀 Diego Portfolio API is starting up...")
-    print(f"📊 Environment: {os.getenv('ENVIRONMENT', 'development')}")
-    print(f"🔧 Debug mode: {os.getenv('DEBUG', 'false')}")
-
-# Application shutdown event
-@app.on_event("shutdown")
-async def shutdown_event() -> None:
-    """Clean up resources on shutdown."""
-    print("🛑 Diego Portfolio API is shutting down...")
 
 # Health check endpoint
 @app.get("/health", tags=["Health"])
@@ -65,6 +70,9 @@ async def health_check() -> Dict[str, Any]:
         "environment": os.getenv("ENVIRONMENT", "development"),
         "debug": os.getenv("DEBUG", "false").lower() == "true",
     }
+
+# Include routers
+app.include_router(geo.router)
 
 # Root endpoint
 @app.get("/", tags=["Root"])
