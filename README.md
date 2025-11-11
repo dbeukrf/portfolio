@@ -1,126 +1,96 @@
 # Diego Portfolio
 
-A unique, music-themed portfolio website that showcases technical skills through an innovative experience featuring Spotify-style navigation, audio-reactive visualizations, and an AI-powered chatbot.
-
-## Project Overview
-
-Diego Portfolio is a fullstack application that combines:
-- **Frontend**: React + TypeScript + Vite with audio visualizations
-- **Backend**: FastAPI + LangChain + Pinecone for AI chatbot
-- **Deployment**: Vercel (frontend + serverless functions)
+A music-themed portfolio that blends a Spotify-inspired experience with AI-powered storytelling. The project ships with a React/Vite frontend and a FastAPI backend, plus helper scripts to set everything up quickly.
 
 ## Features
+- Spotify-style album view with Diego’s original tracks
+- Real-time audio visualisations and playful UI flourishes
+- Geo-aware welcome experience (IPStack + Open-Meteo)
+- AI DJ chatbot powered by FastAPI foundation
 
-- 🎵 **5-Track Music Player**: Spotify-style album view with Diego's original music
-- 🎨 **Audio Visualizations**: Real-time Canvas-based visualizations synced to music
-- 🤖 **AI DJ Chatbot**: Intelligent assistant answering questions about Diego's background
-- 📱 **Responsive Design**: Optimized for desktop, tablet, and mobile
-- ♿ **Accessibility**: WCAG 2.1 AA compliant
-
-## Quick Start
-
-### Prerequisites
-
+## Requirements
+- Python 3.8+
 - Node.js 18+
-- pnpm 8+
-- Python 3.11+ (for backend)
+- pnpm (the setup script can install or detect it)
 
-### Installation
+## Getting Started
 
-1. Clone the repository:
+### 1. Clone the repo
 ```bash
 git clone <repository-url>
-cd diego-portfolio
+cd portfolio
 ```
 
-2. Install dependencies:
+### 2. Automated setup (recommended)
 ```bash
-pnpm install
+python setup.py
 ```
+This script will:
+- Ensure Python, Node.js, and pnpm exist (installs pnpm if missing)
+- Create the backend virtual environment (`apps/backend/venv`)
+- Install all Python requirements from the root `requirements.txt`
+- Install all frontend dependencies with `pnpm install`
 
-3. Set up environment variables:
-```bash
-# Frontend
-cp apps/web/.env.example apps/web/.env.local
+### 3. Manual setup (optional)
+If you prefer to install things yourself:
+- **Backend**
+  ```bash
+  cd apps/backend
+  python -m venv venv
+  venv\Scripts\activate  # macOS/Linux: source venv/bin/activate
+  pip install -r ../../requirements.txt
+  cp env.example .env  # configure IPSTACK_KEY etc.
+  ```
+- **Frontend**
+  ```bash
+  cd apps/web
+  pnpm install
+  cp .env.example .env.local  # adjust VITE_API_BASE_URL if needed
+  ```
 
-# Backend (when implemented)
-cp apps/api/.env.example apps/api/.env
+## Running the project
+
+Scripts live at the repo root for convenience:
+
+- `python start-app.py` – runs both servers concurrently
+- `python start-backend.py` – starts FastAPI (`http://127.0.0.1:8000`)
+- `python start-frontend.py` – starts Vite dev server (`http://localhost:5173`)
+- Windows: `start-app.bat`, `start-backend.bat`, `start-frontend.bat`
+
+## Useful paths & structure
 ```
-
-4. Start development:
-```bash
-# Frontend
-pnpm --filter web dev
-
-# Backend (when implemented)
-cd apps/api
-python -m venv venv
-source venv/bin/activate  # Windows: venv\Scripts\activate
-pip install -r requirements.txt
-uvicorn main:app --reload
-```
-
-## Project Structure
-
-```
-diego-portfolio/
+portfolio/
 ├── apps/
-│   ├── web/                 # React frontend
-│   └── api/                 # Python serverless functions
+│   ├── backend/              # FastAPI service
+│   │   ├── main.py
+│   │   ├── api/routes/geo.py
+│   │   ├── env.example
+│   │   └── venv/
+│   └── web/                  # React + Vite frontend
+│       ├── src/
+│       ├── package.json
+│       └── pnpm-lock.yaml
 ├── packages/
-│   └── shared/              # Shared TypeScript types
-├── docs/                    # Project documentation
-└── scripts/                 # Build/utility scripts
+│   └── shared/               # Shared TS utilities
+├── docs/                     # Architecture, PRDs, UX specs
+├── requirements.txt          # Consolidated Python deps
+├── setup.py                  # Installs backend + frontend deps
+├── start-app.py              # Launch backend + frontend concurrently
+├── start-backend.py          # Backend launcher
+└── start-frontend.py         # Frontend launcher
 ```
 
-## Technology Stack
+## Testing
+- **Backend**: `cd apps/backend && pytest`
+- **Frontend**: `cd apps/web && pnpm test`
 
-### Frontend
-- React 18.2.x + TypeScript 5.3.x
-- Vite 5.0.x (build tool)
-- TailwindCSS 3.4.x (styling)
-- Zustand 4.4.x (state management)
-- Web Audio API (audio processing)
-- Canvas API (visualizations)
-
-### Backend
-- Python 3.11.x + FastAPI 0.108.x
-- LangChain 0.1.x (AI orchestration)
-- Pinecone (vector database)
-- OpenAI API (LLM + embeddings)
-
-### Development
-- pnpm (package manager)
-- ESLint + Prettier (code quality)
-- Vitest + React Testing Library (testing)
-- Playwright (E2E testing)
-
-## Development Commands
-
-```bash
-# Install dependencies
-pnpm install
-
-# Start frontend development server
-pnpm --filter web dev
-
-# Run tests
-pnpm --filter web test
-
-# Build for production
-pnpm --filter web build
-
-# Lint and format
-pnpm --filter web lint
-pnpm --filter web format
-```
+## Environment variables
+- Backend uses `apps/backend/.env` (copy from `env.example`). Requires `IPSTACK_KEY` when geo lookup is enabled.
+- Frontend honours Vite env vars (`apps/web/.env.local`). The API base defaults to `http://localhost:8000/api`.
 
 ## Documentation
-
-- [Product Requirements Document](docs/prd/)
-- [Architecture Document](docs/architecture/)
-- [UI/UX Specification](docs/diego-portfolio-ux-spec.md)
+- Product & UX specs live under `docs/`
+- Architecture overview lives in `docs/architecture/`
 
 ## License
-
-This project is for portfolio purposes.
+This project is provided for personal portfolio purposes.

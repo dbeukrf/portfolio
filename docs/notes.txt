@@ -13,19 +13,27 @@ Gilroy Light font ?
 using ipstack for ip geolocation currently (100 requests/month)
 other options: ipify (500 requests in total), Abstract API (2,400,000/year for $17/month or $209 yearly)
 
-TODO: could take language from: "location": {
-    "geoname_id": 3448439,
-    "capital": "Brasília",
-    "capital": "Brasília",
-    "languages": [
-    "languages": [
-      {
-        "code": "pt",
-        "name": "Portuguese",
-        "native": "Português"
-      }
-    ],
-and use it to change the language of the site...
+
+
+1. Could take language from Json data and use it to change the language of the site...
+Language api: Lecto Translation https://rapidapi.com/lecto-lecto-default/api/lecto-translation
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 entire JSON IP Location example content:
 ==================================================

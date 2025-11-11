@@ -4,6 +4,7 @@ import { FaLinkedin, FaGithub } from 'react-icons/fa';
 import { FaPlay, FaRandom, FaUserPlus } from 'react-icons/fa';
 import Shuffle from '../components/ui/Shuffle';
 import { api } from '../services/api';
+import { fetchWeatherApi } from 'openmeteo';
 
 const clamp = (value: number, min = 0, max = 1) => Math.max(min, Math.min(max, value));
 
@@ -20,7 +21,7 @@ export default function AlbumView() {
   const [currentTrackProgress, setCurrentTrackProgress] = useState<number>(0);
   
   // Location state
-  const [locationText, setLocationText] = useState<string>('Melbourne, Australia - Weather');
+  const [locationText, setLocationText] = useState<string>('Melbourne, Australia');
 
   // Refs
   const heroRef = useRef<HTMLDivElement | null>(null);
@@ -98,37 +99,137 @@ export default function AlbumView() {
     return () => window.removeEventListener('resize', updateViewportHeight);
   }, []);
 
-  // Fetch visitor location (only if enabled via environment variable)
+  // Fetch visitor location and weather (only if enabled via environment variable)
   useEffect(() => {
     // Check if geolocation is enabled via environment variable
     // Defaults to 'true' if not set (backward compatible)
     const enableGeolocation = import.meta.env.VITE_ENABLE_GEOLOCATION !== 'false';
     
+    const fetchWeather = async (latitude: number, longitude: number, locationStr: string) => {
+      try {
+        const params = {
+          "latitude": latitude,
+          "longitude": longitude,
+          "current": ["temperature_2m", "apparent_temperature", "is_day", "rain"],
+          "timezone": "auto",
+        };
+        
+        const url = "https://api.open-meteo.com/v1/forecast";
+        
+        if (import.meta.env.DEV) {
+          console.log('Fetching weather for:', latitude, longitude, params);
+        }
+        
+        const responses = await fetchWeatherApi(url, params);
+        
+        if (!responses || responses.length === 0) {
+          throw new Error('No weather response received');
+        }
+        
+        // Process first location
+        const response = responses[0];
+        if (!response) {
+          throw new Error('Invalid weather response');
+        }
+        
+        const utcOffsetSeconds = response.utcOffsetSeconds();
+        const current = response.current();
+        
+        if (!current) {
+          throw new Error('No current weather data available');
+        }
+        
+        // Extract weather data
+        // Note: The order of weather variables in the URL query and the indices below need to match!
+        const temperature_2m = current.variables(0);
+        const apparent_temperature = current.variables(1);
+        const is_day = current.variables(2);
+        const rain = current.variables(3);
+        
+        if (!temperature_2m || !is_day) {
+          throw new Error('Missing required weather variables');
+        }
+        
+        const weatherData = {
+          time: new Date((Number(current.time()) + utcOffsetSeconds) * 1000),
+          temperature_2m: temperature_2m.value(),
+          apparent_temperature: apparent_temperature?.value() ?? temperature_2m.value(),
+          is_day: is_day.value(),
+          rain: rain?.value() ?? 0,
+        };
+        
+        if (import.meta.env.DEV) {
+          console.log('Weather data received:', weatherData);
+        }
+        
+        // Format weather information
+        const temp = Math.round(weatherData.temperature_2m);
+        const timeOfDay = weatherData.is_day === 1 ? 'Day' : 'Night';
+        const rainStatus = weatherData.rain > 0 ? `, ${Math.round(weatherData.rain)}mm rain` : '';
+        
+        // Update location text with weather info
+        const weatherText = `${temp}°C ${timeOfDay}${rainStatus}`;
+        if (locationStr) {
+          setLocationText(`${locationStr} - ${weatherText}`);
+        } else {
+          setLocationText(weatherText);
+        }
+      } catch (weatherError) {
+        console.error('Failed to fetch weather:', weatherError);
+        // If weather fetch fails, just use location
+        if (locationStr) {
+          setLocationText(locationStr);
+        }
+      }
+    };
+    
     if (!enableGeolocation) {
-      // Geolocation is disabled, keep default text
+      // Geolocation is disabled, use default location (Melbourne, Australia)
+      const defaultLocation = 'Melbourne, Australia';
+      const melbourneLat = -37.814;
+      const melbourneLon = 144.9633;
+      fetchWeather(melbourneLat, melbourneLon, defaultLocation);
       return;
     }
     
-    const fetchLocation = async () => {
+    const fetchLocationAndWeather = async () => {
       try {
-        const response = await api.get<{ city: string | null; country_name: string | null }>('/geo');
-        const { city, country_name } = response.data;
+        // Fetch geolocation data
+        const geoResponse = await api.get<{ 
+          city: string | null; 
+          country_name: string | null;
+          latitude: number | null;
+          longitude: number | null;
+        }>('/geo');
         
+        const { city, country_name, latitude, longitude } = geoResponse.data;
+        
+        // Build location string
+        let locationStr = '';
         if (city && country_name) {
-          setLocationText(`${city}, ${country_name}`);
+          locationStr = `${city}, ${country_name}`;
         } else if (city) {
-          setLocationText(city);
+          locationStr = city;
         } else if (country_name) {
-          setLocationText(country_name);
+          locationStr = country_name;
         }
-        // If both are null, keep the default text
+        
+        // Fetch weather data if we have coordinates
+        if (latitude !== null && longitude !== null) {
+          await fetchWeather(latitude, longitude, locationStr);
+        } else {
+          // No coordinates, just use location
+          if (locationStr) {
+            setLocationText(locationStr);
+          }
+        }
       } catch (error) {
         console.error('Failed to fetch location:', error);
         // Keep default text on error
       }
     };
     
-    fetchLocation();
+    fetchLocationAndWeather();
   }, []);
 
   // Handle wheel events to control parallax reveal during reveal phase
