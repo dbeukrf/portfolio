@@ -58,110 +58,64 @@ export default function AlbumView() {
     // WMO code mapping (https://open-meteo.com/en/docs#weathervariables)
     
     // Clear sky
-    if (code === 0) {
-      return { iconName: isDay ? 'clear-day' : 'clear-night', label: isDay ? 'Clear' : 'Clear night' };
-    }
+    if (code === 0) { return { iconName: isDay ? 'clear-day' : 'clear-night', label: isDay ? 'Clear' : 'Clear night' }; }
     
     // Mostly clear
-    if (code === 1) {
-      return { iconName: isDay ? 'partly-cloudy-day' : 'partly-cloudy-night', label: 'Mostly clear' };
-    }
+    if (code === 1) { return { iconName: isDay ? 'partly-cloudy-day' : 'partly-cloudy-night', label: 'Mostly clear' }; }
     
     // Partly cloudy
-    if (code === 2) {
-      return { iconName: isDay ? 'partly-cloudy-day' : 'partly-cloudy-night', label: 'Partly cloudy' };
-    }
+    if (code === 2) { return { iconName: isDay ? 'partly-cloudy-day' : 'partly-cloudy-night', label: 'Partly cloudy' }; }
     
     // Overcast
-    if (code === 3) {
-      return { iconName: isDay ? 'overcast-day' : 'overcast-night', label: 'Overcast' };
-    }
+    if (code === 3) { return { iconName: isDay ? 'overcast-day' : 'overcast-night', label: 'Overcast' }; }
     
     // Fog
-    if (code === 45 || code === 48) {
-      return { iconName: isDay ? 'fog-day' : 'fog-night', label: 'Fog' };
-    }
+    if (code === 45 || code === 48) { return { iconName: isDay ? 'fog-day' : 'fog-night', label: 'Fog' }; }
     
     // Drizzle
     if (code === 51 || code === 53 || code === 55) {
-      if (isExtreme) {
-        return { iconName: `extreme-${dayNight}-drizzle`, label: 'Extreme drizzle' };
-      }
-      if (cloud >= 85) {
-        return { iconName: `overcast-${dayNight}-drizzle`, label: 'Overcast drizzle' };
-      }
-      if (cloud >= 35) {
-        return { iconName: `partly-cloudy-${dayNight}-drizzle`, label: 'Drizzle' };
-      }
+      if (isExtreme) { return { iconName: `extreme-${dayNight}-drizzle`, label: 'Extreme drizzle' }; }
+      if (cloud >= 85) { return { iconName: `overcast-${dayNight}-drizzle`, label: 'Overcast drizzle' }; }
+      if (cloud >= 35) { return { iconName: `partly-cloudy-${dayNight}-drizzle`, label: 'Drizzle' }; }
       return { iconName: 'drizzle', label: 'Drizzle' };
     }
     
     // Freezing drizzle
-    if (code === 56 || code === 57) {
-      return { iconName: 'sleet', label: 'Freezing drizzle' };
-    }
+    if (code === 56 || code === 57) { return { iconName: 'sleet', label: 'Freezing drizzle' }; }
     
     // Rain
     if (code === 61 || code === 63 || code === 65) {
-      if (isExtreme) {
-        return { iconName: `extreme-${dayNight}-rain`, label: 'Extreme rain' };
-      }
-      if (cloud >= 85) {
-        return { iconName: `overcast-${dayNight}-rain`, label: 'Overcast rain' };
-      }
-      if (cloud >= 35) {
-        return { iconName: `partly-cloudy-${dayNight}-rain`, label: 'Rain' };
-      }
+      if (isExtreme) { return { iconName: `extreme-${dayNight}-rain`, label: 'Extreme rain' }; }
+      if (cloud >= 85) { return { iconName: `overcast-${dayNight}-rain`, label: 'Overcast rain' }; }
+      if (cloud >= 35) { return { iconName: `partly-cloudy-${dayNight}-rain`, label: 'Rain' }; }
       return { iconName: 'rain', label: 'Rain' };
     }
     
     // Freezing rain
-    if (code === 66 || code === 67) {
-      return { iconName: 'sleet', label: 'Freezing rain' };
-    }
+    if (code === 66 || code === 67) { return { iconName: 'sleet', label: 'Freezing rain' }; }
     
     // Snow
     if (code === 71 || code === 73 || code === 75 || code === 77) {
-      if (isExtreme) {
-        return { iconName: `extreme-${dayNight}-snow`, label: 'Extreme snow' };
-      }
-      if (wind >= 40) {
-        return { iconName: 'wind-snow', label: 'Blowing snow' };
-      }
-      if (cloud >= 85) {
-        return { iconName: `overcast-${dayNight}-snow`, label: 'Overcast snow' };
-      }
-      if (cloud >= 35) {
-        return { iconName: `partly-cloudy-${dayNight}-snow`, label: 'Snow' };
-      }
+      if (isExtreme) { return { iconName: `extreme-${dayNight}-snow`, label: 'Extreme snow' }; }
+      if (wind >= 40) { return { iconName: 'wind-snow', label: 'Blowing snow' }; }
+      if (cloud >= 85) { return { iconName: `overcast-${dayNight}-snow`, label: 'Overcast snow' }; }
+      if (cloud >= 35) { return { iconName: `partly-cloudy-${dayNight}-snow`, label: 'Snow' }; }
       return { iconName: 'snow', label: 'Snow' };
     }
     
     // Rain showers
     if (code === 80 || code === 81 || code === 82) {
-      if (isExtreme) {
-        return { iconName: `extreme-${dayNight}-rain`, label: 'Extreme rain showers' };
-      }
-      if (cloud >= 85) {
-        return { iconName: `overcast-${dayNight}-rain`, label: 'Overcast rain showers' };
-      }
-      if (cloud >= 35) {
-        return { iconName: `partly-cloudy-${dayNight}-rain`, label: 'Rain showers' };
-      }
+      if (isExtreme) { return { iconName: `extreme-${dayNight}-rain`, label: 'Extreme rain showers' }; }
+      if (cloud >= 85) { return { iconName: `overcast-${dayNight}-rain`, label: 'Overcast rain showers' }; }
+      if (cloud >= 35) { return { iconName: `partly-cloudy-${dayNight}-rain`, label: 'Rain showers' }; }
       return { iconName: 'rain', label: 'Rain showers' };
     }
     
     // Snow showers
     if (code === 85 || code === 86) {
-      if (isExtreme) {
-        return { iconName: `extreme-${dayNight}-snow`, label: 'Extreme snow showers' };
-      }
-      if (cloud >= 85) {
-        return { iconName: `overcast-${dayNight}-snow`, label: 'Overcast snow showers' };
-      }
-      if (cloud >= 35) {
-        return { iconName: `partly-cloudy-${dayNight}-snow`, label: 'Snow showers' };
-      }
+      if (isExtreme) { return { iconName: `extreme-${dayNight}-snow`, label: 'Extreme snow showers' }; }
+      if (cloud >= 85) { return { iconName: `overcast-${dayNight}-snow`, label: 'Overcast snow showers' }; }
+      if (cloud >= 35) { return { iconName: `partly-cloudy-${dayNight}-snow`, label: 'Snow showers' }; }
       return { iconName: 'snow', label: 'Snow showers' };
     }
     
@@ -171,104 +125,58 @@ export default function AlbumView() {
       const hasSnow = cloud >= 60 && rain < 0.1;
       
       if (isExtreme) {
-        if (hasSnow) {
-          return { iconName: `thunderstorms-${dayNight}-extreme-snow`, label: 'Extreme thunderstorms with snow' };
-        }
-        if (hasRain) {
-          return { iconName: `thunderstorms-${dayNight}-extreme-rain`, label: 'Extreme thunderstorms with rain' };
-        }
+        if (hasSnow) { return { iconName: `thunderstorms-${dayNight}-extreme-snow`, label: 'Extreme thunderstorms with snow' }; }
+        if (hasRain) { return { iconName: `thunderstorms-${dayNight}-extreme-rain`, label: 'Extreme thunderstorms with rain' }; }
         return { iconName: `thunderstorms-${dayNight}-extreme`, label: 'Extreme thunderstorms' };
       }
       
       if (cloud >= 85) {
-        if (hasSnow) {
-          return { iconName: `thunderstorms-${dayNight}-overcast-snow`, label: 'Thunderstorms with snow' };
-        }
-        if (hasRain) {
-          return { iconName: `thunderstorms-${dayNight}-overcast-rain`, label: 'Thunderstorms with rain' };
-        }
+        if (hasSnow) { return { iconName: `thunderstorms-${dayNight}-overcast-snow`, label: 'Thunderstorms with snow' }; }
+        if (hasRain) { return { iconName: `thunderstorms-${dayNight}-overcast-rain`, label: 'Thunderstorms with rain' }; }
         return { iconName: `thunderstorms-${dayNight}-overcast`, label: 'Thunderstorms' };
       }
       
-      if (hasSnow) {
-        return { iconName: `thunderstorms-${dayNight}-snow`, label: 'Thunderstorms with snow' };
-      }
-      if (hasRain) {
-        return { iconName: `thunderstorms-${dayNight}-rain`, label: 'Thunderstorms with rain' };
-      }
+      if (hasSnow) { return { iconName: `thunderstorms-${dayNight}-snow`, label: 'Thunderstorms with snow' }; }
+      if (hasRain) { return { iconName: `thunderstorms-${dayNight}-rain`, label: 'Thunderstorms with rain' }; }
       return { iconName: `thunderstorms-${dayNight}`, label: 'Thunderstorms' };
     }
     
     // Hail
     if (code === 96 || code === 99) {
-      if (isExtreme) {
-        return { iconName: `extreme-${dayNight}-hail`, label: 'Extreme hail' };
-      }
-      if (cloud >= 85) {
-        return { iconName: `overcast-${dayNight}-hail`, label: 'Overcast hail' };
-      }
-      if (cloud >= 35) {
-        return { iconName: `partly-cloudy-${dayNight}-hail`, label: 'Hail' };
-      }
+      if (isExtreme) { return { iconName: `extreme-${dayNight}-hail`, label: 'Extreme hail' }; }
+      if (cloud >= 85) { return { iconName: `overcast-${dayNight}-hail`, label: 'Overcast hail' }; }
+      if (cloud >= 35) { return { iconName: `partly-cloudy-${dayNight}-hail`, label: 'Hail' }; }
       return { iconName: 'hail', label: 'Hail' };
     }
     
     // Heuristics when code is missing or invalid
-    if (rain >= 20) {
-      return { iconName: isDay ? 'extreme-day-rain' : 'extreme-night-rain', label: 'Extreme rain' };
-    }
+    if (rain >= 20) { return { iconName: isDay ? 'extreme-day-rain' : 'extreme-night-rain', label: 'Extreme rain' }; }
     if (rain >= 10) {
-      if (cloud >= 85) {
-        return { iconName: `overcast-${dayNight}-rain`, label: 'Heavy rain' };
-      }
-      if (cloud >= 35) {
-        return { iconName: `partly-cloudy-${dayNight}-rain`, label: 'Heavy rain' };
-      }
+      if (cloud >= 85) { return { iconName: `overcast-${dayNight}-rain`, label: 'Heavy rain' }; }
+      if (cloud >= 35) { return { iconName: `partly-cloudy-${dayNight}-rain`, label: 'Heavy rain' }; }
       return { iconName: 'rain', label: 'Heavy rain' };
     }
     if (rain >= 2.5) {
-      if (cloud >= 85) {
-        return { iconName: `overcast-${dayNight}-rain`, label: 'Moderate rain' };
-      }
-      if (cloud >= 35) {
-        return { iconName: `partly-cloudy-${dayNight}-rain`, label: 'Moderate rain' };
-      }
+      if (cloud >= 85) { return { iconName: `overcast-${dayNight}-rain`, label: 'Moderate rain' }; }
+      if (cloud >= 35) { return { iconName: `partly-cloudy-${dayNight}-rain`, label: 'Moderate rain' }; }
       return { iconName: 'rain', label: 'Moderate rain' };
     }
     if (rain > 0) {
-      if (cloud >= 85) {
-        return { iconName: `overcast-${dayNight}-rain`, label: 'Light rain' };
-      }
-      if (cloud >= 35) {
-        return { iconName: `partly-cloudy-${dayNight}-rain`, label: 'Light rain' };
-      }
+      if (cloud >= 85) { return { iconName: `overcast-${dayNight}-rain`, label: 'Light rain' }; }
+      if (cloud >= 35) { return { iconName: `partly-cloudy-${dayNight}-rain`, label: 'Light rain' }; }
       return { iconName: 'rain', label: 'Light rain' };
     }
     
     // Windy conditions
-    if (wind >= 50) {
-      return { iconName: 'wind', label: 'Very windy' };
-    }
-    if (wind >= 35 && cloud >= 60) {
-      return { iconName: 'wind-snow', label: 'Windy with snow' };
-    }
-    if (wind >= 35) {
-      return { iconName: 'wind', label: 'Windy' };
-    }
+    if (wind >= 50) { return { iconName: 'wind', label: 'Very windy' }; }
+    if (wind >= 35 && cloud >= 60) { return { iconName: 'wind-snow', label: 'Windy with snow' }; }
+    if (wind >= 35) { return { iconName: 'wind', label: 'Windy' }; }
     
     // Cloud cover based conditions
-    if (cloud >= 85) {
-      return { iconName: isDay ? 'overcast-day' : 'overcast-night', label: 'Overcast' };
-    }
-    if (cloud >= 65) {
-      return { iconName: isDay ? 'overcast-day' : 'overcast-night', label: 'Mostly cloudy' };
-    }
-    if (cloud >= 35) {
-      return { iconName: isDay ? 'partly-cloudy-day' : 'partly-cloudy-night', label: 'Partly cloudy' };
-    }
-    if (cloud >= 15) {
-      return { iconName: isDay ? 'partly-cloudy-day' : 'partly-cloudy-night', label: 'Mostly clear' };
-    }
+    if (cloud >= 85) { return { iconName: isDay ? 'overcast-day' : 'overcast-night', label: 'Overcast' }; }
+    if (cloud >= 65) { return { iconName: isDay ? 'overcast-day' : 'overcast-night', label: 'Mostly cloudy' }; }
+    if (cloud >= 35) { return { iconName: isDay ? 'partly-cloudy-day' : 'partly-cloudy-night', label: 'Partly cloudy' }; }
+    if (cloud >= 15) { return { iconName: isDay ? 'partly-cloudy-day' : 'partly-cloudy-night', label: 'Mostly clear' }; }
     
     // Default: clear
     return { iconName: isDay ? 'clear-day' : 'clear-night', label: isDay ? 'Clear' : 'Clear night' };
