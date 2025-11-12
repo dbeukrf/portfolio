@@ -7,7 +7,6 @@ import { api } from '../services/api';
 import { fetchWeatherApi } from 'openmeteo';
 
 const clamp = (value: number, min = 0, max = 1) => Math.max(min, Math.min(max, value));
-const GOOGLE_WEATHER_ICON_BASE = 'https://maps.gstatic.com/weather/v1/';
 
 export default function AlbumView() {
   // Scrolling state
@@ -41,84 +40,244 @@ export default function AlbumView() {
     precipitationSumMm?: number[];
   } | null>(null);
   
-  const mapToGoogleCondition = (w: {
+  const mapToWeatherIcon = (w: {
     weatherCode?: number;
     rainMm?: number;
     cloudCoverPct?: number;
     isDay?: number;
     windSpeed10m?: number;
-  }): { condition: string; label: string } => {
+  }): { iconName: string; label: string } => {
     const code = w.weatherCode ?? -1;
     const rain = w.rainMm ?? 0;
     const cloud = w.cloudCoverPct ?? 0;
     const isDay = (w.isDay ?? 1) === 1;
     const wind = w.windSpeed10m ?? 0;
-    const isWindy = wind >= 35 && rain < 0.1;
+    const isExtreme = wind >= 50 || rain >= 20;
+    const dayNight = isDay ? 'day' : 'night';
+    
     // WMO code mapping (https://open-meteo.com/en/docs#weathervariables)
-    // Core sky state
-    if (code === 0) return { condition: isDay ? 'clear' : 'clear_night', label: isDay ? 'Clear' : 'Clear night' };
-    if (code === 1) return { condition: 'mostly_clear', label: 'Mostly clear' };
-    if (code === 2) return { condition: 'partly_cloudy', label: 'Partly cloudy' };
-    if (code === 3) return { condition: 'cloudy', label: 'Cloudy' };
-    // Fog: approximate as mostly_cloudy (no direct fog icon in provided list)
-    if (code === 45 || code === 48) return { condition: 'mostly_cloudy', label: 'Fog' };
+    
+    // Clear sky
+    if (code === 0) {
+      return { iconName: isDay ? 'clear-day' : 'clear-night', label: isDay ? 'Clear' : 'Clear night' };
+    }
+    
+    // Mostly clear
+    if (code === 1) {
+      return { iconName: isDay ? 'partly-cloudy-day' : 'partly-cloudy-night', label: 'Mostly clear' };
+    }
+    
+    // Partly cloudy
+    if (code === 2) {
+      return { iconName: isDay ? 'partly-cloudy-day' : 'partly-cloudy-night', label: 'Partly cloudy' };
+    }
+    
+    // Overcast
+    if (code === 3) {
+      return { iconName: isDay ? 'overcast-day' : 'overcast-night', label: 'Overcast' };
+    }
+    
+    // Fog
+    if (code === 45 || code === 48) {
+      return { iconName: isDay ? 'fog-day' : 'fog-night', label: 'Fog' };
+    }
+    
     // Drizzle
-    if (code === 51) return { condition: 'light_rain', label: 'Light drizzle' };
-    if (code === 53) return { condition: 'light_to_moderate_rain', label: 'Drizzle' };
-    if (code === 55) return { condition: 'rain', label: 'Dense drizzle' };
-    if (code === 56 || code === 57) return { condition: 'rain', label: 'Freezing drizzle' };
+    if (code === 51 || code === 53 || code === 55) {
+      if (isExtreme) {
+        return { iconName: `extreme-${dayNight}-drizzle`, label: 'Extreme drizzle' };
+      }
+      if (cloud >= 85) {
+        return { iconName: `overcast-${dayNight}-drizzle`, label: 'Overcast drizzle' };
+      }
+      if (cloud >= 35) {
+        return { iconName: `partly-cloudy-${dayNight}-drizzle`, label: 'Drizzle' };
+      }
+      return { iconName: 'drizzle', label: 'Drizzle' };
+    }
+    
+    // Freezing drizzle
+    if (code === 56 || code === 57) {
+      return { iconName: 'sleet', label: 'Freezing drizzle' };
+    }
+    
     // Rain
-    if (code === 61) return { condition: 'light_rain', label: 'Light rain' };
-    if (code === 63) return { condition: 'light_to_moderate_rain', label: 'Moderate rain' };
-    if (code === 65) return { condition: 'heavy_rain', label: 'Heavy rain' };
-    // Freezing rain/mixed precip — approximate as rain_and_snow
-    if (code === 66 || code === 67) return { condition: 'rain_and_snow', label: 'Freezing rain' };
+    if (code === 61 || code === 63 || code === 65) {
+      if (isExtreme) {
+        return { iconName: `extreme-${dayNight}-rain`, label: 'Extreme rain' };
+      }
+      if (cloud >= 85) {
+        return { iconName: `overcast-${dayNight}-rain`, label: 'Overcast rain' };
+      }
+      if (cloud >= 35) {
+        return { iconName: `partly-cloudy-${dayNight}-rain`, label: 'Rain' };
+      }
+      return { iconName: 'rain', label: 'Rain' };
+    }
+    
+    // Freezing rain
+    if (code === 66 || code === 67) {
+      return { iconName: 'sleet', label: 'Freezing rain' };
+    }
+    
     // Snow
-    if (code === 71) return { condition: 'light_snow', label: 'Light snow' };
-    if (code === 73) return { condition: 'light_to_moderate_snow', label: 'Moderate snow' };
-    if (code === 75) {
-      // Very windy + heavy snow -> snowstorm variants
-      if (wind >= 40) return { condition: 'heavy_snow_storm', label: 'Heavy snow storm' };
-      if (wind >= 28) return { condition: 'snowstorm', label: 'Snowstorm' };
-      return { condition: 'heavy_snow', label: 'Heavy snow' };
+    if (code === 71 || code === 73 || code === 75 || code === 77) {
+      if (isExtreme) {
+        return { iconName: `extreme-${dayNight}-snow`, label: 'Extreme snow' };
+      }
+      if (wind >= 40) {
+        return { iconName: 'wind-snow', label: 'Blowing snow' };
+      }
+      if (cloud >= 85) {
+        return { iconName: `overcast-${dayNight}-snow`, label: 'Overcast snow' };
+      }
+      if (cloud >= 35) {
+        return { iconName: `partly-cloudy-${dayNight}-snow`, label: 'Snow' };
+      }
+      return { iconName: 'snow', label: 'Snow' };
     }
-    if (code === 77) return { condition: 'snow', label: 'Snow grains' };
-    // Showers
-    if (code === 80) return { condition: 'scattered_showers', label: 'Scattered showers' };
-    if (code === 81) return { condition: 'rain_showers', label: 'Rain showers' };
-    if (code === 82) return { condition: 'heavy_rain_showers', label: 'Violent rain showers' };
-    if (code === 85) return { condition: 'scattered_snow_showers', label: 'Scattered snow showers' };
-    if (code === 86) return { condition: 'heavy_snow_showers', label: 'Heavy snow showers' };
-    // Thunder
-    if (code === 95) {
-      if (rain > 0.1) return { condition: 'thundershower', label: 'Thundershower' };
-      // scattered thunderstorms if not raining heavily
-      if (cloud >= 50) return { condition: 'scattered_thunderstorms', label: 'Scattered thunderstorms' };
-      return { condition: 'thunderstorm', label: 'Thunderstorm' };
+    
+    // Rain showers
+    if (code === 80 || code === 81 || code === 82) {
+      if (isExtreme) {
+        return { iconName: `extreme-${dayNight}-rain`, label: 'Extreme rain showers' };
+      }
+      if (cloud >= 85) {
+        return { iconName: `overcast-${dayNight}-rain`, label: 'Overcast rain showers' };
+      }
+      if (cloud >= 35) {
+        return { iconName: `partly-cloudy-${dayNight}-rain`, label: 'Rain showers' };
+      }
+      return { iconName: 'rain', label: 'Rain showers' };
     }
-    if (code === 96 || code === 99) return { condition: 'hail', label: 'Hail' };
-    // Heuristics when code missing
-    if (rain >= 12) return { condition: 'moderate_to_heavy_rain', label: 'Moderate to heavy rain' };
-    if (rain >= 10) return { condition: 'rain_periodically_heavy', label: 'Heavy rain' };
-    if (rain >= 7) return { condition: 'heavy_rain', label: 'Heavy rain' };
-    if (rain >= 2.5) return { condition: 'light_to_moderate_rain', label: 'Light to moderate rain' };
-    if (rain >= 0.5) return { condition: 'chance_of_showers', label: 'Chance of showers' };
-    if (rain > 0) return { condition: 'light_rain', label: 'Light rain' };
-    if (isWindy && rain > 0.1) return { condition: 'wind_and_rain', label: 'Wind and rain' };
-    // Blowing snow heuristic (no code + windy and likely snowy cloud cover)
-    if (wind >= 35 && cloud >= 60 && !isDay) return { condition: 'blowing_snow', label: 'Blowing snow' };
-    if (isWindy) return { condition: 'windy', label: 'Windy' };
-    if (cloud >= 85) return { condition: 'cloudy', label: 'Cloudy' };
-    if (cloud >= 65) return { condition: 'mostly_cloudy', label: 'Mostly cloudy' };
-    if (cloud >= 35) return { condition: 'partly_cloudy', label: 'Partly cloudy' };
-    if (cloud >= 15) return { condition: 'mostly_clear', label: 'Mostly clear' };
-    return { condition: isDay ? 'clear' : 'clear_night', label: isDay ? 'Clear' : 'Clear night' };
+    
+    // Snow showers
+    if (code === 85 || code === 86) {
+      if (isExtreme) {
+        return { iconName: `extreme-${dayNight}-snow`, label: 'Extreme snow showers' };
+      }
+      if (cloud >= 85) {
+        return { iconName: `overcast-${dayNight}-snow`, label: 'Overcast snow showers' };
+      }
+      if (cloud >= 35) {
+        return { iconName: `partly-cloudy-${dayNight}-snow`, label: 'Snow showers' };
+      }
+      return { iconName: 'snow', label: 'Snow showers' };
+    }
+    
+    // Thunderstorms
+    if (code === 95 || code === 96 || code === 99) {
+      const hasRain = rain > 0.1;
+      const hasSnow = cloud >= 60 && rain < 0.1;
+      
+      if (isExtreme) {
+        if (hasSnow) {
+          return { iconName: `thunderstorms-${dayNight}-extreme-snow`, label: 'Extreme thunderstorms with snow' };
+        }
+        if (hasRain) {
+          return { iconName: `thunderstorms-${dayNight}-extreme-rain`, label: 'Extreme thunderstorms with rain' };
+        }
+        return { iconName: `thunderstorms-${dayNight}-extreme`, label: 'Extreme thunderstorms' };
+      }
+      
+      if (cloud >= 85) {
+        if (hasSnow) {
+          return { iconName: `thunderstorms-${dayNight}-overcast-snow`, label: 'Thunderstorms with snow' };
+        }
+        if (hasRain) {
+          return { iconName: `thunderstorms-${dayNight}-overcast-rain`, label: 'Thunderstorms with rain' };
+        }
+        return { iconName: `thunderstorms-${dayNight}-overcast`, label: 'Thunderstorms' };
+      }
+      
+      if (hasSnow) {
+        return { iconName: `thunderstorms-${dayNight}-snow`, label: 'Thunderstorms with snow' };
+      }
+      if (hasRain) {
+        return { iconName: `thunderstorms-${dayNight}-rain`, label: 'Thunderstorms with rain' };
+      }
+      return { iconName: `thunderstorms-${dayNight}`, label: 'Thunderstorms' };
+    }
+    
+    // Hail
+    if (code === 96 || code === 99) {
+      if (isExtreme) {
+        return { iconName: `extreme-${dayNight}-hail`, label: 'Extreme hail' };
+      }
+      if (cloud >= 85) {
+        return { iconName: `overcast-${dayNight}-hail`, label: 'Overcast hail' };
+      }
+      if (cloud >= 35) {
+        return { iconName: `partly-cloudy-${dayNight}-hail`, label: 'Hail' };
+      }
+      return { iconName: 'hail', label: 'Hail' };
+    }
+    
+    // Heuristics when code is missing or invalid
+    if (rain >= 20) {
+      return { iconName: isDay ? 'extreme-day-rain' : 'extreme-night-rain', label: 'Extreme rain' };
+    }
+    if (rain >= 10) {
+      if (cloud >= 85) {
+        return { iconName: `overcast-${dayNight}-rain`, label: 'Heavy rain' };
+      }
+      if (cloud >= 35) {
+        return { iconName: `partly-cloudy-${dayNight}-rain`, label: 'Heavy rain' };
+      }
+      return { iconName: 'rain', label: 'Heavy rain' };
+    }
+    if (rain >= 2.5) {
+      if (cloud >= 85) {
+        return { iconName: `overcast-${dayNight}-rain`, label: 'Moderate rain' };
+      }
+      if (cloud >= 35) {
+        return { iconName: `partly-cloudy-${dayNight}-rain`, label: 'Moderate rain' };
+      }
+      return { iconName: 'rain', label: 'Moderate rain' };
+    }
+    if (rain > 0) {
+      if (cloud >= 85) {
+        return { iconName: `overcast-${dayNight}-rain`, label: 'Light rain' };
+      }
+      if (cloud >= 35) {
+        return { iconName: `partly-cloudy-${dayNight}-rain`, label: 'Light rain' };
+      }
+      return { iconName: 'rain', label: 'Light rain' };
+    }
+    
+    // Windy conditions
+    if (wind >= 50) {
+      return { iconName: 'wind', label: 'Very windy' };
+    }
+    if (wind >= 35 && cloud >= 60) {
+      return { iconName: 'wind-snow', label: 'Windy with snow' };
+    }
+    if (wind >= 35) {
+      return { iconName: 'wind', label: 'Windy' };
+    }
+    
+    // Cloud cover based conditions
+    if (cloud >= 85) {
+      return { iconName: isDay ? 'overcast-day' : 'overcast-night', label: 'Overcast' };
+    }
+    if (cloud >= 65) {
+      return { iconName: isDay ? 'overcast-day' : 'overcast-night', label: 'Mostly cloudy' };
+    }
+    if (cloud >= 35) {
+      return { iconName: isDay ? 'partly-cloudy-day' : 'partly-cloudy-night', label: 'Partly cloudy' };
+    }
+    if (cloud >= 15) {
+      return { iconName: isDay ? 'partly-cloudy-day' : 'partly-cloudy-night', label: 'Mostly clear' };
+    }
+    
+    // Default: clear
+    return { iconName: isDay ? 'clear-day' : 'clear-night', label: isDay ? 'Clear' : 'Clear night' };
   };
   
   const renderWeatherIcon = () => {
     if (!weatherCurrent) return null;
-    const { condition, label } = mapToGoogleCondition(weatherCurrent);
-    const iconUrl = `${GOOGLE_WEATHER_ICON_BASE}${condition}.svg`;
+    const { iconName, label } = mapToWeatherIcon(weatherCurrent);
+    const iconUrl = `/weathericons/${iconName}.svg`;
     return (
       <div
         className={`ml-1 md:ml-2 inline-flex items-center transition-opacity duration-1500 ${weatherCurrent ? 'opacity-100' : 'opacity-0'}`}
@@ -127,7 +286,7 @@ export default function AlbumView() {
         <img
           src={iconUrl}
           alt={`${label} weather icon`}
-          className="w-[18px] h-[18px] md:w-[26px] md:h-[26px] -translate-y-[4.5px] md:-translate-y-[4.5px]"
+          className="w-[30px] h-[30px] md:w-[60px] md:h-[60px] -translate-y-[4.5px] md:-translate-y-[4.5px]"
           loading="lazy"
         />
       </div>
@@ -170,6 +329,121 @@ export default function AlbumView() {
       clearTimeout(timeoutId);
       window.removeEventListener('resize', compute);
       observer.disconnect();
+    };
+  }, []);
+
+  // Periodically refresh weather so the icon updates on weather/time (day/night) changes
+  useEffect(() => {
+    let isCancelled = false;
+    const enableGeolocation = import.meta.env.VITE_ENABLE_GEOLOCATION !== 'false';
+    const DEFAULT_LOCATION = 'Melbourne, Australia';
+    const MELBOURNE = { lat: -37.8136, lon: 144.9631 };
+    const url = "https://api.open-meteo.com/v1/forecast";
+
+    const refresh = async () => {
+      try {
+        let latitude: number | null = null;
+        let longitude: number | null = null;
+        let locationStr = DEFAULT_LOCATION;
+
+        if (enableGeolocation) {
+          try {
+            const geoResponse = await api.get<{ 
+              city: string | null; 
+              country_name: string | null;
+              latitude: number | null;
+              longitude: number | null;
+            }>('/geo');
+            const { city, country_name, latitude: lat, longitude: lon } = geoResponse.data;
+            latitude = lat;
+            longitude = lon;
+            if (city && country_name) locationStr = `${city}, ${country_name}`;
+            else if (city) locationStr = city;
+            else if (country_name) locationStr = country_name;
+          } catch {
+            // Ignore geo refresh errors; fall back to default below
+          }
+        }
+
+        if (latitude === null || longitude === null) {
+          latitude = MELBOURNE.lat;
+          longitude = MELBOURNE.lon;
+          if (!locationStr) locationStr = DEFAULT_LOCATION;
+        }
+
+        // Fetch only "current" block to keep refresh light
+        const params: any = {
+          latitude,
+          longitude,
+          current: ["temperature_2m", "apparent_temperature", "is_day", "rain", "cloud_cover", "weather_code", "wind_speed_10m"],
+          timezone: "auto",
+        };
+        const responses = await fetchWeatherApi(url, params);
+        if (!responses || responses.length === 0) return;
+        const resp = responses[0];
+        const utcOffsetSeconds = resp.utcOffsetSeconds?.() ?? 0;
+        const currentBlock = resp.current?.();
+        if (!currentBlock) return;
+
+        const temperature_2m = currentBlock.variables(0);
+        const apparent_temperature = currentBlock.variables(1);
+        const is_day = currentBlock.variables(2);
+        const rain = currentBlock.variables(3);
+        const cloud_cover = currentBlock.variables(4);
+        const weather_code = currentBlock.variables(5);
+        const wind_speed_10m = currentBlock.variables(6);
+
+        if (temperature_2m && is_day && !isCancelled) {
+          const updated = {
+            time: new Date((Number(currentBlock.time()) + utcOffsetSeconds) * 1000),
+            temperatureC: temperature_2m.value(),
+            apparentTemperatureC: apparent_temperature?.value() ?? temperature_2m.value(),
+            isDay: is_day.value(),
+            rainMm: rain?.value() ?? 0,
+            cloudCoverPct: cloud_cover?.value(),
+            weatherCode: weather_code?.value(),
+            windSpeed10m: wind_speed_10m?.value(),
+            source: 'current' as const,
+          };
+          setWeatherCurrent(prev => {
+            // Avoid unnecessary state updates if nothing changed
+            const hasChanged =
+              !prev ||
+              prev.isDay !== updated.isDay ||
+              prev.weatherCode !== updated.weatherCode ||
+              Math.round(prev.temperatureC) !== Math.round(updated.temperatureC) ||
+              Math.round((prev.cloudCoverPct ?? -1)) !== Math.round((updated.cloudCoverPct ?? -1)) ||
+              Math.round((prev.rainMm ?? 0) * 10) !== Math.round((updated.rainMm ?? 0) * 10) ||
+              Math.round((prev.windSpeed10m ?? 0)) !== Math.round((updated.windSpeed10m ?? 0));
+            return hasChanged ? updated : prev;
+          });
+
+          // Optionally keep the header text roughly in sync without re-fetching daily
+          setLocationText((prevText) => {
+            const temp = Math.round(updated.temperatureC);
+            const rainStatus = updated.rainMm > 0 ? `, ${Math.round(updated.rainMm)}mm rain` : '';
+            const currentText = `${temp}°C ${rainStatus}`;
+            // Try to replace the trailing weather part if present
+            const parts = prevText.split(' - ');
+            if (parts.length >= 2) {
+              return `${parts[0]} - ${currentText}`;
+            }
+            // If no location prefix, attach default location
+            return `${locationStr} - ${currentText}`;
+          });
+        }
+      } catch {
+        // Swallow refresh errors silently to avoid noisy logs on intervals
+      }
+    };
+
+    // Initial quick refresh shortly after mount, then every 10 minutes
+    const initial = setTimeout(refresh, 15_000);
+    const interval = setInterval(refresh, 600_000);
+    return () => {
+      isCancelled = true;
+      clearTimeout(initial);
+      clearInterval(interval);
     };
   }, []);
 
