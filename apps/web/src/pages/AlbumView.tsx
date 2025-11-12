@@ -1094,7 +1094,7 @@ export default function AlbumView() {
         </div>
       </div>
 
-      {/* Progress indicator and Action Buttons - Combined for mobile */}
+      {/* Action Buttons - Combined for mobile */}
       <div ref={controlsRef} className="sticky z-40 w-full bg-transparent" style={{ top: `${heroHeight}px` }}>
         {/* Action Buttons above Track List */}
         <div className="flex items-center gap-2 md:gap-4 px-4 md:px-8 py-4 md:py-6">

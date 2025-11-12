@@ -232,61 +232,91 @@ export default function PlayerBar({ isVisible, contentVisible, clipPathReveal: _
           {/* Control buttons */}
           <div className="flex items-center gap-1 md:gap-2">
             {/* Shuffle */}
-            <button
-              onClick={toggleShuffle}
-              className={`p-1.5 md:p-2 text-white/70 hover:text-white transition-colors focus:outline-none ${
-                isShuffled ? 'text-[#1db954]' : ''
-              }`}
-              aria-label="Shuffle"
-            >
-              <FaRandom className="w-3 h-3 md:w-4 md:h-4" />
-            </button>
+            <div className="relative group">
+              <button
+                onClick={toggleShuffle}
+                className={`p-1.5 md:p-2 text-white/70 hover:text-white transition-colors focus:outline-none ${
+                  isShuffled ? 'text-[#1db954]' : ''
+                }`}
+                aria-label="Shuffle"
+              >
+                <FaRandom className="w-3 h-3 md:w-4 md:h-4" />
+              </button>
+              {/* Tooltip */}
+              <span className="absolute bottom-full mb-2 left-1/2 -translate-x-1/2 bg-black text-white text-xs px-2 py-1 rounded opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap pointer-events-none">
+                Shuffle
+              </span>
+            </div>
 
             {/* Previous */}
-            <button
-              onClick={handlePrevious}
-              disabled={currentIndex <= 0}
-              className="p-1.5 md:p-2 text-white/70 hover:text-white transition-colors disabled:opacity-50 disabled:cursor-not-allowed focus:outline-none"
-              aria-label="Previous track"
-            >
-              <FaStepBackward className="w-3 h-3 md:w-4 md:h-4" />
-            </button>
+            <div className="relative group">
+              <button
+                onClick={handlePrevious}
+                disabled={currentIndex <= 0}
+                className="p-1.5 md:p-2 text-white/70 hover:text-white transition-colors disabled:opacity-50 disabled:cursor-not-allowed focus:outline-none"
+                aria-label="Previous track"
+              >
+                <FaStepBackward className="w-3 h-3 md:w-4 md:h-4" />
+              </button>
+              {/* Tooltip */}
+              <span className="absolute bottom-full mb-2 left-1/2 -translate-x-1/2 bg-black text-white text-xs px-2 py-1 rounded opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap pointer-events-none">
+                Previous track
+              </span>
+            </div>
 
             {/* Play/Pause */}
-            <button
-              onClick={togglePlayPause}
-              disabled={isLoading}
-              className="p-1.5 md:p-2 bg-white text-black rounded-full hover:scale-110 transition-transform disabled:opacity-50 disabled:cursor-not-allowed w-8 h-8 md:w-10 md:h-10 flex items-center justify-center focus:outline-none"
-              aria-label={isPlaying ? 'Pause' : 'Play'}
-            >
-              {isLoading ? (
-                <div className="w-3 h-3 md:w-4 md:h-4 border-2 border-black border-t-transparent rounded-full animate-spin" />
-              ) : isPlaying ? (
-                <FaPause className="w-3 h-3 md:w-3.5 md:h-3.5" />
-              ) : (
-                <FaPlay className="w-3 h-3 md:w-3.5 md:h-3.5 ml-0.5" />
-              )}
-            </button>
+            <div className="relative group">
+              <button
+                onClick={togglePlayPause}
+                disabled={isLoading}
+                className="p-1.5 md:p-2 bg-white text-black rounded-full hover:scale-110 transition-transform disabled:opacity-50 disabled:cursor-not-allowed w-8 h-8 md:w-10 md:h-10 flex items-center justify-center focus:outline-none"
+                aria-label={isPlaying ? 'Pause' : 'Play'}
+              >
+                {isLoading ? (
+                  <div className="w-3 h-3 md:w-4 md:h-4 border-2 border-black border-t-transparent rounded-full animate-spin" />
+                ) : isPlaying ? (
+                  <FaPause className="w-3 h-3 md:w-3.5 md:h-3.5" />
+                ) : (
+                  <FaPlay className="w-3 h-3 md:w-3.5 md:h-3.5 ml-0.5" />
+                )}
+              </button>
+              {/* Tooltip */}
+              <span className="absolute bottom-full mb-2 left-1/2 -translate-x-1/2 bg-black text-white text-xs px-2 py-1 rounded opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap pointer-events-none">
+                {isPlaying ? 'Pause' : 'Play'}
+              </span>
+            </div>
 
             {/* Next */}
-            <button
-              onClick={handleNext}
-              className="p-1.5 md:p-2 text-white/70 hover:text-white transition-colors focus:outline-none"
-              aria-label="Next track"
-            >
-              <FaStepForward className="w-3 h-3 md:w-4 md:h-4" />
-            </button>
+            <div className="relative group">
+              <button
+                onClick={handleNext}
+                className="p-1.5 md:p-2 text-white/70 hover:text-white transition-colors focus:outline-none"
+                aria-label="Next track"
+              >
+                <FaStepForward className="w-3 h-3 md:w-4 md:h-4" />
+              </button>
+              {/* Tooltip */}
+              <span className="absolute bottom-full mb-2 left-1/2 -translate-x-1/2 bg-black text-white text-xs px-2 py-1 rounded opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap pointer-events-none">
+                Next track
+              </span>
+            </div>
 
             {/* Loop */}
-            <button
-              onClick={toggleLoop}
-              className={`p-1.5 md:p-2 text-white/70 hover:text-white transition-colors focus:outline-none ${
-                isLooping ? 'text-[#1db954]' : ''
-              }`}
-              aria-label="Repeat"
-            >
-              <FaRedo className="w-3 h-3 md:w-4 md:h-4" />
-            </button>
+            <div className="relative group">
+              <button
+                onClick={toggleLoop}
+                className={`p-1.5 md:p-2 text-white/70 hover:text-white transition-colors focus:outline-none ${
+                  isLooping ? 'text-[#1db954]' : ''
+                }`}
+                aria-label="Repeat"
+              >
+                <FaRedo className="w-3 h-3 md:w-4 md:h-4" />
+              </button>
+              {/* Tooltip */}
+              <span className="absolute bottom-full mb-2 left-1/2 -translate-x-1/2 bg-black text-white text-xs px-2 py-1 rounded opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap pointer-events-none">
+                {isLooping ? 'Repeat one' : 'Repeat'}
+              </span>
+            </div>
           </div>
 
           {/* Progress bar with time */}
@@ -311,17 +341,23 @@ export default function PlayerBar({ isVisible, contentVisible, clipPathReveal: _
 
         {/* Right: Volume control */}
         <div className="flex items-center gap-1.5 md:gap-2 justify-end">
-          <button
-            onClick={toggleMute}
-            className="p-1.5 md:p-2 text-white/70 hover:text-white transition-colors focus:outline-none"
-            aria-label={isMuted ? 'Unmute' : 'Mute'}
-          >
-            {isMuted ? (
-              <FaVolumeMute className="w-3 h-3 md:w-4 md:h-4" />
-            ) : (
-              <FaVolumeUp className="w-3 h-3 md:w-4 md:h-4" />
-            )}
-          </button>
+          <div className="relative group">
+            <button
+              onClick={toggleMute}
+              className="p-1.5 md:p-2 text-white/70 hover:text-white transition-colors focus:outline-none"
+              aria-label={isMuted ? 'Unmute' : 'Mute'}
+            >
+              {isMuted ? (
+                <FaVolumeMute className="w-3 h-3 md:w-4 md:h-4" />
+              ) : (
+                <FaVolumeUp className="w-3 h-3 md:w-4 md:h-4" />
+              )}
+            </button>
+            {/* Tooltip */}
+            <span className="absolute bottom-full mb-2 left-1/2 -translate-x-1/2 bg-black text-white text-xs px-2 py-1 rounded opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap pointer-events-none">
+              {isMuted ? 'Unmute' : 'Mute'}
+            </span>
+          </div>
           <input
             type="range"
             min="0"
