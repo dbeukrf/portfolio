@@ -5,10 +5,15 @@ import { FaPlay, FaRandom, FaUserPlus } from 'react-icons/fa';
 import Shuffle from '../components/ui/Shuffle';
 import { api } from '../services/api';
 import { fetchWeatherApi } from 'openmeteo';
+import PlayerBar from '../components/player/PlayerBar';
+import { useAudioStore } from '../stores/audioStore';
 
 const clamp = (value: number, min = 0, max = 1) => Math.max(min, Math.min(max, value));
 
 export default function AlbumView() {
+  // Audio store
+  const { setCurrentTrack, play, toggleShuffle, isShuffled, currentTrackId } = useAudioStore();
+  
   // Scrolling state
   const [heroHeight, setHeroHeight] = useState<number>(0);
   const [controlsHeight, setControlsHeight] = useState<number>(0);
@@ -19,6 +24,7 @@ export default function AlbumView() {
   const [manualRevealProgress, setManualRevealProgress] = useState<number>(0); // Manual reveal progress during reveal phase
   const [currentTrackIndex, setCurrentTrackIndex] = useState<number>(0);
   const [currentTrackProgress, setCurrentTrackProgress] = useState<number>(0);
+  const [playerBarVisible, setPlayerBarVisible] = useState<boolean>(false); // Player bar visibility
   
   // Location state
   const [locationText, setLocationText] = useState<string>('Melbourne, Australia');
@@ -188,13 +194,13 @@ export default function AlbumView() {
     const iconUrl = `/weathericons/${iconName}.svg`;
     return (
       <div
-        className={`ml-1 md:ml-2 inline-flex items-center transition-opacity duration-1500 ${weatherCurrent ? 'opacity-100' : 'opacity-0'}`}
+        className={`ml-0.5 sm:ml-1 md:ml-2 inline-flex items-center transition-opacity duration-1500 ${weatherCurrent ? 'opacity-100' : 'opacity-0'}`}
         aria-hidden={!weatherCurrent}
       >
         <img
           src={iconUrl}
           alt={`${label} weather icon`}
-          className="w-[30px] h-[30px] md:w-[60px] md:h-[60px] -translate-y-[4.5px] md:-translate-y-[4.5px]"
+          className="w-[20px] h-[20px] sm:w-[24px] sm:h-[24px] md:w-[40px] md:h-[40px] lg:w-[50px] lg:h-[50px] xl:w-[60px] xl:h-[60px] -translate-y-[2px] sm:-translate-y-[3px] md:-translate-y-[4.5px]"
           loading="lazy"
         />
       </div>
@@ -212,6 +218,7 @@ export default function AlbumView() {
   const prevRevealRef = useRef<number>(0); // Track previous reveal value to prevent expansion when scrolling up
   const maxRevealReachedRef = useRef<number>(0); // Track maximum reveal reached to ensure scrolling up only shrinks
   const trackSectionRefs = useRef<(HTMLDivElement | null)[]>([]);
+  const trackTitleRefs = useRef<(HTMLHeadingElement | null)[]>([]);
 
   // Compute hero height
   useEffect(() => {
@@ -907,34 +914,85 @@ export default function AlbumView() {
   const scrollToTrack = (trackIndex: number) => {
     if (!scrollContainerRef.current) return;
     
+    const track = TRACKS[trackIndex];
+    if (!track) return;
+    
+    // Don't set track in audio store when clicking from track list
+    // Only action buttons should open the player bar
+    
     const vh = viewportHeight || window.innerHeight;
     const revealDistance = vh * 1.5;
     
-    // Calculate scroll position for the track
-    // Each track is min-h-screen, so we need to scroll to revealDistance + (trackIndex * vh)
-    // For the first track (Education), add an offset so it appears lower in the viewport
-    const offset = trackIndex === 0 ? vh * 0.25 : 0; // First track appears 25% lower
-    const trackScrollPosition = revealDistance + (trackIndex * vh) + offset;
-    
-    // First, ensure reveal is complete if we're not past revealDistance
-    const currentScrollTop = scrollContainerRef.current.scrollTop;
-    if (currentScrollTop < revealDistance) {
-      // Complete the reveal first, then scroll to track
-      scrollContainerRef.current.scrollTo({ top: revealDistance, behavior: 'smooth' });
-      
-      // Wait for reveal to complete, then scroll to track
-      setTimeout(() => {
-        if (scrollContainerRef.current) {
-          scrollContainerRef.current.scrollTo({ top: trackScrollPosition, behavior: 'smooth' });
-        }
-      }, 500); // Adjust timing based on reveal animation
-    } else {
-      // Already past reveal, just scroll to track
-      scrollContainerRef.current.scrollTo({ top: trackScrollPosition, behavior: 'smooth' });
-    }
-
-    setCurrentTrackIndex(trackIndex);
+    // Reset progress to 0
     setCurrentTrackProgress(0);
+    setCurrentTrackIndex(trackIndex);
+    
+    // Find the track title element and scroll to its exact position
+    const titleElement = trackTitleRefs.current[trackIndex];
+    
+    if (titleElement && scrollContainerRef.current) {
+      // Use getBoundingClientRect to get the current visual position of the title
+      // This accounts for any transforms applied to parent elements
+      const titleRect = titleElement.getBoundingClientRect();
+      const containerRect = scrollContainerRef.current.getBoundingClientRect();
+      
+      // Calculate the current scroll position
+      const currentScrollTop = scrollContainerRef.current.scrollTop;
+      
+      // Calculate where the title currently is relative to the container's top
+      // titleRect.top is relative to viewport, containerRect.top is also relative to viewport
+      // So titleRect.top - containerRect.top gives us the position relative to container
+      const titleTopRelativeToContainer = titleRect.top - containerRect.top + currentScrollTop;
+      
+      // Add a small offset to position the title near the top of the viewport
+      // Account for sticky headers (hero + controls)
+      const stickyOffset = heroHeight + controlsHeight;
+      const offsetFromTop = stickyOffset + 20; // Small additional offset
+      const targetScrollPosition = titleTopRelativeToContainer - offsetFromTop;
+      
+      // Ensure we don't scroll before the reveal distance
+      const finalScrollPosition = Math.max(revealDistance, targetScrollPosition);
+      
+      // First, ensure reveal is complete if we're not past revealDistance
+      const currentScroll = scrollContainerRef.current.scrollTop;
+      if (currentScroll < revealDistance) {
+        // Complete the reveal first, then scroll to track title
+        scrollContainerRef.current.scrollTo({ top: revealDistance, behavior: 'smooth' });
+        
+        // Wait for reveal to complete, then scroll to track title
+        // We need to recalculate the position after the reveal completes
+        setTimeout(() => {
+          if (scrollContainerRef.current && titleElement) {
+            // Recalculate position after reveal
+            const newTitleRect = titleElement.getBoundingClientRect();
+            const newContainerRect = scrollContainerRef.current.getBoundingClientRect();
+            const newScrollTop = scrollContainerRef.current.scrollTop;
+            const newTitleTopRelativeToContainer = newTitleRect.top - newContainerRect.top + newScrollTop;
+            const newTargetScrollPosition = Math.max(revealDistance, newTitleTopRelativeToContainer - offsetFromTop);
+            scrollContainerRef.current.scrollTo({ top: newTargetScrollPosition, behavior: 'smooth' });
+          }
+        }, 500); // Adjust timing based on reveal animation
+      } else {
+        // Already past reveal, just scroll to track title
+        scrollContainerRef.current.scrollTo({ top: finalScrollPosition, behavior: 'smooth' });
+      }
+    } else {
+      // Fallback: if title element not found, use the old calculation method
+      const offset = trackIndex === 0 ? vh * 0.25 : 0;
+      const trackScrollPosition = revealDistance + (trackIndex * vh) + offset;
+      
+      const currentScrollTop = scrollContainerRef.current.scrollTop;
+      if (currentScrollTop < revealDistance) {
+        scrollContainerRef.current.scrollTo({ top: revealDistance, behavior: 'smooth' });
+        setTimeout(() => {
+          if (scrollContainerRef.current) {
+            scrollContainerRef.current.scrollTo({ top: trackScrollPosition, behavior: 'smooth' });
+          }
+        }, 500);
+      } else {
+        scrollContainerRef.current.scrollTo({ top: trackScrollPosition, behavior: 'smooth' });
+      }
+    }
   };
 
   return (
@@ -947,13 +1005,13 @@ export default function AlbumView() {
       <div ref={announceRef} aria-live="polite" className="sr-only" />
 
       {/* Hero Section with Album Artwork - Fixed at top */}
-      <div ref={heroRef} className="sticky top-0 z-40 w-full bg-gradient-to-b from-[#1f2937] to-[#6b7280] flex flex-row items-center gap-2 md:gap-6 px-4 md:px-8 py-2 md:py-4 overflow-hidden max-h-[40vh] md:max-h-[30vh]">
+      <div ref={heroRef} className="sticky top-0 z-40 w-full bg-gradient-to-b from-[#1f2937] to-[#6b7280] flex flex-row items-center gap-1.5 sm:gap-3 md:gap-4 lg:gap-6 px-2 sm:px-4 md:px-6 lg:px-8 py-1.5 sm:py-2 md:py-3 lg:py-4 overflow-hidden max-h-[40vh] md:max-h-[30vh]">
 
         {/* Album cover image */}
         <img
           src="/images/album-cover.jpg"
           alt="Album cover"
-          className="w-16 h-16 md:w-32 md:h-32 object-cover shadow-2xl rounded relative z-10 cursor-pointer flex-shrink-0"
+          className="w-12 h-12 sm:w-16 sm:h-16 md:w-24 md:h-24 lg:w-32 lg:h-32 object-cover shadow-2xl rounded relative z-10 cursor-pointer flex-shrink-0"
           onClick={scrollToTop}
         />
 
@@ -963,7 +1021,7 @@ export default function AlbumView() {
           <div className="min-w-0">
             <Shuffle
               tag="p"
-              className="text-[clamp(9px,2.8vw,12px)] md:text-sm font-semibold text-white/70 mb-0.5 md:mb-2 md:whitespace-nowrap"
+              className="text-[clamp(8px,2.5vw,10px)] sm:text-[clamp(9px,2.8vw,12px)] md:text-xs lg:text-sm font-semibold text-white/70 mb-0.5 sm:mb-1 md:mb-2 md:whitespace-nowrap"
               text="Album"
               duration={0.35}
               animationMode="evenodd"
@@ -973,10 +1031,10 @@ export default function AlbumView() {
               rootMargin="0px"
               textAlign="left"
             />
-            <div className="flex items-center gap-1 md:gap-2 min-w-0">
+            <div className="flex items-center gap-0.5 sm:gap-1 md:gap-2 min-w-0">
               <Shuffle
                 tag="h1"
-                className="text-[clamp(10px,3.8vw,14px)] sm:text-sm md:text-3xl font-extrabold text-white mb-0.5 md:mb-2 leading-tight break-words md:truncate md:whitespace-nowrap"
+                className="text-[clamp(10px,3.5vw,12px)] sm:text-[clamp(12px,3.8vw,14px)] md:text-lg lg:text-2xl xl:text-3xl font-extrabold text-white mb-0.5 sm:mb-1 md:mb-2 leading-tight break-words md:truncate md:whitespace-nowrap"
                 text={locationText}
                 duration={0.5}
                 animationMode="evenodd"
@@ -993,7 +1051,7 @@ export default function AlbumView() {
           {/* Description */}
           <Shuffle
             tag="p"
-            className="text-white/90 mb-0 md:mb-0 text-[clamp(9px,3.2vw,12px)] md:text-sm break-words md:truncate md:whitespace-nowrap leading-snug"
+            className="text-white/90 mb-0 text-[clamp(8px,3vw,10px)] sm:text-[clamp(9px,3.2vw,12px)] md:text-xs lg:text-sm break-words md:truncate md:whitespace-nowrap leading-snug"
             text="Diego Beuk • 2025 • 6 songs, 11 min"
             duration={0.4}
             animationMode="random"
@@ -1006,15 +1064,15 @@ export default function AlbumView() {
         </div>
 
         {/* Contact info - Right side */}
-        <div className="flex flex-col items-end justify-center gap-1 md:gap-2 text-white text-[10px] md:text-sm sm:flex-shrink-0 relative z-10 max-w-[40%] sm:max-w-none">
+        <div className="flex flex-col items-end justify-center gap-0.5 sm:gap-1 md:gap-2 text-white text-[9px] sm:text-[10px] md:text-xs lg:text-sm sm:flex-shrink-0 relative z-10 max-w-[40%] sm:max-w-none">
           {/* Email and Phone */}
-          <div className="flex flex-col items-end space-y-0 md:space-y-1">
-            <Shuffle tag="span" className="text-[10px] md:text-xs truncate max-w-full" text="beuk.diego@gmail.com" duration={0.35} triggerOnHover triggerOnce threshold={0} rootMargin="0px" textAlign="right" />
-            <Shuffle tag="span" className="text-[10px] md:text-xs truncate max-w-full" text="+61 448 092 338" duration={0.35} triggerOnHover triggerOnce threshold={0} rootMargin="0px" textAlign="right" />
+          <div className="flex flex-col items-end space-y-0 sm:space-y-0.5 md:space-y-1">
+            <Shuffle tag="span" className="text-[9px] sm:text-[10px] md:text-xs truncate max-w-full" text="beuk.diego@gmail.com" duration={0.35} triggerOnHover triggerOnce threshold={0} rootMargin="0px" textAlign="right" />
+            <Shuffle tag="span" className="text-[9px] sm:text-[10px] md:text-xs truncate max-w-full" text="+61 448 092 338" duration={0.35} triggerOnHover triggerOnce threshold={0} rootMargin="0px" textAlign="right" />
           </div>
 
           {/* LinkedIn and GitHub icons - Below text */}
-          <div className="flex space-x-2 md:space-x-3.5">
+          <div className="flex space-x-1.5 sm:space-x-2 md:space-x-3 lg:space-x-3.5">
             <a
               href="https://www.linkedin.com/in/diego-beuk-8a9100288/"
               target="_blank"
@@ -1022,7 +1080,7 @@ export default function AlbumView() {
               className="hover:text-primary-500 transition-colors focus:outline-none focus:ring-2 focus:ring-primary-500 rounded flex-shrink-0"
               aria-label="Diego Beuk LinkedIn profile"
             >
-              <FaLinkedin size={18} className="md:w-[25px] md:h-[25px]" color="white" />
+              <FaLinkedin className="w-4 h-4 sm:w-[18px] sm:h-[18px] md:w-5 md:h-5 lg:w-[25px] lg:h-[25px]" color="white" />
             </a>
             <a
               href="https://github.com/dbeukrf"
@@ -1031,7 +1089,7 @@ export default function AlbumView() {
               className="hover:text-primary-500 transition-colors focus:outline-none focus:ring-2 focus:ring-primary-500 rounded flex-shrink-0"
               aria-label="Diego Beuk Github profile"
             >
-              <FaGithub size={18} className="md:w-[25px] md:h-[25px]" color="white" />
+              <FaGithub className="w-4 h-4 sm:w-[18px] sm:h-[18px] md:w-5 md:h-5 lg:w-[25px] lg:h-[25px]" color="white" />
             </a>
           </div>
         </div>
@@ -1043,7 +1101,23 @@ export default function AlbumView() {
         <div className="flex items-center gap-2 md:gap-4 px-4 md:px-8 py-4 md:py-6">
           {/* Play Button */}
           <div className="relative group">
-            <button className="flex items-center justify-center w-7 h-7 md:w-10 md:h-10 rounded-full bg-white/5 hover:bg-white/20 text-white transition-colors">
+            <button 
+              onClick={() => {
+                // If shuffle is enabled, select a random track
+                if (isShuffled) {
+                  const randomTrack = TRACKS[Math.floor(Math.random() * TRACKS.length)];
+                  setCurrentTrack(randomTrack.id);
+                } else {
+                  // If no track is selected or shuffle is off, select first track
+                  if (!currentTrackId) {
+                    setCurrentTrack(TRACKS[0].id);
+                  }
+                }
+                play();
+                setPlayerBarVisible(true);
+              }}
+              className="flex items-center justify-center w-7 h-7 md:w-10 md:h-10 rounded-full bg-white/5 hover:bg-white/20 text-white transition-colors focus:outline-none"
+            >
               <FaPlay size={14} className="md:w-4 md:h-4" />
             </button>
             {/* Tooltip */}
@@ -1054,7 +1128,15 @@ export default function AlbumView() {
 
           {/* Shuffle Button */}
           <div className="relative group">
-            <button className="flex items-center justify-center w-7 h-7 md:w-10 md:h-10 rounded-full bg-white/5 hover:bg-white/20 text-white transition-colors">
+            <button 
+              onClick={() => {
+                toggleShuffle();
+                // Shuffle button only toggles shuffle mode, doesn't play
+              }}
+              className={`flex items-center justify-center w-7 h-7 md:w-10 md:h-10 rounded-full bg-white/5 hover:bg-white/20 text-white transition-colors focus:outline-none ${
+                isShuffled ? 'bg-white/20' : ''
+              }`}
+            >
               <FaRandom size={14} className="md:w-4 md:h-4" />
             </button>
             <span className="absolute bottom-full mb-2 left-1/2 -translate-x-1/2 bg-black text-white text-xs px-2 py-1 rounded opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap">
@@ -1215,7 +1297,12 @@ export default function AlbumView() {
               <div className="max-w-4xl mx-auto text-center text-white space-y-8">
                 {/* Track Title */}
                 <div>
-                  <h2 className="text-4xl md:text-6xl font-extrabold mb-4">
+                  <h2 
+                    ref={(el) => {
+                      trackTitleRefs.current[index] = el;
+                    }}
+                    className="text-4xl md:text-6xl font-extrabold mb-4"
+                  >
                     {track.number}. {track.title}
                   </h2>
                   <p className="text-xl text-white/80 mb-12">{track.artist}</p>
@@ -1238,13 +1325,6 @@ export default function AlbumView() {
                   <p className="text-lg leading-relaxed">
                     Nam dui mi, tincidunt quis, accumsan porttitor, facilisis luctus, metus. Phasellus ultrices nulla quis nibh. Quisque a lectus.
                   </p>
-                </div>
-
-                {/* Audio player */}
-                <div className="mt-12">
-                  <audio preload="none" controls className="mx-auto">
-                    <source src={track.audioUrl} />
-                  </audio>
                 </div>
               </div>
             </div>
@@ -1291,6 +1371,11 @@ export default function AlbumView() {
           })}
         </div>
       </div>
+
+      {/* Player Bar */}
+      {/* Show player bar when play was clicked, and fade in when on track views */}
+      {/* Pass clipPathReveal to help determine when parallax is covering the player bar */}
+      <PlayerBar isVisible={playerBarVisible} contentVisible={contentVisible} clipPathReveal={clipPathReveal} />
     </div>
   );
 }
