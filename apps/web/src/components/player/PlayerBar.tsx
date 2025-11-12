@@ -189,8 +189,9 @@ export default function PlayerBar({ isVisible, contentVisible, clipPathReveal: _
   // Determine opacity: fade in when reaching track view, otherwise stay visible
   // During reveal phase, keep it visible (parallax will cover it visually)
   // When track view appears, fade in to full opacity
-  const opacity = isOnTrackView ? 100 : (shouldShow ? 100 : 0);
-  const zIndex = isOnTrackView ? 100 : (shouldShow ? 40 : 100);
+  // Only show on track view if isVisible is true
+  const opacity = isOnTrackView && shouldShow ? 100 : (shouldShow ? 100 : 0);
+  const zIndex = isOnTrackView && shouldShow ? 100 : (shouldShow ? 40 : 100);
   
   return (
     <div 

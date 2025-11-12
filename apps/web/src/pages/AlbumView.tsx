@@ -12,7 +12,7 @@ const clamp = (value: number, min = 0, max = 1) => Math.max(min, Math.min(max, v
 
 export default function AlbumView() {
   // Audio store
-  const { setCurrentTrack, play, toggleShuffle, isShuffled, currentTrackId } = useAudioStore();
+  const { setCurrentTrack, play, pause, toggleShuffle, isShuffled, currentTrackId } = useAudioStore();
   
   // Scrolling state
   const [heroHeight, setHeroHeight] = useState<number>(0);
@@ -904,11 +904,10 @@ export default function AlbumView() {
     return () => { document.body.style.overflow = prevOverflow; };
   }, []);
 
-  const scrollToTop = () => {
-    if (scrollContainerRef.current) {
-      scrollContainerRef.current.scrollTo({ top: 0, behavior: 'smooth' });
-      setManualRevealProgress(0);
-    }
+  const handleAlbumImageClick = () => {
+    setPlayerBarVisible(false);
+    pause(); // Stop audio playback
+    setCurrentTrack(null); // Clear current track so player bar doesn't render
   };
 
   const scrollToTrack = (trackIndex: number) => {
@@ -1012,7 +1011,7 @@ export default function AlbumView() {
           src="/images/album-cover.jpg"
           alt="Album cover"
           className="w-12 h-12 sm:w-16 sm:h-16 md:w-24 md:h-24 lg:w-32 lg:h-32 object-cover shadow-2xl rounded relative z-10 cursor-pointer flex-shrink-0"
-          onClick={scrollToTop}
+          onClick={handleAlbumImageClick}
         />
 
         {/* Album title and description */}

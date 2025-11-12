@@ -15,7 +15,7 @@ export interface AudioState {
 }
 
 export interface AudioActions {
-  setCurrentTrack: (trackId: string) => void;
+  setCurrentTrack: (trackId: string | null) => void;
   play: () => void;
   pause: () => void;
   togglePlayPause: () => void;
@@ -49,7 +49,7 @@ const initialState: AudioState = {
 export const useAudioStore = create<AudioStore>((set) => ({
   ...initialState,
   
-  setCurrentTrack: (trackId: string) => 
+  setCurrentTrack: (trackId: string | null) => 
     set({ currentTrackId: trackId, currentTime: 0 }),
   
   play: () => 
