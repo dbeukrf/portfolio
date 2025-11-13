@@ -7,6 +7,7 @@ import { api } from '../services/api';
 import { fetchWeatherApi } from 'openmeteo';
 import PlayerBar from '../components/player/PlayerBar';
 import { useAudioStore } from '../stores/audioStore';
+import TrackPage from '../components/tracks/TrackPage';
 
 const clamp = (value: number, min = 0, max = 1) => Math.max(min, Math.min(max, value));
 
@@ -674,6 +675,35 @@ export default function AlbumView() {
     };
   }, [manualRevealProgress, viewportHeight]);
 
+  // Capture track title refs after TrackPage components render
+  useEffect(() => {
+    const updateTitleRefs = () => {
+      TRACKS.forEach((_, index) => {
+        const titleElement = document.querySelector(`[data-track-index="${index}"] #track-title`) as HTMLHeadingElement | null;
+        if (titleElement) {
+          trackTitleRefs.current[index] = titleElement;
+        }
+      });
+    };
+    
+    // Initial update
+    updateTitleRefs();
+    
+    // Update after a short delay to ensure DOM is ready
+    const timeoutId = setTimeout(updateTitleRefs, 100);
+    
+    // Also update when content becomes visible
+    if (contentVisible) {
+      const visibleTimeoutId = setTimeout(updateTitleRefs, 200);
+      return () => {
+        clearTimeout(timeoutId);
+        clearTimeout(visibleTimeoutId);
+      };
+    }
+    
+    return () => clearTimeout(timeoutId);
+  }, [contentVisible]);
+
   // Handle scroll to create parallax effect
   useEffect(() => {
     let rafId: number | null = null;
@@ -1255,6 +1285,9 @@ export default function AlbumView() {
         </div>
       </div>
 
+
+
+
       {/* Parallax Scrolling Content Area */}
       <div className="relative w-full">
         {/* Parallax Background - Expands equally up and down from center */}
@@ -1272,6 +1305,9 @@ export default function AlbumView() {
           }}
         />
 
+
+        
+
         {/* Track Content - appears after reveal and scrolls up */}
         <div 
           className="relative z-[60] min-h-[400vh]"
@@ -1286,46 +1322,41 @@ export default function AlbumView() {
         >
           {TRACKS.map((track, index) => (
             <div 
-              key={track.id} 
+              key={track.id}
+              data-track-index={index}
               ref={(el) => {
                 trackSectionRefs.current[index] = el;
               }}
-              className="min-h-screen flex items-center justify-center px-8 py-24"
+              className="min-h-screen"
               style={{ backgroundColor: '#191B20' }}
             >
-              <div className="max-w-4xl mx-auto text-center text-white space-y-8">
-                {/* Track Title */}
-                <div>
-                  <h2 
-                    ref={(el) => {
-                      trackTitleRefs.current[index] = el;
-                    }}
-                    className="text-4xl md:text-6xl font-extrabold mb-4"
-                  >
-                    {track.number}. {track.title}
-                  </h2>
-                  <p className="text-xl text-white/80 mb-12">{track.artist}</p>
-                </div>
-                
-                {/* Track Content */}
-                <div className="text-left space-y-6 text-white/90" style={{ fontFamily: "'Ubuntu', sans-serif" }}>
-                  <p className="text-lg leading-relaxed">
-                    Content for {track.title}. Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed non risus. Suspendisse lectus tortor, dignissim sit amet, adipiscing nec.
-                  </p>
-                  <p className="text-lg leading-relaxed">
-                    Cras elementum ultrices diam. Maecenas ligula massa, varius a, semper congue, euismod non, mi. Proin porttitor, orci nec nonummy molestie, enim est eleifend mi.
-                  </p>
-                  <p className="text-lg leading-relaxed">
-                    Aenean fermentum, elit eget tincidunt condimentum, eros ipsum rutrum orci, sagittis tempus lacus enim ac dui. Donec non enim in turpis pulvinar facilisis.
-                  </p>
-                  <p className="text-lg leading-relaxed">
-                    Ut felis. Praesent dapibus, neque id cursus faucibus, tortor neque egestas augue, eu vulputate magna eros eu erat. Aliquam erat volutpat.
-                  </p>
-                  <p className="text-lg leading-relaxed">
-                    Nam dui mi, tincidunt quis, accumsan porttitor, facilisis luctus, metus. Phasellus ultrices nulla quis nibh. Quisque a lectus.
-                  </p>
-                </div>
-              </div>
+              <TrackPage
+                title={track.title}
+                trackNumber={track.number}
+                // subtitle={track.artist}
+                content={
+                  <div style={{ fontFamily: "'Ubuntu', sans-serif" }}>
+                    <p>
+                      Content for {track.title}. Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed non risus. Suspendisse lectus tortor, dignissim sit amet, adipiscing nec.
+                    </p>
+                    <p>
+                      Cras elementum ultrices diam. Maecenas ligula massa, varius a, semper congue, euismod non, mi. Proin porttitor, orci nec nonummy molestie, enim est eleifend mi.
+                    </p>
+                    <p>
+                      Aenean fermentum, elit eget tincidunt condimentum, eros ipsum rutrum orci, sagittis tempus lacus enim ac dui. Donec non enim in turpis pulvinar facilisis.
+                    </p>
+                    <p>
+                      Ut felis. Praesent dapibus, neque id cursus faucibus, tortor neque egestas augue, eu vulputate magna eros eu erat. Aliquam erat volutpat.
+                    </p>
+                    <p>
+                      Nam dui mi, tincidunt quis, accumsan porttitor, facilisis luctus, metus. Phasellus ultrices nulla quis nibh. Quisque a lectus.
+                    </p>
+                  </div>
+                }
+                className="min-h-screen bg-[#191B20]"
+                headerClassName="bg-[#191B20]"
+                contentClassName="bg-[#191B20]"
+              />
             </div>
           ))}
         </div>
