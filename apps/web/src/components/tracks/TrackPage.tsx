@@ -1,6 +1,6 @@
-import { type ReactNode, useEffect, useMemo, useState } from 'react';
+import { type ReactNode, useEffect, useMemo, useRef, useState } from 'react';
 
-const RAINBOW_COLORS = [
+export const RAINBOW_COLORS = [
   '#FF3B30', // red
   '#FF9500', // orange
   '#FFCC00', // yellow
@@ -28,6 +28,51 @@ function getReadableTextColor(hexColor: string): string {
   const luminance = 0.2126 * rLinear + 0.7152 * gLinear + 0.0722 * bLinear;
 
   return luminance > 0.55 ? '#0b0b0b' : '#F8F8F8';
+}
+
+/**
+ * Darkens a hex color by reducing its brightness/value
+ * @param hexColor - Hex color string (e.g., '#FF3B30')
+ * @param amount - Amount to darken (0-1, where 0.3 = 30% darker)
+ * @returns Darkened hex color string
+ */
+function darkenColor(hexColor: string, amount: number = 0.3): string {
+  const sanitized = hexColor.replace('#', '');
+  
+  if (sanitized.length !== 6) {
+    return hexColor;
+  }
+  
+  const r = parseInt(sanitized.slice(0, 2), 16);
+  const g = parseInt(sanitized.slice(2, 4), 16);
+  const b = parseInt(sanitized.slice(4, 6), 16);
+  
+  // Reduce each channel by the amount (multiply by (1 - amount))
+  const newR = Math.max(0, Math.min(255, Math.floor(r * (1 - amount))));
+  const newG = Math.max(0, Math.min(255, Math.floor(g * (1 - amount))));
+  const newB = Math.max(0, Math.min(255, Math.floor(b * (1 - amount))));
+  
+  return `#${newR.toString(16).padStart(2, '0')}${newG.toString(16).padStart(2, '0')}${newB.toString(16).padStart(2, '0')}`;
+}
+
+/**
+ * Converts a hex color to rgba format with specified opacity
+ * @param hexColor - Hex color string (e.g., '#FF3B30')
+ * @param opacity - Opacity value (0-1, where 0.5 = 50% opacity)
+ * @returns RGBA color string
+ */
+function hexToRgba(hexColor: string, opacity: number = 1): string {
+  const sanitized = hexColor.replace('#', '');
+  
+  if (sanitized.length !== 6) {
+    return `rgba(0, 0, 0, ${opacity})`;
+  }
+  
+  const r = parseInt(sanitized.slice(0, 2), 16);
+  const g = parseInt(sanitized.slice(2, 4), 16);
+  const b = parseInt(sanitized.slice(4, 6), 16);
+  
+  return `rgba(${r}, ${g}, ${b}, ${opacity})`;
 }
 
 export interface TrackPageProps {
@@ -58,11 +103,6 @@ export interface TrackPageProps {
   contentClassName?: string;
   
   /**
-   * Optional subtitle or additional header information
-   */
-  subtitle?: string;
-  
-  /**
    * Optional track number to display
    */
   trackNumber?: number | string;
@@ -71,6 +111,11 @@ export interface TrackPageProps {
    * Optional ARIA label for the track page (defaults to title-based label)
    */
   ariaLabel?: string;
+  
+  /**
+   * Optional gradient color index (0-6) to synchronize color changes across all track pages
+   */
+  gradientColorIndex?: number;
 }
 
 /**
@@ -89,7 +134,6 @@ export interface TrackPageProps {
  * <TrackPage
  *   title="My Track"
  *   content={<p>Track content here</p>}
- *   subtitle="Track subtitle"
  *   trackNumber={1}
  * />
  * ```
@@ -100,100 +144,93 @@ export default function TrackPage({
   className = '',
   headerClassName = '',
   contentClassName = '',
-  subtitle,
   trackNumber,
   ariaLabel,
+  gradientColorIndex = 0,
 }: TrackPageProps) {
   // Generate accessible label
   const pageLabel = ariaLabel || (trackNumber ? `Track ${trackNumber}: ${title}` : title);
-  const [highlightIndex, setHighlightIndex] = useState(0);
+  const articleRef = useRef<HTMLElement | null>(null);
+  const [isHovered, setIsHovered] = useState(false);
+  const [isFilterVisible, setIsFilterVisible] = useState(false);
 
+  // Use the provided gradient color index, ensuring it's within valid range
+  const safeIndex = Math.max(0, Math.min(RAINBOW_COLORS.length - 1, Math.floor(gradientColorIndex) || 0));
+  
+  // Base gradient color (scroll-based, doesn't change on hover)
+  const baseGradientColor = RAINBOW_COLORS[safeIndex];
+  
+  // Toggle filter overlay on/off when hovering
   useEffect(() => {
-    if (typeof window === 'undefined') {
+    if (!isHovered) {
+      setIsFilterVisible(false);
       return;
     }
 
-    const segmentSize = 120;
-
-    let animationFrameId: number | null = null;
-
-    const updateHighlightFromScroll = () => {
-      const scrollY =
-        window.scrollY ||
-        document.documentElement.scrollTop ||
-        document.body.scrollTop ||
-        0;
-
-      const newIndex =
-        Math.floor(scrollY / segmentSize) % RAINBOW_COLORS.length;
-
-      setHighlightIndex((prev) => (prev === newIndex ? prev : newIndex));
-    };
-
-    const handleScroll = () => {
-      if (animationFrameId !== null) {
-        return;
-      }
-
-      animationFrameId = window.requestAnimationFrame(() => {
-        updateHighlightFromScroll();
-        animationFrameId = null;
-      });
-    };
-
-    updateHighlightFromScroll();
-    window.addEventListener('scroll', handleScroll, { passive: true });
+    // Rapidly toggle filter overlay on/off
+    const filterInterval = setInterval(() => {
+      setIsFilterVisible((prev) => !prev);
+    }, 50); // Toggle every 50ms
 
     return () => {
-      window.removeEventListener('scroll', handleScroll);
-      if (animationFrameId !== null) {
-        window.cancelAnimationFrame(animationFrameId);
-      }
+      clearInterval(filterInterval);
     };
-  }, []);
-
-  const highlightColor = useMemo(
-    () => RAINBOW_COLORS[highlightIndex],
-    [highlightIndex],
+  }, [isHovered]);
+  
+  // When hovered: title text color matches the base gradient background color
+  const titleColor = useMemo(
+    () => isHovered ? baseGradientColor : undefined,
+    [isHovered, baseGradientColor],
   );
+  
+  // When hovered: gradient background is darkened by 0.6 brightness
+  const gradientColor = useMemo(
+    () => isHovered ? darkenColor(baseGradientColor, 0.6) : baseGradientColor,
+    [isHovered, baseGradientColor],
+  );
+  
   const highlightGradient = useMemo(
-    () =>
-      `linear-gradient(to right, ${highlightColor} 0%, ${highlightColor} 65%, rgba(0,0,0,0) 100%)`,
-    [highlightColor],
+    () => {
+      return `linear-gradient(to right, ${gradientColor} 0%, ${gradientColor} 65%, rgba(0,0,0,0) 100%)`;
+    },
+    [gradientColor],
   );
+  
+  const borderColor = gradientColor;
   
   return (
     <article
-      className={`w-full min-h-screen bg-background-dark text-text-primary ${className}`}
+      ref={articleRef}
+      className={`w-full min-h-screen bg-[#0F172A] text-text-primary m-0 p-0 block ${className}`}
       aria-label={pageLabel}
       role="article"
+      style={{ 
+        display: 'block', 
+        margin: 0, 
+        padding: 0,
+        width: '100%',
+        minHeight: '100vh',
+        height: '100%'
+      }}
     >
       {/* Track Header */}
       <header
         className={`
           w-full
           px-4 sm:px-6 md:px-8 lg:px-12 xl:px-16
-          py-8 sm:py-12 md:py-16 lg:py-20
-          border-b border-border
+          flex items-center
           ${headerClassName}
         `}
         role="banner"
         aria-labelledby="track-title"
       >
-        <div className="max-w-7xl mx-auto flex flex-col items-end text-right gap-4">
-          {/* Track Number (if provided) */}
-          {trackNumber !== undefined && (
-            <div
-              className="text-sm sm:text-base md:text-lg text-text-secondary"
-              aria-label={`Track number ${trackNumber}`}
-            >
-              <span className="sr-only">Track number: </span>
-              {trackNumber}
-            </div>
-          )}
-          
+        <div className="max-w-7xl mx-auto flex flex-col items-end text-right gap-4 w-full">          
           {/* Track Title */}
-          <div className="relative w-full overflow-visible flex justify-end">
+          <div 
+            className="relative inline-block cursor-pointer"
+            onMouseEnter={() => setIsHovered(true)}
+            onMouseLeave={() => setIsHovered(false)}
+          >
               {/* Gradient background banner */}
             <div
               aria-hidden="true"
@@ -207,22 +244,52 @@ export default function TrackPage({
           
                   // Align the gradient with the title's position and height
                   const offsetLeft = titleRect.left - containerRect.left;
+                  const offsetTop = titleRect.top - containerRect.top;
                   const titleHeight = titleRect.height;
           
                   el.style.left = `${offsetLeft}px`;
                   el.style.height = `${titleHeight}px`;
-                  el.style.top = `${(containerRect.height - titleHeight) / 2}px`;
+                  el.style.top = `${offsetTop}px`;
                 }
               }}
-              className="absolute z-0 rounded-md border"
+              className="absolute inset-0 z-0 rounded-sm border pointer-events-none"
               style={{
                 right: 'calc(100% - 100vw)', // extend to the right edge of the screen
                 background: highlightGradient,
-                borderColor: highlightColor, // border matches the rainbow color
-                transition: 'background 350ms ease',
-                pointerEvents: 'none',
+                borderColor: borderColor,
+                transition: 'background 200ms ease, border-color 200ms ease',
               }}
             />
+            {/* Filter overlay that toggles on/off when hovering */}
+            {isHovered && titleColor && (
+              <div
+                aria-hidden="true"
+                ref={(el) => {
+                  if (!el) return;
+                  const container = el.parentElement;
+                  const titleEl = container?.querySelector('#track-title');
+                  if (container && titleEl) {
+                    const containerRect = container.getBoundingClientRect();
+                    const titleRect = titleEl.getBoundingClientRect();
+            
+                    // Align the filter overlay with the gradient's position and height (same as gradient)
+                    const offsetLeft = titleRect.left - containerRect.left;
+                    const offsetTop = titleRect.top - containerRect.top;
+                    const titleHeight = titleRect.height;
+            
+                    el.style.left = `${offsetLeft}px`;
+                    el.style.height = `${titleHeight}px`;
+                    el.style.top = `${offsetTop}px`;
+                  }
+                }}
+                className="absolute z-20 rounded-md pointer-events-none"
+                style={{
+                  right: 'calc(100% - 100vw)', // extend to the right edge of the screen (same as gradient)
+                  backgroundColor: isFilterVisible ? hexToRgba(titleColor, 0.5) : 'transparent', // 50% opacity for see-through effect
+                  transition: 'background-color 150ms ease',
+                }}
+              />
+            )}
             <h1
               id="track-title"
               className="
@@ -230,37 +297,21 @@ export default function TrackPage({
                 z-10
                 inline-block
                 text-right
-                text-xl sm:text-2xl md:text-3xl lg:text-4xl
+                text-base sm:text-lg md:text-xl lg:text-2xl
                 font-semibold sm:font-bold
                 leading-tight
-                px-3 sm:px-4 md:px-6
-                py-3 sm:py-3
+                px-2 sm:px-3 md:px-4
+                py-1.5 sm:py-2
                 text-text-primary
                 whitespace-nowrap
+                transition-colors duration-150 ease-in-out
+                flex items-center
               "
-             
+              style={titleColor ? { color: titleColor } : undefined}
             >
-              {trackNumber}{title}
+              {String(trackNumber).padStart(2, '0')} {title}
             </h1>
           </div>
-          
-          {/* Subtitle (if provided) */}
-          {subtitle && (
-            <p
-              className="
-                text-base sm:text-lg md:text-xl lg:text-2xl
-                text-text-secondary
-                font-medium
-                leading-relaxed
-              "
-              style={{
-                maxWidth: '42rem',
-              }}
-              aria-label={`Track subtitle: ${subtitle}`}
-            >
-              {subtitle}
-            </p>
-          )}
         </div>
       </header>
 

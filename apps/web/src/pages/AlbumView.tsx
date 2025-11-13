@@ -7,7 +7,7 @@ import { api } from '../services/api';
 import { fetchWeatherApi } from 'openmeteo';
 import PlayerBar from '../components/player/PlayerBar';
 import { useAudioStore } from '../stores/audioStore';
-import TrackPage from '../components/tracks/TrackPage';
+import TrackPage, { RAINBOW_COLORS } from '../components/tracks/TrackPage';
 
 const clamp = (value: number, min = 0, max = 1) => Math.max(min, Math.min(max, value));
 
@@ -26,6 +26,7 @@ export default function AlbumView() {
   const [currentTrackIndex, setCurrentTrackIndex] = useState<number>(0);
   const [currentTrackProgress, setCurrentTrackProgress] = useState<number>(0);
   const [playerBarVisible, setPlayerBarVisible] = useState<boolean>(false); // Player bar visibility
+  const [gradientColorIndex, setGradientColorIndex] = useState<number>(0); // Gradient color index for track titles
   
   // Location state
   const [locationText, setLocationText] = useState<string>('Melbourne, Australia');
@@ -859,6 +860,11 @@ export default function AlbumView() {
             prevScrollProgressRef.current = reveal;
           }
 
+          // Calculate gradient color index based on scroll position (3x faster color changes)
+          const segmentSize = 27; // Smaller segment size = faster color changes (80/3 ≈ 27)
+          const newGradientColorIndex = Math.floor(scrollTop / segmentSize) % RAINBOW_COLORS.length;
+          setGradientColorIndex(newGradientColorIndex);
+
           // Track-specific progress + active track calculation
           const viewportY = viewportHeight || vh;
           if (viewportY > 0 && trackSectionRefs.current.length) {
@@ -1300,7 +1306,7 @@ export default function AlbumView() {
             transition: 'clip-path 0.1s cubic-bezier(0.4, 0, 0.2, 1)',
             willChange: 'clip-path',
             zIndex: 50,
-            backgroundColor: '#191B20',
+            backgroundColor: '#0F172A',
             pointerEvents: contentVisible ? 'auto' : 'none'
           }}
         />
@@ -1317,7 +1323,11 @@ export default function AlbumView() {
               ? `translate3d(0, ${(viewportHeight || window.innerHeight) - (scrollProgress * (viewportHeight || window.innerHeight) * 1.5)}px, 0)` 
               : `translate3d(0, ${viewportHeight || window.innerHeight}px, 0)`, // Start below viewport, scroll up as user scrolls
             transition: 'opacity 0.5s cubic-bezier(0.4, 0, 0.2, 1)',
-            willChange: contentVisible ? 'transform, opacity' : 'opacity'
+            willChange: contentVisible ? 'transform, opacity' : 'opacity',
+            backgroundColor: '#0F172A',
+            margin: 0,
+            padding: 0,
+            fontSize: 0
           }}
         >
           {TRACKS.map((track, index) => (
@@ -1327,13 +1337,20 @@ export default function AlbumView() {
               ref={(el) => {
                 trackSectionRefs.current[index] = el;
               }}
-              className="min-h-screen"
-              style={{ backgroundColor: '#191B20' }}
+              className="w-full m-0 p-0"
+              style={{ 
+                backgroundColor: '#0F172A', 
+                margin: 0, 
+                padding: 0,
+                minHeight: '100vh',
+                display: 'block',
+                fontSize: '16px'
+              }}
             >
               <TrackPage
                 title={track.title}
                 trackNumber={track.number}
-                // subtitle={track.artist}
+                gradientColorIndex={gradientColorIndex}
                 content={
                   <div style={{ fontFamily: "'Ubuntu', sans-serif" }}>
                     <p>
@@ -1353,9 +1370,9 @@ export default function AlbumView() {
                     </p>
                   </div>
                 }
-                className="min-h-screen bg-[#191B20]"
-                headerClassName="bg-[#191B20]"
-                contentClassName="bg-[#191B20]"
+                className="w-full h-full min-h-screen bg-[#0F172A]"
+                headerClassName="bg-[#0F172A]"
+                contentClassName="bg-[#0F172A]"
               />
             </div>
           ))}
