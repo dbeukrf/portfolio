@@ -195,7 +195,7 @@ export default function PlayerBar({ isVisible, contentVisible, clipPathReveal: _
   
   return (
     <div 
-      className={`fixed bottom-0 left-0 right-0 bg-[#181818] border-t border-white/10 px-2 md:px-4 py-1.5 md:py-2 transition-all duration-500 pointer-events-auto`}
+      className={`fixed bottom-0 left-0 right-0 bg-[#181818] border-t border-white/10 px-1.5 md:px-3 py-1 md:py-1.5 transition-all duration-500 pointer-events-auto`}
       style={{
         opacity: opacity / 100,
         zIndex: zIndex,
@@ -205,7 +205,7 @@ export default function PlayerBar({ isVisible, contentVisible, clipPathReveal: _
       <audio ref={audioRef} preload="metadata" />
 
       {/* Progress bar */}
-      <div className="absolute top-0 left-0 right-0 h-1 bg-white/10 cursor-pointer" onClick={handleSeek}>
+      <div className="absolute top-0 left-0 right-0 h-0.5 bg-white/10 cursor-pointer" onClick={handleSeek}>
         <div
           className="h-full bg-[#1db954] transition-all"
           style={{ width: `${progressPercent}%` }}
@@ -213,37 +213,37 @@ export default function PlayerBar({ isVisible, contentVisible, clipPathReveal: _
       </div>
 
       {/* Main player content */}
-      <div className="grid grid-cols-3 items-center h-[70px] md:h-[90px]">
+      <div className="grid grid-cols-3 items-center h-[56px] md:h-[64px]">
         {/* Left: Album image, track title, and author */}
-        <div className="flex items-center gap-5 min-w-0 justify-start">
+        <div className="flex items-center gap-3 md:gap-4 min-w-0 justify-start">
           <img
             src="/images/album-cover.jpg"
             alt="Album cover"
-            className="w-10 h-10 md:w-12 md:h-12 lg:w-14 lg:h-14 object-cover rounded flex-shrink-0"
+            className="w-8 h-8 md:w-10 md:h-10 lg:w-11 lg:h-11 object-cover rounded flex-shrink-0"
           />
           <div className="min-w-0">
-            <div className="text-white text-xs md:text-sm font-medium truncate">{currentTrack.title}</div>
-            <div className="text-white/70 text-[10px] md:text-xs truncate">{currentTrack.artist}</div>
+            <div className="text-white text-[10px] md:text-xs font-medium truncate">{currentTrack.title}</div>
+            <div className="text-white/70 text-[9px] md:text-[10px] truncate">{currentTrack.artist}</div>
           </div>
         </div>
 
         {/* Center: Controls and progress */}
-        <div className="flex flex-col items-center gap-1.5 md:gap-2 justify-self-center w-full max-w-[400px] sm:max-w-[500px] md:max-w-[600px] lg:max-w-[800px] xl:max-w-[900px]">
+        <div className="flex flex-col items-center gap-1 md:gap-1.5 justify-self-center w-full max-w-[400px] sm:max-w-[500px] md:max-w-[600px] lg:max-w-[800px] xl:max-w-[900px]">
           {/* Control buttons */}
-          <div className="flex items-center gap-1 md:gap-2">
+          <div className="flex items-center gap-0.5 md:gap-1.5">
             {/* Shuffle */}
             <div className="relative group">
               <button
                 onClick={toggleShuffle}
-                className={`p-1.5 md:p-2 text-white/70 hover:text-white transition-colors focus:outline-none ${
-                  isShuffled ? 'text-[#1db954]' : ''
+                className={`p-1 md:p-1.5 text-white/70 hover:text-white transition-colors focus:outline-none ${
+                  isShuffled ? 'text-[#ff6b35]' : ''
                 }`}
                 aria-label="Shuffle"
               >
-                <FaRandom className="w-3 h-3 md:w-4 md:h-4" />
+                <FaRandom className="w-2.5 h-2.5 md:w-3.5 md:h-3.5" />
               </button>
               {/* Tooltip */}
-              <span className="absolute bottom-full mb-2 left-1/2 -translate-x-1/2 bg-black text-white text-xs px-2 py-1 rounded opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap pointer-events-none">
+              <span className="absolute bottom-full mb-1.5 left-1/2 -translate-x-1/2 bg-black text-white text-[10px] px-1.5 py-0.5 rounded opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap pointer-events-none">
                 Shuffle
               </span>
             </div>
@@ -253,13 +253,13 @@ export default function PlayerBar({ isVisible, contentVisible, clipPathReveal: _
               <button
                 onClick={handlePrevious}
                 disabled={currentIndex <= 0}
-                className="p-1.5 md:p-2 text-white/70 hover:text-white transition-colors disabled:opacity-50 disabled:cursor-not-allowed focus:outline-none"
+                className="p-1 md:p-1.5 text-white/70 hover:text-white transition-colors disabled:opacity-50 disabled:cursor-not-allowed focus:outline-none"
                 aria-label="Previous track"
               >
-                <FaStepBackward className="w-3 h-3 md:w-4 md:h-4" />
+                <FaStepBackward className="w-2.5 h-2.5 md:w-3.5 md:h-3.5" />
               </button>
               {/* Tooltip */}
-              <span className="absolute bottom-full mb-2 left-1/2 -translate-x-1/2 bg-black text-white text-xs px-2 py-1 rounded opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap pointer-events-none">
+              <span className="absolute bottom-full mb-1.5 left-1/2 -translate-x-1/2 bg-black text-white text-[10px] px-1.5 py-0.5 rounded opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap pointer-events-none">
                 Previous track
               </span>
             </div>
@@ -269,19 +269,19 @@ export default function PlayerBar({ isVisible, contentVisible, clipPathReveal: _
               <button
                 onClick={togglePlayPause}
                 disabled={isLoading}
-                className="p-1.5 md:p-2 bg-white text-black rounded-full hover:scale-110 transition-transform disabled:opacity-50 disabled:cursor-not-allowed w-8 h-8 md:w-10 md:h-10 flex items-center justify-center focus:outline-none"
+                className="p-1 md:p-1.5 bg-white text-black rounded-full hover:scale-110 transition-transform disabled:opacity-50 disabled:cursor-not-allowed w-6 h-6 md:w-8 md:h-8 flex items-center justify-center focus:outline-none"
                 aria-label={isPlaying ? 'Pause' : 'Play'}
               >
                 {isLoading ? (
-                  <div className="w-3 h-3 md:w-4 md:h-4 border-2 border-black border-t-transparent rounded-full animate-spin" />
+                  <div className="w-2.5 h-2.5 md:w-3 md:h-3 border-2 border-black border-t-transparent rounded-full animate-spin" />
                 ) : isPlaying ? (
-                  <FaPause className="w-3 h-3 md:w-3.5 md:h-3.5" />
+                  <FaPause className="w-2.5 h-2.5 md:w-3 md:h-3" />
                 ) : (
-                  <FaPlay className="w-3 h-3 md:w-3.5 md:h-3.5 ml-0.5" />
+                  <FaPlay className="w-2.5 h-2.5 md:w-3 md:h-3 ml-0.5" />
                 )}
               </button>
               {/* Tooltip */}
-              <span className="absolute bottom-full mb-2 left-1/2 -translate-x-1/2 bg-black text-white text-xs px-2 py-1 rounded opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap pointer-events-none">
+              <span className="absolute bottom-full mb-1.5 left-1/2 -translate-x-1/2 bg-black text-white text-[10px] px-1.5 py-0.5 rounded opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap pointer-events-none">
                 {isPlaying ? 'Pause' : 'Play'}
               </span>
             </div>
@@ -290,13 +290,13 @@ export default function PlayerBar({ isVisible, contentVisible, clipPathReveal: _
             <div className="relative group">
               <button
                 onClick={handleNext}
-                className="p-1.5 md:p-2 text-white/70 hover:text-white transition-colors focus:outline-none"
+                className="p-1 md:p-1.5 text-white/70 hover:text-white transition-colors focus:outline-none"
                 aria-label="Next track"
               >
-                <FaStepForward className="w-3 h-3 md:w-4 md:h-4" />
+                <FaStepForward className="w-2.5 h-2.5 md:w-3.5 md:h-3.5" />
               </button>
               {/* Tooltip */}
-              <span className="absolute bottom-full mb-2 left-1/2 -translate-x-1/2 bg-black text-white text-xs px-2 py-1 rounded opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap pointer-events-none">
+              <span className="absolute bottom-full mb-1.5 left-1/2 -translate-x-1/2 bg-black text-white text-[10px] px-1.5 py-0.5 rounded opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap pointer-events-none">
                 Next track
               </span>
             </div>
@@ -305,27 +305,27 @@ export default function PlayerBar({ isVisible, contentVisible, clipPathReveal: _
             <div className="relative group">
               <button
                 onClick={toggleLoop}
-                className={`p-1.5 md:p-2 text-white/70 hover:text-white transition-colors focus:outline-none ${
-                  isLooping ? 'text-[#1db954]' : ''
+                className={`p-1 md:p-1.5 text-white/70 hover:text-white transition-colors focus:outline-none ${
+                  isLooping ? 'text-[#ff6b35]' : ''
                 }`}
                 aria-label="Repeat"
               >
-                <FaRedo className="w-3 h-3 md:w-4 md:h-4" />
+                <FaRedo className="w-2.5 h-2.5 md:w-3.5 md:h-3.5" />
               </button>
               {/* Tooltip */}
-              <span className="absolute bottom-full mb-2 left-1/2 -translate-x-1/2 bg-black text-white text-xs px-2 py-1 rounded opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap pointer-events-none">
+              <span className="absolute bottom-full mb-1.5 left-1/2 -translate-x-1/2 bg-black text-white text-[10px] px-1.5 py-0.5 rounded opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap pointer-events-none">
                 {isLooping ? 'Repeat one' : 'Repeat'}
               </span>
             </div>
           </div>
 
           {/* Progress bar with time */}
-          <div className="flex items-center gap-1.5 md:gap-2 w-full">
-            <span className="text-white/70 text-[10px] md:text-xs min-w-[35px] md:min-w-[40px] text-right">
+          <div className="flex items-center gap-1 md:gap-1.5 w-full">
+            <span className="text-white/70 text-[9px] md:text-[10px] min-w-[30px] md:min-w-[35px] text-right">
               {formatTime(currentTime)}
             </span>
             <div
-              className="flex-1 h-0.5 md:h-1 bg-white/20 rounded-full cursor-pointer group"
+              className="flex-1 h-0.5 bg-white/20 rounded-full cursor-pointer group"
               onClick={handleSeek}
             >
               <div
@@ -333,28 +333,28 @@ export default function PlayerBar({ isVisible, contentVisible, clipPathReveal: _
                 style={{ width: `${progressPercent}%` }}
               />
             </div>
-            <span className="text-white/70 text-[10px] md:text-xs min-w-[35px] md:min-w-[40px]">
+            <span className="text-white/70 text-[9px] md:text-[10px] min-w-[30px] md:min-w-[35px]">
               {formatTime(duration)}
             </span>
           </div>
         </div>
 
         {/* Right: Volume control */}
-        <div className="flex items-center gap-1.5 md:gap-2 justify-end">
+        <div className="flex items-center gap-1 md:gap-1.5 justify-end">
           <div className="relative group">
             <button
               onClick={toggleMute}
-              className="p-1.5 md:p-2 text-white/70 hover:text-white transition-colors focus:outline-none"
+              className="p-1 md:p-1.5 text-white/70 hover:text-white transition-colors focus:outline-none"
               aria-label={isMuted ? 'Unmute' : 'Mute'}
             >
               {isMuted ? (
-                <FaVolumeMute className="w-3 h-3 md:w-4 md:h-4" />
+                <FaVolumeMute className="w-2.5 h-2.5 md:w-3.5 md:h-3.5" />
               ) : (
-                <FaVolumeUp className="w-3 h-3 md:w-4 md:h-4" />
+                <FaVolumeUp className="w-2.5 h-2.5 md:w-3.5 md:h-3.5" />
               )}
             </button>
             {/* Tooltip */}
-            <span className="absolute bottom-full mb-2 left-1/2 -translate-x-1/2 bg-black text-white text-xs px-2 py-1 rounded opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap pointer-events-none">
+            <span className="absolute bottom-full mb-1.5 left-1/2 -translate-x-1/2 bg-black text-white text-[10px] px-1.5 py-0.5 rounded opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap pointer-events-none">
               {isMuted ? 'Unmute' : 'Mute'}
             </span>
           </div>
@@ -372,7 +372,7 @@ export default function PlayerBar({ isVisible, contentVisible, clipPathReveal: _
                 toggleMute();
               }
             }}
-            className="w-16 md:w-20 lg:w-24 h-0.5 md:h-1 bg-white/20 rounded-full appearance-none cursor-pointer accent-white focus:outline-none"
+            className="w-12 md:w-16 lg:w-20 h-0.5 bg-white/20 rounded-full appearance-none cursor-pointer accent-white focus:outline-none"
             style={{
               background: `linear-gradient(to right, white 0%, white ${displayVolume * 100}%, rgba(255,255,255,0.2) ${displayVolume * 100}%, rgba(255,255,255,0.2) 100%)`,
             }}

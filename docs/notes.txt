@@ -19,8 +19,7 @@ other options: ipify (500 requests in total), Abstract API (2,400,000/year for $
 Language api: Lecto Translation https://rapidapi.com/lecto-lecto-default/api/lecto-translation
 
 
-clear, mostly_clear, partly_cloudy, mostly_cloudy, cloudy, windy, wind_and_rain, light_rain_showers, chance_of_showers, scaterred_showers, rain_showers, heavy_rain_showers,light_to_moderate_rain,moderate_to_heavy_rain, rain, light_rain, heavy_rain, rain_periodically_heavy,light_snow_showers,chance_of_snow_showers, scattered_snow_showers,snow_showers, heavy_snow_showers,light_to_moderate_snow, moderate_to_heavy_snow, snow, light_snow, heavy_snow,snowstorm,snow_periodically_heavy, heavy_snow_storm, blowing_snow, rain_and_snow, hail, hail_showers, thunderstorm, thundershower, light_thunderstorm_rain, scattered_thunderstorms, heavy_thunderstorm
-
+paprer airplane following cursor loosely (slow velocity, high momentum, medium mouse tracking)
 
 
 
