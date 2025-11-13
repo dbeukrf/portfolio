@@ -201,7 +201,7 @@ export default function AlbumView() {
         <img
           src={iconUrl}
           alt={`${label} weather icon`}
-          className="w-[20px] h-[20px] sm:w-[24px] sm:h-[24px] md:w-[40px] md:h-[40px] lg:w-[50px] lg:h-[50px] xl:w-[60px] xl:h-[60px] -translate-y-[2px] sm:-translate-y-[3px] md:-translate-y-[4.5px]"
+          className="w-[16px] h-[16px] sm:w-[18px] sm:h-[18px] md:w-[28px] md:h-[28px] lg:w-[32px] lg:h-[32px] xl:w-[36px] xl:h-[36px] -translate-y-[1.5px] sm:-translate-y-[2px] md:-translate-y-[3px]"
           loading="lazy"
         />
       </div>
@@ -1034,13 +1034,13 @@ export default function AlbumView() {
       <div ref={announceRef} aria-live="polite" className="sr-only" />
 
       {/* Hero Section with Album Artwork - Fixed at top */}
-      <div ref={heroRef} className="sticky top-0 z-40 w-full bg-gradient-to-b from-[#1f2937] to-[#6b7280] flex flex-row items-center gap-1.5 sm:gap-3 md:gap-4 lg:gap-6 px-2 sm:px-4 md:px-6 lg:px-8 py-1.5 sm:py-2 md:py-3 lg:py-4 overflow-hidden max-h-[40vh] md:max-h-[30vh]">
+      <div ref={heroRef} className="sticky top-0 z-40 w-full bg-gradient-to-b from-[#1f2937] to-[#6b7280] flex flex-row items-center gap-1 sm:gap-2 md:gap-2.5 lg:gap-3 px-1.5 sm:px-2.5 md:px-4 lg:px-5 py-1 sm:py-1.5 md:py-2 lg:py-2.5 overflow-hidden max-h-[35vh] md:max-h-[25vh]">
 
         {/* Album cover image */}
         <img
           src="/images/album-cover.jpg"
           alt="Album cover"
-          className="w-12 h-12 sm:w-16 sm:h-16 md:w-24 md:h-24 lg:w-32 lg:h-32 object-cover shadow-2xl rounded relative z-10 cursor-pointer flex-shrink-0"
+          className="w-10 h-10 sm:w-12 sm:h-12 md:w-16 md:h-16 lg:w-20 lg:h-20 object-cover shadow-2xl rounded relative z-10 cursor-pointer flex-shrink-0"
           onClick={handleAlbumImageClick}
         />
 
@@ -1050,7 +1050,7 @@ export default function AlbumView() {
           <div className="min-w-0">
             <Shuffle
               tag="p"
-              className="text-[clamp(8px,2.5vw,10px)] sm:text-[clamp(9px,2.8vw,12px)] md:text-xs lg:text-sm font-semibold text-white/70 mb-0.5 sm:mb-1 md:mb-2 md:whitespace-nowrap"
+              className="text-[clamp(7px,2.2vw,9px)] sm:text-[clamp(8px,2.5vw,10px)] md:text-[10px] lg:text-xs font-semibold text-white/70 mb-0.5 sm:mb-0.5 md:mb-1 md:whitespace-nowrap"
               text="Album"
               duration={0.35}
               animationMode="evenodd"
@@ -1063,7 +1063,7 @@ export default function AlbumView() {
             <div className="flex items-center gap-0.5 sm:gap-1 md:gap-2 min-w-0">
               <Shuffle
                 tag="h1"
-                className="text-[clamp(10px,3.5vw,12px)] sm:text-[clamp(12px,3.8vw,14px)] md:text-lg lg:text-2xl xl:text-3xl font-extrabold text-white mb-0.5 sm:mb-1 md:mb-2 leading-tight break-words md:truncate md:whitespace-nowrap"
+                className="text-[clamp(9px,3vw,11px)] sm:text-[clamp(10px,3.2vw,12px)] md:text-sm lg:text-base xl:text-lg font-extrabold text-white mb-0.5 sm:mb-0.5 md:mb-1 leading-tight break-words md:truncate md:whitespace-nowrap"
                 text={locationText}
                 duration={0.5}
                 animationMode="evenodd"
@@ -1080,7 +1080,7 @@ export default function AlbumView() {
           {/* Description */}
           <Shuffle
             tag="p"
-            className="text-white/90 mb-0 text-[clamp(8px,3vw,10px)] sm:text-[clamp(9px,3.2vw,12px)] md:text-xs lg:text-sm break-words md:truncate md:whitespace-nowrap leading-snug"
+            className="text-white/90 mb-0 text-[clamp(7px,2.8vw,9px)] sm:text-[clamp(8px,3vw,10px)] md:text-[10px] lg:text-xs break-words md:truncate md:whitespace-nowrap leading-snug"
             text="Diego Beuk • 2025 • 6 songs, 11 min"
             duration={0.4}
             animationMode="random"
@@ -1093,15 +1093,15 @@ export default function AlbumView() {
         </div>
 
         {/* Contact info - Right side */}
-        <div className="flex flex-col items-end justify-center gap-0.5 sm:gap-1 md:gap-2 text-white text-[9px] sm:text-[10px] md:text-xs lg:text-sm sm:flex-shrink-0 relative z-10 max-w-[40%] sm:max-w-none">
+        <div className="flex flex-col items-end justify-center gap-0.5 sm:gap-0.5 md:gap-1 text-white text-[8px] sm:text-[9px] md:text-[10px] lg:text-xs sm:flex-shrink-0 relative z-10 max-w-[40%] sm:max-w-none">
           {/* Email and Phone */}
-          <div className="flex flex-col items-end space-y-0 sm:space-y-0.5 md:space-y-1">
-            <Shuffle tag="span" className="text-[9px] sm:text-[10px] md:text-xs truncate max-w-full" text="beuk.diego@gmail.com" duration={0.35} triggerOnHover triggerOnce threshold={0} rootMargin="0px" textAlign="right" />
-            <Shuffle tag="span" className="text-[9px] sm:text-[10px] md:text-xs truncate max-w-full" text="+61 448 092 338" duration={0.35} triggerOnHover triggerOnce threshold={0} rootMargin="0px" textAlign="right" />
+          <div className="flex flex-col items-end space-y-0 sm:space-y-0 md:space-y-0.5">
+            <Shuffle tag="span" className="text-[8px] sm:text-[9px] md:text-[10px] truncate max-w-full" text="beuk.diego@gmail.com" duration={0.35} triggerOnHover triggerOnce threshold={0} rootMargin="0px" textAlign="right" />
+            <Shuffle tag="span" className="text-[8px] sm:text-[9px] md:text-[10px] truncate max-w-full" text="+61 448 092 338" duration={0.35} triggerOnHover triggerOnce threshold={0} rootMargin="0px" textAlign="right" />
           </div>
 
           {/* LinkedIn and GitHub icons - Below text */}
-          <div className="flex space-x-1.5 sm:space-x-2 md:space-x-3 lg:space-x-3.5">
+          <div className="flex space-x-1 sm:space-x-1.5 md:space-x-2 lg:space-x-2.5">
             <a
               href="https://www.linkedin.com/in/diego-beuk-8a9100288/"
               target="_blank"
@@ -1109,7 +1109,7 @@ export default function AlbumView() {
               className="hover:text-primary-500 transition-colors focus:outline-none focus:ring-2 focus:ring-primary-500 rounded flex-shrink-0"
               aria-label="Diego Beuk LinkedIn profile"
             >
-              <FaLinkedin className="w-4 h-4 sm:w-[18px] sm:h-[18px] md:w-5 md:h-5 lg:w-[25px] lg:h-[25px]" color="white" />
+              <FaLinkedin className="w-3 h-3 sm:w-[14px] sm:h-[14px] md:w-4 md:h-4 lg:w-[18px] lg:h-[18px]" color="white" />
             </a>
             <a
               href="https://github.com/dbeukrf"
@@ -1118,7 +1118,7 @@ export default function AlbumView() {
               className="hover:text-primary-500 transition-colors focus:outline-none focus:ring-2 focus:ring-primary-500 rounded flex-shrink-0"
               aria-label="Diego Beuk Github profile"
             >
-              <FaGithub className="w-4 h-4 sm:w-[18px] sm:h-[18px] md:w-5 md:h-5 lg:w-[25px] lg:h-[25px]" color="white" />
+              <FaGithub className="w-3 h-3 sm:w-[14px] sm:h-[14px] md:w-4 md:h-4 lg:w-[18px] lg:h-[18px]" color="white" />
             </a>
           </div>
         </div>
@@ -1127,7 +1127,7 @@ export default function AlbumView() {
       {/* Action Buttons - Combined for mobile */}
       <div ref={controlsRef} className="sticky z-40 w-full bg-transparent" style={{ top: `${heroHeight}px` }}>
         {/* Action Buttons above Track List */}
-        <div className="flex items-center gap-2 md:gap-4 px-4 md:px-8 py-4 md:py-6">
+        <div className="flex items-center gap-1.5 md:gap-2.5 px-3 md:px-6 py-2.5 md:py-4">
           {/* Play Button */}
           <div className="relative group">
             <button 
@@ -1145,12 +1145,12 @@ export default function AlbumView() {
                 play();
                 setPlayerBarVisible(true);
               }}
-              className="flex items-center justify-center w-7 h-7 md:w-10 md:h-10 rounded-full bg-white/5 hover:bg-white/20 text-white transition-colors focus:outline-none"
+              className="flex items-center justify-center w-6 h-6 md:w-8 md:h-8 rounded-full bg-white/5 hover:bg-white/20 text-white transition-colors focus:outline-none"
             >
-              <FaPlay size={14} className="md:w-4 md:h-4" />
+              <FaPlay size={12} className="md:w-3.5 md:h-3.5" />
             </button>
             {/* Tooltip */}
-            <span className="absolute bottom-full mb-2 left-1/2 -translate-x-1/2 bg-black text-white text-xs px-2 py-1 rounded opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap">
+            <span className="absolute bottom-full mb-1.5 left-1/2 -translate-x-1/2 bg-black text-white text-[10px] px-1.5 py-0.5 rounded opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap">
               Play
             </span>
           </div>
@@ -1162,23 +1162,23 @@ export default function AlbumView() {
                 toggleShuffle();
                 // Shuffle button only toggles shuffle mode, doesn't play
               }}
-              className={`flex items-center justify-center w-7 h-7 md:w-10 md:h-10 rounded-full bg-white/5 hover:bg-white/20 text-white transition-colors focus:outline-none ${
-                isShuffled ? 'bg-white/20' : ''
+              className={`flex items-center justify-center w-6 h-6 md:w-8 md:h-8 rounded-full bg-white/5 hover:bg-white/20 transition-colors focus:outline-none ${
+                isShuffled ? 'bg-white/20 text-[#ff6b35]' : 'text-white'
               }`}
             >
-              <FaRandom size={14} className="md:w-4 md:h-4" />
+              <FaRandom size={12} className="md:w-3.5 md:h-3.5" />
             </button>
-            <span className="absolute bottom-full mb-2 left-1/2 -translate-x-1/2 bg-black text-white text-xs px-2 py-1 rounded opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap">
+            <span className="absolute bottom-full mb-1.5 left-1/2 -translate-x-1/2 bg-black text-white text-[10px] px-1.5 py-0.5 rounded opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap">
               Shuffle
             </span>
           </div>
 
           {/* Invite Collaborator Button */}
           <div className="relative group">
-            <button className="flex items-center justify-center w-7 h-7 md:w-10 md:h-10 rounded-full bg-white/5 hover:bg-white/20 text-white transition-colors">
-              <FaUserPlus size={14} className="md:w-4 md:h-4" />
+            <button className="flex items-center justify-center w-6 h-6 md:w-8 md:h-8 rounded-full bg-white/5 hover:bg-white/20 text-white transition-colors">
+              <FaUserPlus size={12} className="md:w-3.5 md:h-3.5" />
             </button>
-            <span className="absolute bottom-full mb-2 left-1/2 -translate-x-1/2 bg-black text-white text-xs px-2 py-1 rounded opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap">
+            <span className="absolute bottom-full mb-1.5 left-1/2 -translate-x-1/2 bg-black text-white text-[10px] px-1.5 py-0.5 rounded opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap">
               Invite Collaborator
             </span>
           </div>
@@ -1195,21 +1195,21 @@ export default function AlbumView() {
         }}
       >
         <div 
-          className="h-full flex flex-col px-4 md:px-8 max-w-[1600px] mx-auto overflow-y-auto"
+          className="h-full flex flex-col px-3 md:px-6 max-w-[1600px] mx-auto overflow-y-auto"
           style={{
-            paddingTop: '0.25rem',
-            paddingBottom: '0.25rem'
+            paddingTop: '0.125rem',
+            paddingBottom: '0.125rem'
           }}
         >
           {/* Table Header */}
-          <div className="grid grid-cols-12 text-white/70 text-xs md:text-sm font-semibold border-b border-white/20 pb-1 md:pb-2 mb-1 md:mb-2 px-2 md:px-4 flex-shrink-0">
+          <div className="grid grid-cols-12 text-white/70 text-[10px] md:text-xs font-semibold border-b border-white/20 pb-0.5 md:pb-1 mb-0.5 md:mb-1 px-1.5 md:px-3 flex-shrink-0">
             <div className="col-span-1 text-middle">#</div>
             <div className="col-span-6 text-middle">Title</div>
             <div className="col-span-3 text-middle hidden sm:block">Artist</div>
-            <div className="col-span-3 sm:col-span-2 flex items-center justify-end gap-1">
+            <div className="col-span-3 sm:col-span-2 flex items-center justify-end gap-0.5">
               <svg
                 xmlns="http://www.w3.org/2000/svg"
-                className="w-3 h-3 md:w-4 md:h-4"
+                className="w-2.5 h-2.5 md:w-3 md:h-3"
                 fill="none"
                 viewBox="0 0 24 24"
                 stroke="currentColor"
@@ -1225,7 +1225,7 @@ export default function AlbumView() {
           </div>
 
           {/* Track List */}
-          <div className="space-y-1 md:space-y-2 flex-1 min-h-0">
+          <div className="space-y-0.5 md:space-y-1 flex-1 min-h-0">
             {TRACKS.map((track, index) => {
               const isAIDJ = track.id === 'aiDj';
               const totalSeconds = track.duration || 0;
@@ -1236,7 +1236,7 @@ export default function AlbumView() {
               return (
                 <div
                   key={track.id}
-                  className={`grid grid-cols-12 items-center text-white hover:bg-white/5 rounded-lg px-2 md:px-4 py-1 md:py-2 transition-colors cursor-pointer focus:outline-none focus-visible:outline-none`}
+                  className={`grid grid-cols-12 items-center text-white hover:bg-white/5 rounded-lg px-1.5 md:px-3 py-0.5 md:py-1 transition-colors cursor-pointer focus:outline-none focus-visible:outline-none`}
                   role="button"
                   tabIndex={0}
                   onClick={() => scrollToTrack(index)}
@@ -1248,32 +1248,32 @@ export default function AlbumView() {
                   }}
                 >
                   {/* Track Number */}
-                  <div className="col-span-1 text-white/80 text-sm md:text-base">{track.number}</div>
+                  <div className="col-span-1 text-white/80 text-xs md:text-sm">{track.number}</div>
 
                   {/* AI DJ Track Layout */}
                   {isAIDJ ? (
-                    <div className="col-span-11 flex justify-center items-end gap-2">
+                    <div className="col-span-11 flex justify-center items-end gap-1.5">
                       <img
                         src={'/images/ai-dj.jpg'}
                         alt="AI DJ"
-                        className="w-8 h-8 md:w-10 md:h-10 object-cover rounded mr-2 md:mr-5"
+                        className="w-6 h-6 md:w-8 md:h-8 object-cover rounded mr-1.5 md:mr-3"
                       />
-                      <h3 className="text-sm md:text-lg font-semibold text-center">{track.title}</h3>
+                      <h3 className="text-xs md:text-sm font-semibold text-center">{track.title}</h3>
                     </div>
                   ) : (
                     <>
                       {/* Title */}
-                      <div className="col-span-6 sm:col-span-6 text-white font-semibold text-sm md:text-base truncate">
+                      <div className="col-span-6 sm:col-span-6 text-white font-semibold text-xs md:text-sm truncate">
                         {track.title}
                       </div>
 
                       {/* Artist */}
-                      <div className="col-span-3 text-white/70 text-xs md:text-sm hidden sm:block truncate">
+                      <div className="col-span-3 text-white/70 text-[10px] md:text-xs hidden sm:block truncate">
                         {track.artist || 'Diego Beuk'}
                       </div>
 
                       {/* Duration */}
-                      <div className="col-span-3 sm:col-span-2 text-right text-white/70 text-xs md:text-sm">
+                      <div className="col-span-3 sm:col-span-2 text-right text-white/70 text-[10px] md:text-xs">
                         {formattedDuration}
                       </div>
                     </>
@@ -1364,11 +1364,11 @@ export default function AlbumView() {
 
       {/* Track Progress Grid */}
       <div
-        className={`fixed top-6 left-6 z-[80] transition-all duration-500 ease-out ${
+        className={`fixed top-4 left-4 z-[80] transition-all duration-500 ease-out ${
           contentVisible ? 'opacity-100 translate-y-0 pointer-events-auto' : 'opacity-0 -translate-y-6 pointer-events-none'
         }`}
       >
-        <div className="grid gap-1.5">
+        <div className="grid gap-1">
           {TRACKS.map((track, index) => {
             const isActive = index === currentTrackIndex;
             const label = `${String(track.number).padStart(2, '0')} ${track.title}`;
@@ -1384,7 +1384,7 @@ export default function AlbumView() {
                     scrollToTrack(index);
                   }
                 }}
-                className={`relative min-w-[160px] px-3 py-1.5 text-left text-white text-xs font-semibold rounded-md overflow-hidden transition-transform duration-300 focus:outline-none focus-visible:outline-none focus:ring-0 ring-0 ${
+                className={`relative min-w-[140px] px-2 py-1 text-left text-white text-[10px] font-semibold rounded-md overflow-hidden transition-transform duration-300 focus:outline-none focus-visible:outline-none focus:ring-0 ring-0 ${
                   isActive ? 'shadow-lg scale-[1.02]' : 'opacity-80 hover:opacity-100 hover:scale-[1.01]'
                 }`}
                 aria-pressed={isActive}
