@@ -1,13 +1,21 @@
 import { type ReactNode, useEffect, useMemo, useRef, useState } from 'react';
 
 export const RAINBOW_COLORS = [
-  '#FF3B30', // red
-  '#FF9500', // orange
-  '#FFCC00', // yellow
-  '#34C759', // green
-  '#007AFF', // blue
-  '#5856D6', // indigo
-  '#AF52DE', // violet
+  // '#FF3B30', // red
+  // '#FF9500', // orange
+  // '#FFCC00', // yellow
+  // '#34C759', // green
+  // '#007AFF', // blue
+  // '#5856D6', // indigo
+  // '#AF52DE', // violet
+  '#DC136C', // dogwood rose
+  '#22577A', // lapis lazuli
+  '#57CC99', // emerald
+  '#3F2E56', // english violet
+  '#F2542D', //cinnabar
+  '#0D21A1', // zaffre 
+  '#D81E5B', // raspberry
+  '#F6E528', // aureolin
 ] as const;
 
 function getReadableTextColor(hexColor: string): string {
@@ -302,12 +310,12 @@ export default function TrackPage({
                 leading-tight
                 px-2 sm:px-3 md:px-4
                 py-1.5 sm:py-2
-                text-text-primary
+                text-black
                 whitespace-nowrap
                 transition-colors duration-150 ease-in-out
                 flex items-center
               "
-              style={titleColor ? { color: titleColor } : undefined}
+              style={titleColor ? { color: titleColor } : { color: '#000000' }}
             >
               {String(trackNumber).padStart(2, '0')} {title}
             </h1>
@@ -331,20 +339,21 @@ export default function TrackPage({
           <div
             className={`
               max-w-none
-              text-text-primary
+              text-black
               [&>p]:text-base sm:[&>p]:text-lg md:[&>p]:text-xl
               [&>p]:leading-relaxed
               [&>p]:mb-4 sm:[&>p]:mb-6
+              [&>p]:text-black
               [&>h2]:text-2xl sm:[&>h2]:text-3xl md:[&>h2]:text-4xl
               [&>h2]:font-bold
               [&>h2]:mt-8 sm:[&>h2]:mt-10 md:[&>h2]:mt-12
               [&>h2]:mb-4 sm:[&>h2]:mb-6
-              [&>h2]:text-text-primary
+              [&>h2]:text-black
               [&>h3]:text-xl sm:[&>h3]:text-2xl md:[&>h3]:text-3xl
               [&>h3]:font-semibold
               [&>h3]:mt-6 sm:[&>h3]:mt-8
               [&>h3]:mb-3 sm:[&>h3]:mb-4
-              [&>h3]:text-text-primary
+              [&>h3]:text-black
               [&>ul]:list-disc
               [&>ul]:pl-6 sm:[&>ul]:pl-8
               [&>ul]:mb-4 sm:[&>ul]:mb-6
@@ -352,7 +361,7 @@ export default function TrackPage({
               [&>ol]:pl-6 sm:[&>ol]:pl-8
               [&>ol]:mb-4 sm:[&>ol]:mb-6
               [&>li]:mb-2
-              [&>li]:text-text-primary
+              [&>li]:text-black
               [&>a]:text-primary-500
               [&>a]:hover:text-primary-400
               [&>a]:underline
@@ -378,14 +387,14 @@ export default function TrackPage({
               [&>code]:py-0.5
               [&>code]:rounded
               [&>code]:text-sm sm:[&>code]:text-base
-              [&>code]:text-text-primary
+              [&>code]:text-black
               [&>code]:font-mono
               [&>pre]:bg-background-light
               [&>pre]:p-4 sm:[&>pre]:p-6
               [&>pre]:rounded-lg
               [&>pre]:overflow-x-auto
               [&>pre]:my-4 sm:[&>pre]:my-6
-              [&>pre]:text-text-primary
+              [&>pre]:text-black
               [&>pre>code]:bg-transparent
               [&>pre>code]:p-0
             `}

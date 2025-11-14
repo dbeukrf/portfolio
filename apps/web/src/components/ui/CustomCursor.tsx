@@ -1,108 +1,153 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useRef } from "react";
 
 export default function CustomCursor() {
-  const [mousePosition, setMousePosition] = useState({ x: 0, y: 0 });
-  const [lineColor, setLineColor] = useState('#000000');
+  const horizRef = useRef<HTMLDivElement>(null);
+  const vertRef = useRef<HTMLDivElement>(null);
+  const boxRef = useRef<HTMLDivElement>(null);
 
-  // Function to get background color at a point
-  const getBackgroundColorAtPoint = (x: number, y: number): string => {
-    const element = document.elementFromPoint(x, y);
-    if (!element) return '#000000';
+  const mouseX = useRef(0);
+  const mouseY = useRef(0);
+  const locked = useRef(false);
 
-    let currentElement: Element | null = element;
-    let bgColor = 'rgba(0, 0, 0, 0)';
+  // SAMPLE A POINT'S BG COLOR
+  const getColorAt = (x: number, y: number) => {
+    const el = document.elementFromPoint(x, y);
+    if (!el) return "rgb(0,0,0)";
 
-    // Traverse up the DOM tree to find a non-transparent background
-    while (currentElement && bgColor === 'rgba(0, 0, 0, 0)') {
-      const computedStyle = window.getComputedStyle(currentElement);
-      bgColor = computedStyle.backgroundColor;
-      
-      // If still transparent, check parent
-      if (bgColor === 'rgba(0, 0, 0, 0)' || bgColor === 'transparent') {
-        currentElement = currentElement.parentElement;
-      } else {
-        break;
-      }
+    let bg = "transparent";
+    let node: HTMLElement | null = el as HTMLElement;
+
+    while (node && (bg === "transparent" || bg === "rgba(0, 0, 0, 0)")) {
+      bg = getComputedStyle(node).backgroundColor;
+      node = node.parentElement as HTMLElement | null;
     }
-
-    return bgColor;
+    return bg;
   };
 
-  // Function to calculate luminance and determine if background is light or dark
-  const getLuminance = (color: string): number => {
-    // Parse RGB from rgba or rgb string
-    const match = color.match(/\d+/g);
-    if (!match || match.length < 3) return 0;
-
-    const r = parseInt(match[0]);
-    const g = parseInt(match[1]);
-    const b = parseInt(match[2]);
-
-    // Calculate relative luminance
-    const [rs, gs, bs] = [r, g, b].map(val => {
-      val = val / 255;
-      return val <= 0.03928 ? val / 12.92 : Math.pow((val + 0.055) / 1.055, 2.4);
-    });
-
-    return 0.2126 * rs + 0.7152 * gs + 0.0722 * bs;
+  // LUMINANCE
+  const luminance = (rgb: string) => {
+    const m = rgb.match(/\d+/g);
+    if (!m) return 0;
+    const [r, g, b] = m.map(Number);
+    return 0.2126 * (r/255) + 0.7152 * (g/255) + 0.0722 * (b/255);
   };
 
   useEffect(() => {
-    const handleMouseMove = (e: MouseEvent) => {
-      setMousePosition({ x: e.clientX, y: e.clientY });
+    const update = () => {
+      locked.current = false;
+      const x = mouseX.current;
+      const y = mouseY.current;
 
-      // Get background color at mouse position
-      const bgColor = getBackgroundColorAtPoint(e.clientX, e.clientY);
-      const luminance = getLuminance(bgColor);
+      // move cursor lines
+      horizRef.current!.style.transform = `translateY(${y}px)`;
+      vertRef.current!.style.transform = `translateX(${x}px)`;
+      boxRef.current!.style.transform = `translate(${x}px, ${y}px) translate(-50%, -50%)`;
 
-      // Use white for dark backgrounds, black for light backgrounds
-      // Threshold of 0.5 for luminance (0 = black, 1 = white)
-      setLineColor(luminance > 0.5 ? '#000000' : '#FFFFFF');
+
+
+      // number of sampling points along each line
+      const samples = 50;
+
+      // ---- HORIZONTAL LINE ----
+      {
+        const segments: string[] = [];
+        const step = window.innerWidth / samples;
+
+        for (let i = 0; i < samples; i++) {
+          const px = i * step;
+          const bg = getColorAt(px, y);
+          const col = luminance(bg) > 0.5 ? "black" : "white";
+          segments.push(col);
+        }
+
+        // Convert to CSS gradient mask pattern
+        const gradient = segments
+          .map((c, i) => {
+            const start = (i / samples) * 100;
+            const end = ((i + 1) / samples) * 100;
+            return `${c} ${start}% ${end}%`;
+          })
+          .join(", ");
+
+        horizRef.current!.style.background = `linear-gradient(to right, ${gradient})`;
+      }
+
+      // ---- VERTICAL LINE ----
+      {
+        const segments: string[] = [];
+        const step = window.innerHeight / samples;
+
+        for (let i = 0; i < samples; i++) {
+          const py = i * step;
+          const bg = getColorAt(x, py);
+          const col = luminance(bg) > 0.5 ? "black" : "white";
+          segments.push(col);
+        }
+
+        const gradient = segments
+          .map((c, i) => {
+            const start = (i / samples) * 100;
+            const end = ((i + 1) / samples) * 100;
+            return `${c} ${start}% ${end}%`;
+          })
+          .join(", ");
+
+        vertRef.current!.style.background = `linear-gradient(to bottom, ${gradient})`;
+      }
     };
 
-    window.addEventListener('mousemove', handleMouseMove);
+    const onMouseMove = (e: MouseEvent) => {
+      mouseX.current = e.clientX;
+      mouseY.current = e.clientY;
 
-    return () => {
-      window.removeEventListener('mousemove', handleMouseMove);
+      if (!locked.current) {
+        locked.current = true;
+        requestAnimationFrame(update);
+      }
     };
+
+    window.addEventListener("mousemove", onMouseMove, { passive: true });
+    return () => window.removeEventListener("mousemove", onMouseMove);
   }, []);
 
   return (
     <>
-      {/* Horizontal line */}
+      {/* HORIZONTAL LINE */}
       <div
-        className="fixed top-0 left-0 w-full pointer-events-none z-[9999]"
+        ref={horizRef}
+        className="fixed top-0 left-0 pointer-events-none z-[99999]"
         style={{
-          height: '1.1px',
-          backgroundColor: lineColor,
-          transform: `translateY(${mousePosition.y}px)`,
+          width: "100vw",
+          height: "0.5px",
+          background: "white",
         }}
       />
-      
-      {/* Vertical line */}
+
+      {/* VERTICAL LINE */}
       <div
-        className="fixed top-0 left-0 h-full pointer-events-none z-[9999]"
+        ref={vertRef}
+        className="fixed top-0 left-0 pointer-events-none z-[99999]"
         style={{
-          width: '1.1px',
-          backgroundColor: lineColor,
-          transform: `translateX(${mousePosition.x}px)`,
+          width: "0.5px",
+          height: "100vh",
+          background: "white",
         }}
       />
-      
-      {/* Rainbow square at intersection */}
+
+      {/* CENTER BOX */}
       <div
-        className="fixed pointer-events-none z-[10000]"
+        ref={boxRef}
+        className="fixed pointer-events-none z-[100000]"
         style={{
-          width: '5.5px',
-          height: '5.5px',
-          backgroundColor: 'hsl(0, 100%, 50%)',
-          border: '1px solid #000000',
-          left: `${mousePosition.x - 2}px`,
-          top: `${mousePosition.y - 2}px`,
-          animation: 'rainbow 3s linear infinite',
+          width: "6px",
+          height: "6px",
+          border: "1px solid black",
+          background: "hsl(0,100%,50%)",
+          animation: "rainbow 3s linear infinite",
+         
         }}
       />
-      
+
       <style>{`
         @keyframes rainbow {
           0% { background-color: hsl(0, 100%, 50%); }
@@ -118,4 +163,3 @@ export default function CustomCursor() {
     </>
   );
 }
-

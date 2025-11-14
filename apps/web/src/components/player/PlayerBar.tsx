@@ -7,9 +7,11 @@ interface PlayerBarProps {
   isVisible: boolean;
   contentVisible: boolean;
   clipPathReveal?: number;
+  onAlbumImageClick?: () => void;
+  onTrackTitleClick?: (trackId: string) => void;
 }
 
-export default function PlayerBar({ isVisible, contentVisible, clipPathReveal: _clipPathReveal = 0 }: PlayerBarProps) {
+export default function PlayerBar({ isVisible, contentVisible, clipPathReveal: _clipPathReveal = 0, onAlbumImageClick, onTrackTitleClick }: PlayerBarProps) {
   const audioRef = useRef<HTMLAudioElement>(null);
   const {
     currentTrackId,
@@ -195,7 +197,7 @@ export default function PlayerBar({ isVisible, contentVisible, clipPathReveal: _
   
   return (
     <div 
-      className={`fixed bottom-0 left-0 right-0 bg-[#181818] border-t border-white/10 px-1.5 md:px-3 py-1 md:py-1.5 transition-all duration-500 pointer-events-auto`}
+      className={`fixed bottom-0 left-0 right-0 bg-[#000000] border-t border-white/10 px-1.5 md:px-3 py-1 md:py-1.5 transition-all duration-500 pointer-events-auto`}
       style={{
         opacity: opacity / 100,
         zIndex: zIndex,
@@ -207,7 +209,7 @@ export default function PlayerBar({ isVisible, contentVisible, clipPathReveal: _
       {/* Progress bar */}
       <div className="absolute top-0 left-0 right-0 h-0.5 bg-white/10 cursor-pointer" onClick={handleSeek}>
         <div
-          className="h-full bg-[#1db954] transition-all"
+          className="h-full bg-[#FFCD70] transition-all"
           style={{ width: `${progressPercent}%` }}
         />
       </div>
@@ -217,12 +219,18 @@ export default function PlayerBar({ isVisible, contentVisible, clipPathReveal: _
         {/* Left: Album image, track title, and author */}
         <div className="flex items-center gap-3 md:gap-4 min-w-0 justify-start">
           <img
-            src="/images/album-cover.jpg"
+            src="/images/album-cover1.jpg"
             alt="Album cover"
-            className="w-8 h-8 md:w-10 md:h-10 lg:w-11 lg:h-11 object-cover rounded flex-shrink-0"
+            className="w-8 h-8 md:w-10 md:h-10 lg:w-11 lg:h-11 object-cover rounded flex-shrink-0 cursor-pointer hover:opacity-80 transition-opacity"
+            onClick={onAlbumImageClick}
           />
           <div className="min-w-0">
-            <div className="text-white text-[10px] md:text-xs font-medium truncate">{currentTrack.title}</div>
+            <div 
+              className="text-white text-[10px] md:text-xs font-medium truncate cursor-pointer hover:underline transition-all"
+              onClick={() => onTrackTitleClick?.(currentTrack.id)}
+            >
+              {currentTrack.title}
+            </div>
             <div className="text-white/70 text-[9px] md:text-[10px] truncate">{currentTrack.artist}</div>
           </div>
         </div>
@@ -236,7 +244,7 @@ export default function PlayerBar({ isVisible, contentVisible, clipPathReveal: _
               <button
                 onClick={toggleShuffle}
                 className={`p-1 md:p-1.5 text-white/70 hover:text-white transition-colors focus:outline-none ${
-                  isShuffled ? 'text-[#ff6b35]' : ''
+                  isShuffled ? 'text-[#FFCD70]' : ''
                 }`}
                 aria-label="Shuffle"
               >
@@ -306,7 +314,7 @@ export default function PlayerBar({ isVisible, contentVisible, clipPathReveal: _
               <button
                 onClick={toggleLoop}
                 className={`p-1 md:p-1.5 text-white/70 hover:text-white transition-colors focus:outline-none ${
-                  isLooping ? 'text-[#ff6b35]' : ''
+                  isLooping ? 'text-[#FFCD70]' : ''
                 }`}
                 aria-label="Repeat"
               >

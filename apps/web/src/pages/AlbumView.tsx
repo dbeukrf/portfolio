@@ -9,78 +9,76 @@ import PlayerBar from '../components/player/PlayerBar';
 import { useAudioStore } from '../stores/audioStore';
 import TrackPage, { RAINBOW_COLORS } from '../components/tracks/TrackPage';
 
-const clamp = (value: number, min = 0, max = 1) => Math.max(min, Math.min(max, value));
+interface WeatherData {
+  time: Date;
+  temperatureC: number;
+  apparentTemperatureC: number;
+  isDay: number;
+  rainMm: number;
+  cloudCoverPct?: number;
+  weatherCode?: number;
+  windSpeed10m?: number;
+  source: string;
+}
+
+interface DailyWeatherData {
+  time: Date[];
+  temperatureMaxC: number[];
+  temperatureMinC: number[];
+  precipitationSumMm?: number[];
+}
+
+interface GeoResponse {
+  city?: string;
+  country_name?: string;
+  latitude: number;
+  longitude: number;
+}
+
+const clamp = (value: number, min?: number, max?: number): number => {
+  const minVal = min === undefined ? 0 : min;
+  const maxVal = max === undefined ? 1 : max;
+  return Math.max(minVal, Math.min(maxVal, value));
+};
 
 export default function AlbumView() {
   // Audio store
   const { setCurrentTrack, play, pause, toggleShuffle, isShuffled, currentTrackId } = useAudioStore();
   
   // Scrolling state
-  const [heroHeight, setHeroHeight] = useState<number>(0);
-  const [controlsHeight, setControlsHeight] = useState<number>(0);
-  const [scrollProgress, setScrollProgress] = useState<number>(0); // 0..1 overall scroll progress
-  const [clipPathReveal, setClipPathReveal] = useState<number>(0); // Reveal value for clipPath (0..1)
-  const [contentVisible, setContentVisible] = useState<boolean>(false); // Track content visibility
-  const [viewportHeight, setViewportHeight] = useState<number>(0); // Viewport height for calculations
-  const [manualRevealProgress, setManualRevealProgress] = useState<number>(0); // Manual reveal progress during reveal phase
-  const [currentTrackIndex, setCurrentTrackIndex] = useState<number>(0);
-  const [currentTrackProgress, setCurrentTrackProgress] = useState<number>(0);
-  const [playerBarVisible, setPlayerBarVisible] = useState<boolean>(false); // Player bar visibility
-  const [gradientColorIndex, setGradientColorIndex] = useState<number>(0); // Gradient color index for track titles
+  const [heroHeight, setHeroHeight] = useState(0);
+  const [controlsHeight, setControlsHeight] = useState(0);
+  const [scrollProgress, setScrollProgress] = useState(0);
+  const [clipPathReveal, setClipPathReveal] = useState(0);
+  const [contentVisible, setContentVisible] = useState(false);
+  const [viewportHeight, setViewportHeight] = useState(0);
+  const [manualRevealProgress, setManualRevealProgress] = useState(0);
+  const [currentTrackIndex, setCurrentTrackIndex] = useState(0);
+  const [currentTrackProgress, setCurrentTrackProgress] = useState(0);
+  const [playerBarVisible, setPlayerBarVisible] = useState(false);
+  const [gradientColorIndex, setGradientColorIndex] = useState(0);
+  const [chatbotProgress, setChatbotProgress] = useState(0);
   
   // Location state
-  const [locationText, setLocationText] = useState<string>('Melbourne, Australia');
-  const [weatherCurrent, setWeatherCurrent] = useState<{
-    time: Date;
-    temperatureC: number;
-    apparentTemperatureC: number;
-    isDay: number;
-    rainMm: number;
-    cloudCoverPct?: number;
-    weatherCode?: number;
-    windSpeed10m?: number;
-    source: 'current' | 'latest-hourly';
-  } | null>(null);
-  const [weatherDaily, setWeatherDaily] = useState<{
-    time: Date[];
-    temperatureMaxC: number[];
-    temperatureMinC: number[];
-    precipitationSumMm?: number[];
-  } | null>(null);
+  const [locationText, setLocationText] = useState('Melbourne, Australia');
+  const [weatherCurrent, setWeatherCurrent] = useState<WeatherData | null>(null);
+  const [, setWeatherDaily] = useState<DailyWeatherData | null>(null);
   
-  const mapToWeatherIcon = (w: {
-    weatherCode?: number;
-    rainMm?: number;
-    cloudCoverPct?: number;
-    isDay?: number;
-    windSpeed10m?: number;
-  }): { iconName: string; label: string } => {
-    const code = w.weatherCode ?? -1;
-    const rain = w.rainMm ?? 0;
-    const cloud = w.cloudCoverPct ?? 0;
-    const isDay = (w.isDay ?? 1) === 1;
-    const wind = w.windSpeed10m ?? 0;
+  const mapToWeatherIcon = (w: WeatherData) => {
+    const code = w.weatherCode !== undefined ? w.weatherCode : -1;
+    const rain = w.rainMm !== undefined ? w.rainMm : 0;
+    const cloud = w.cloudCoverPct !== undefined ? w.cloudCoverPct : 0;
+    const isDay = (w.isDay !== undefined ? w.isDay : 1) === 1;
+    const wind = w.windSpeed10m !== undefined ? w.windSpeed10m : 0;
     const isExtreme = wind >= 50 || rain >= 20;
     const dayNight = isDay ? 'day' : 'night';
     
-    // WMO code mapping (https://open-meteo.com/en/docs#weathervariables)
-    
-    // Clear sky
     if (code === 0) { return { iconName: isDay ? 'clear-day' : 'clear-night', label: isDay ? 'Clear' : 'Clear night' }; }
-    
-    // Mostly clear
     if (code === 1) { return { iconName: isDay ? 'partly-cloudy-day' : 'partly-cloudy-night', label: 'Mostly clear' }; }
-    
-    // Partly cloudy
     if (code === 2) { return { iconName: isDay ? 'partly-cloudy-day' : 'partly-cloudy-night', label: 'Partly cloudy' }; }
-    
-    // Overcast
     if (code === 3) { return { iconName: isDay ? 'overcast-day' : 'overcast-night', label: 'Overcast' }; }
-    
-    // Fog
     if (code === 45 || code === 48) { return { iconName: isDay ? 'fog-day' : 'fog-night', label: 'Fog' }; }
     
-    // Drizzle
     if (code === 51 || code === 53 || code === 55) {
       if (isExtreme) { return { iconName: `extreme-${dayNight}-drizzle`, label: 'Extreme drizzle' }; }
       if (cloud >= 85) { return { iconName: `overcast-${dayNight}-drizzle`, label: 'Overcast drizzle' }; }
@@ -88,10 +86,8 @@ export default function AlbumView() {
       return { iconName: 'drizzle', label: 'Drizzle' };
     }
     
-    // Freezing drizzle
     if (code === 56 || code === 57) { return { iconName: 'sleet', label: 'Freezing drizzle' }; }
     
-    // Rain
     if (code === 61 || code === 63 || code === 65) {
       if (isExtreme) { return { iconName: `extreme-${dayNight}-rain`, label: 'Extreme rain' }; }
       if (cloud >= 85) { return { iconName: `overcast-${dayNight}-rain`, label: 'Overcast rain' }; }
@@ -99,10 +95,8 @@ export default function AlbumView() {
       return { iconName: 'rain', label: 'Rain' };
     }
     
-    // Freezing rain
     if (code === 66 || code === 67) { return { iconName: 'sleet', label: 'Freezing rain' }; }
     
-    // Snow
     if (code === 71 || code === 73 || code === 75 || code === 77) {
       if (isExtreme) { return { iconName: `extreme-${dayNight}-snow`, label: 'Extreme snow' }; }
       if (wind >= 40) { return { iconName: 'wind-snow', label: 'Blowing snow' }; }
@@ -111,7 +105,6 @@ export default function AlbumView() {
       return { iconName: 'snow', label: 'Snow' };
     }
     
-    // Rain showers
     if (code === 80 || code === 81 || code === 82) {
       if (isExtreme) { return { iconName: `extreme-${dayNight}-rain`, label: 'Extreme rain showers' }; }
       if (cloud >= 85) { return { iconName: `overcast-${dayNight}-rain`, label: 'Overcast rain showers' }; }
@@ -119,7 +112,6 @@ export default function AlbumView() {
       return { iconName: 'rain', label: 'Rain showers' };
     }
     
-    // Snow showers
     if (code === 85 || code === 86) {
       if (isExtreme) { return { iconName: `extreme-${dayNight}-snow`, label: 'Extreme snow showers' }; }
       if (cloud >= 85) { return { iconName: `overcast-${dayNight}-snow`, label: 'Overcast snow showers' }; }
@@ -127,7 +119,6 @@ export default function AlbumView() {
       return { iconName: 'snow', label: 'Snow showers' };
     }
     
-    // Thunderstorms
     if (code === 95 || code === 96 || code === 99) {
       const hasRain = rain > 0.1;
       const hasSnow = cloud >= 60 && rain < 0.1;
@@ -149,7 +140,6 @@ export default function AlbumView() {
       return { iconName: `thunderstorms-${dayNight}`, label: 'Thunderstorms' };
     }
     
-    // Hail
     if (code === 96 || code === 99) {
       if (isExtreme) { return { iconName: `extreme-${dayNight}-hail`, label: 'Extreme hail' }; }
       if (cloud >= 85) { return { iconName: `overcast-${dayNight}-hail`, label: 'Overcast hail' }; }
@@ -157,7 +147,6 @@ export default function AlbumView() {
       return { iconName: 'hail', label: 'Hail' };
     }
     
-    // Heuristics when code is missing or invalid
     if (rain >= 20) { return { iconName: isDay ? 'extreme-day-rain' : 'extreme-night-rain', label: 'Extreme rain' }; }
     if (rain >= 10) {
       if (cloud >= 85) { return { iconName: `overcast-${dayNight}-rain`, label: 'Heavy rain' }; }
@@ -175,18 +164,15 @@ export default function AlbumView() {
       return { iconName: 'rain', label: 'Light rain' };
     }
     
-    // Windy conditions
     if (wind >= 50) { return { iconName: 'wind', label: 'Very windy' }; }
     if (wind >= 35 && cloud >= 60) { return { iconName: 'wind-snow', label: 'Windy with snow' }; }
     if (wind >= 35) { return { iconName: 'wind', label: 'Windy' }; }
     
-    // Cloud cover based conditions
     if (cloud >= 85) { return { iconName: isDay ? 'overcast-day' : 'overcast-night', label: 'Overcast' }; }
     if (cloud >= 65) { return { iconName: isDay ? 'overcast-day' : 'overcast-night', label: 'Mostly cloudy' }; }
     if (cloud >= 35) { return { iconName: isDay ? 'partly-cloudy-day' : 'partly-cloudy-night', label: 'Partly cloudy' }; }
     if (cloud >= 15) { return { iconName: isDay ? 'partly-cloudy-day' : 'partly-cloudy-night', label: 'Mostly clear' }; }
     
-    // Default: clear
     return { iconName: isDay ? 'clear-day' : 'clear-night', label: isDay ? 'Clear' : 'Clear night' };
   };
   
@@ -210,22 +196,23 @@ export default function AlbumView() {
   };
 
   // Refs
-  const heroRef = useRef<HTMLDivElement | null>(null);
-  const controlsRef = useRef<HTMLDivElement | null>(null);
-  const scrollContainerRef = useRef<HTMLDivElement | null>(null);
-  const announceRef = useRef<HTMLDivElement | null>(null);
-  const maxScrollTopRef = useRef<number>(0);
-  const prevScrollTopRef = useRef<number>(0);
-  const prevScrollProgressRef = useRef<number>(0);
-  const prevRevealRef = useRef<number>(0); // Track previous reveal value to prevent expansion when scrolling up
-  const maxRevealReachedRef = useRef<number>(0); // Track maximum reveal reached to ensure scrolling up only shrinks
+  const heroRef = useRef<HTMLDivElement>(null);
+  const controlsRef = useRef<HTMLDivElement>(null);
+  const scrollContainerRef = useRef<HTMLDivElement>(null);
+  const announceRef = useRef<HTMLDivElement>(null);
+  const maxScrollTopRef = useRef(0);
+  const prevScrollTopRef = useRef(0);
+  const prevScrollProgressRef = useRef(0);
+  const prevRevealRef = useRef(0);
+  const maxRevealReachedRef = useRef(0);
   const trackSectionRefs = useRef<(HTMLDivElement | null)[]>([]);
-  const trackTitleRefs = useRef<(HTMLHeadingElement | null)[]>([]);
+  const trackTitleRefs = useRef<(HTMLElement | null)[]>([]);
+  const chatbotSectionRef = useRef<HTMLDivElement>(null);
 
   // Compute hero height
   useEffect(() => {
     const compute = () => {
-      const heroH = heroRef.current?.offsetHeight ?? 0;
+      const heroH = heroRef.current ? heroRef.current.offsetHeight : 0;
       setHeroHeight(heroH);
     };
     
@@ -249,7 +236,7 @@ export default function AlbumView() {
     };
   }, []);
 
-  // Periodically refresh weather so the icon updates on weather/time (day/night) changes
+  // Periodically refresh weather
   useEffect(() => {
     let isCancelled = false;
     const enableGeolocation = import.meta.env.VITE_ENABLE_GEOLOCATION !== 'false';
@@ -265,12 +252,7 @@ export default function AlbumView() {
 
         if (enableGeolocation) {
           try {
-            const geoResponse = await api.get<{ 
-              city: string | null; 
-              country_name: string | null;
-              latitude: number | null;
-              longitude: number | null;
-            }>('/geo');
+            const geoResponse = await api.get<GeoResponse>('/geo');
             const { city, country_name, latitude: lat, longitude: lon } = geoResponse.data;
             latitude = lat;
             longitude = lon;
@@ -278,7 +260,7 @@ export default function AlbumView() {
             else if (city) locationStr = city;
             else if (country_name) locationStr = country_name;
           } catch {
-            // Ignore geo refresh errors; fall back to default below
+            // Ignore
           }
         }
 
@@ -288,8 +270,7 @@ export default function AlbumView() {
           if (!locationStr) locationStr = DEFAULT_LOCATION;
         }
 
-        // Fetch only "current" block to keep refresh light
-        const params: any = {
+        const params = {
           latitude,
           longitude,
           current: ["temperature_2m", "apparent_temperature", "is_day", "rain", "cloud_cover", "weather_code", "wind_speed_10m"],
@@ -298,8 +279,8 @@ export default function AlbumView() {
         const responses = await fetchWeatherApi(url, params);
         if (!responses || responses.length === 0) return;
         const resp = responses[0];
-        const utcOffsetSeconds = resp.utcOffsetSeconds?.() ?? 0;
-        const currentBlock = resp.current?.();
+        const utcOffsetSeconds = resp.utcOffsetSeconds ? resp.utcOffsetSeconds() : 0;
+        const currentBlock = resp.current ? resp.current() : null;
         if (!currentBlock) return;
 
         const temperature_2m = currentBlock.variables(0);
@@ -314,49 +295,44 @@ export default function AlbumView() {
           const updated = {
             time: new Date((Number(currentBlock.time()) + utcOffsetSeconds) * 1000),
             temperatureC: temperature_2m.value(),
-            apparentTemperatureC: apparent_temperature?.value() ?? temperature_2m.value(),
+            apparentTemperatureC: apparent_temperature ? apparent_temperature.value() : temperature_2m.value(),
             isDay: is_day.value(),
-            rainMm: rain?.value() ?? 0,
-            cloudCoverPct: cloud_cover?.value(),
-            weatherCode: weather_code?.value(),
-            windSpeed10m: wind_speed_10m?.value(),
-            source: 'current' as const,
+            rainMm: rain ? rain.value() : 0,
+            cloudCoverPct: cloud_cover ? cloud_cover.value() : undefined,
+            weatherCode: weather_code ? weather_code.value() : undefined,
+            windSpeed10m: wind_speed_10m ? wind_speed_10m.value() : undefined,
+            source: 'current',
           };
           setWeatherCurrent(prev => {
-            // Avoid unnecessary state updates if nothing changed
+            if (!prev) return updated;
             const hasChanged =
-              !prev ||
               prev.isDay !== updated.isDay ||
               prev.weatherCode !== updated.weatherCode ||
               Math.round(prev.temperatureC) !== Math.round(updated.temperatureC) ||
-              Math.round((prev.cloudCoverPct ?? -1)) !== Math.round((updated.cloudCoverPct ?? -1)) ||
-              Math.round((prev.rainMm ?? 0) * 10) !== Math.round((updated.rainMm ?? 0) * 10) ||
-              Math.round((prev.windSpeed10m ?? 0)) !== Math.round((updated.windSpeed10m ?? 0));
+              Math.round((prev.cloudCoverPct !== undefined ? prev.cloudCoverPct : -1)) !== Math.round((updated.cloudCoverPct !== undefined ? updated.cloudCoverPct : -1)) ||
+              Math.round((prev.rainMm !== undefined ? prev.rainMm : 0) * 10) !== Math.round((updated.rainMm !== undefined ? updated.rainMm : 0) * 10) ||
+              Math.round((prev.windSpeed10m !== undefined ? prev.windSpeed10m : 0)) !== Math.round((updated.windSpeed10m !== undefined ? updated.windSpeed10m : 0));
             return hasChanged ? updated : prev;
           });
 
-          // Optionally keep the header text roughly in sync without re-fetching daily
           setLocationText((prevText) => {
             const temp = Math.round(updated.temperatureC);
             const rainStatus = updated.rainMm > 0 ? `, ${Math.round(updated.rainMm)}mm rain` : '';
             const currentText = `${temp}°C ${rainStatus}`;
-            // Try to replace the trailing weather part if present
             const parts = prevText.split(' - ');
             if (parts.length >= 2) {
               return `${parts[0]} - ${currentText}`;
             }
-            // If no location prefix, attach default location
             return `${locationStr} - ${currentText}`;
           });
         }
       } catch {
-        // Swallow refresh errors silently to avoid noisy logs on intervals
+        // Swallow
       }
     };
 
-    // Initial quick refresh shortly after mount, then every 10 minutes
-    const initial = setTimeout(refresh, 15_000);
-    const interval = setInterval(refresh, 600_000);
+    const initial = setTimeout(refresh, 15000);
+    const interval = setInterval(refresh, 600000);
     return () => {
       isCancelled = true;
       clearTimeout(initial);
@@ -364,10 +340,10 @@ export default function AlbumView() {
     };
   }, []);
 
-  // Compute controls height (progress + buttons)
+  // Compute controls height
   useEffect(() => {
     const compute = () => {
-      const controlsH = controlsRef.current?.offsetHeight ?? 0;
+      const controlsH = controlsRef.current ? controlsRef.current.offsetHeight : 0;
       setControlsHeight(controlsH);
     };
     
@@ -401,10 +377,8 @@ export default function AlbumView() {
     return () => window.removeEventListener('resize', updateViewportHeight);
   }, []);
 
-  // Fetch visitor location and weather (only if enabled via environment variable)
+  // Fetch visitor location and weather
   useEffect(() => {
-    // Check if geolocation is enabled via environment variable
-    // Defaults to 'true' if not set (backward compatible)
     const enableGeolocation = import.meta.env.VITE_ENABLE_GEOLOCATION !== 'false';
     const DEFAULT_LOCATION = 'Melbourne, Australia';
     const MELBOURNE = { lat: -37.8136, lon: 144.9631 };
@@ -412,35 +386,22 @@ export default function AlbumView() {
     const fetchWeather = async (latitude: number, longitude: number, locationStr: string) => {
       try {
         const url = "https://api.open-meteo.com/v1/forecast";
-        // First try: get current + daily
-        const primaryParams: any = {
+        const primaryParams = {
           latitude,
           longitude,
           current: ["temperature_2m", "apparent_temperature", "is_day", "rain", "cloud_cover", "weather_code", "wind_speed_10m"],
           daily: ["temperature_2m_max", "temperature_2m_min", "precipitation_sum"],
           timezone: "auto",
         };
-        if (import.meta.env.DEV) console.log('Fetching weather (primary):', latitude, longitude, primaryParams);
         const primaryResponses = await fetchWeatherApi(url, primaryParams);
         if (!primaryResponses || primaryResponses.length === 0) throw new Error('No weather response received');
         const primary = primaryResponses[0];
         if (!primary) throw new Error('Invalid weather response');
-        const utcOffsetSeconds = primary.utcOffsetSeconds?.() ?? 0;
-        let currentBlock = primary.current?.();
-        let dailyBlock = primary.daily?.();
+        const utcOffsetSeconds = primary.utcOffsetSeconds ? primary.utcOffsetSeconds() : 0;
+        let currentBlock = primary.current ? primary.current() : null;
+        let dailyBlock = primary.daily ? primary.daily() : null;
         
-        // Fallback: if current missing, try latest hourly (including last 10 days)
-        let finalCurrent: {
-          time: Date;
-          temperatureC: number;
-          apparentTemperatureC: number;
-          isDay: number;
-          rainMm: number;
-          cloudCoverPct?: number;
-          weatherCode?: number;
-          windSpeed10m?: number;
-          source: 'current' | 'latest-hourly';
-        } | null = null;
+        let finalCurrent = null;
         
         if (currentBlock) {
           const temperature_2m = currentBlock.variables(0);
@@ -454,47 +415,46 @@ export default function AlbumView() {
             finalCurrent = {
               time: new Date((Number(currentBlock.time()) + utcOffsetSeconds) * 1000),
               temperatureC: temperature_2m.value(),
-              apparentTemperatureC: apparent_temperature?.value() ?? temperature_2m.value(),
+              apparentTemperatureC: apparent_temperature ? apparent_temperature.value() : temperature_2m.value(),
               isDay: is_day.value(),
-              rainMm: rain?.value() ?? 0,
-              cloudCoverPct: cloud_cover?.value(),
-              weatherCode: weather_code?.value(),
-              windSpeed10m: wind_speed_10m?.value(),
+              rainMm: rain ? rain.value() : 0,
+              cloudCoverPct: cloud_cover ? cloud_cover.value() : undefined,
+              weatherCode: weather_code ? weather_code.value() : undefined,
+              windSpeed10m: wind_speed_10m ? wind_speed_10m.value() : undefined,
               source: 'current',
             };
           }
         }
         
         if (!finalCurrent) {
-          const fallbackParams: any = {
+          const fallbackParams = {
             latitude,
             longitude,
             hourly: ["temperature_2m", "relative_humidity_2m", "wind_speed_10m"],
             past_days: 10,
             timezone: "auto",
           };
-          if (import.meta.env.DEV) console.log('Fetching weather (fallback hourly):', fallbackParams);
           const fbResponses = await fetchWeatherApi(url, fallbackParams);
           if (fbResponses && fbResponses.length > 0 && fbResponses[0]) {
             const fb = fbResponses[0];
-            const fbUtcOffset = fb.utcOffsetSeconds?.() ?? 0;
-            const hourly = fb.hourly?.();
+            const fbUtcOffset = fb.utcOffsetSeconds ? fb.utcOffsetSeconds() : 0;
+            const hourly = fb.hourly ? fb.hourly() : null;
             if (hourly) {
-            const timesRaw = hourly.time?.();
-            const timesArr: number[] = timesRaw ? Array.from(timesRaw as any).map((t: any) => Number(t)) : [];
-            const tempVar = hourly.variables(0);
-            const tempValuesRaw = tempVar?.valuesArray?.();
-            const tempValues: number[] = tempValuesRaw ? Array.from(tempValuesRaw as any).map((v: any) => Number(v)) : [];
-            const lastIndex = timesArr.length > 0 ? timesArr.length - 1 : -1;
-            if (lastIndex >= 0) {
-              const lastTime = timesArr[lastIndex];
-              const lastTemp = tempValues[lastIndex];
-              if (typeof lastTemp === 'number' && !Number.isNaN(lastTemp)) {
+              const timesRaw = hourly.time ? hourly.time() : null;
+              const timesArr = timesRaw ? Array.from(timesRaw as unknown as ArrayLike<number>).map((t) => Number(t)) : [];
+              const tempVar = hourly.variables(0);
+              const tempValuesRaw = tempVar && tempVar.valuesArray ? tempVar.valuesArray() : null;
+              const tempValues = tempValuesRaw ? Array.from(tempValuesRaw as unknown as ArrayLike<number>).map((v) => Number(v)) : [];
+              const lastIndex = timesArr.length > 0 ? timesArr.length - 1 : -1;
+              if (lastIndex >= 0) {
+                const lastTime = timesArr[lastIndex];
+                const lastTemp = tempValues[lastIndex];
+                if (typeof lastTemp === 'number' && !Number.isNaN(lastTemp)) {
                   finalCurrent = {
                     time: new Date((Number(lastTime) + fbUtcOffset) * 1000),
                     temperatureC: lastTemp,
                     apparentTemperatureC: lastTemp,
-                  isDay: 1,
+                    isDay: 1,
                     rainMm: 0,
                     source: 'latest-hourly',
                   };
@@ -504,26 +464,20 @@ export default function AlbumView() {
           }
         }
         
-        // Prepare daily
-        let finalDaily: {
-          time: Date[];
-          temperatureMaxC: number[];
-          temperatureMinC: number[];
-          precipitationSumMm?: number[];
-        } | null = null;
+        let finalDaily = null;
         if (dailyBlock) {
-          const timeArrRaw = dailyBlock.time(); // usually epoch seconds array (typed)
+          const timeArrRaw = dailyBlock.time();
           const tmax = dailyBlock.variables(0);
           const tmin = dailyBlock.variables(1);
           const psum = dailyBlock.variables(2);
-          const timeNums: number[] = timeArrRaw ? Array.from(timeArrRaw as any).map((t: any) => Number(t)) : [];
-          const times: Date[] = timeNums.map((t: number) => new Date((Number(t) + utcOffsetSeconds) * 1000));
-          const maxRaw = tmax?.valuesArray?.();
-          const minRaw = tmin?.valuesArray?.();
-          const pRaw = psum?.valuesArray?.();
-          const maxArr: number[] = maxRaw ? Array.from(maxRaw as any).map((v: any) => Number(v)) : [];
-          const minArr: number[] = minRaw ? Array.from(minRaw as any).map((v: any) => Number(v)) : [];
-          const pArr: number[] | undefined = pRaw ? Array.from(pRaw as any).map((v: any) => Number(v)) : undefined;
+          const timeNums = timeArrRaw ? Array.from(timeArrRaw as unknown as ArrayLike<number>).map((t) => Number(t)) : [];
+          const times = timeNums.map((t) => new Date((Number(t) + utcOffsetSeconds) * 1000));
+          const maxRaw = tmax && tmax.valuesArray ? tmax.valuesArray() : null;
+          const minRaw = tmin && tmin.valuesArray ? tmin.valuesArray() : null;
+          const pRaw = psum && psum.valuesArray ? psum.valuesArray() : null;
+          const maxArr = maxRaw ? Array.from(maxRaw as ArrayLike<number>).map((v) => Number(v)) : [];
+          const minArr = minRaw ? Array.from(minRaw as ArrayLike<number>).map((v) => Number(v)) : [];
+          const pArr = pRaw ? Array.from(pRaw as ArrayLike<number>).map((v) => Number(v)) : undefined;
           if (times.length && maxArr.length && minArr.length) {
             finalDaily = {
               time: times,
@@ -534,14 +488,11 @@ export default function AlbumView() {
           }
         }
         
-        // Save to state for UI usage
         if (finalCurrent) setWeatherCurrent(finalCurrent);
         if (finalDaily) setWeatherDaily(finalDaily);
         
-        // Compose header text (current + optional daily first day)
         if (finalCurrent) {
           const temp = Math.round(finalCurrent.temperatureC);
-          // const timeOfDay = finalCurrent.isDay === 1 ? 'Day' : 'Night';
           const rainStatus = finalCurrent.rainMm > 0 ? `, ${Math.round(finalCurrent.rainMm)}mm rain` : '';
           const currentText = `${temp}°C ${rainStatus}`;
           let dailyText = '';
@@ -557,7 +508,6 @@ export default function AlbumView() {
         }
       } catch (weatherError) {
         console.error('Failed to fetch weather:', weatherError);
-        // If weather fetch fails, just use location
         if (locationStr) {
           setLocationText(locationStr);
         }
@@ -565,24 +515,15 @@ export default function AlbumView() {
     };
     
     if (!enableGeolocation) {
-      // Geolocation is disabled, use default location (Melbourne, Australia)
       fetchWeather(MELBOURNE.lat, MELBOURNE.lon, DEFAULT_LOCATION);
       return;
     }
     
     const fetchLocationAndWeather = async () => {
       try {
-        // Fetch geolocation data
-        const geoResponse = await api.get<{ 
-          city: string | null; 
-          country_name: string | null;
-          latitude: number | null;
-          longitude: number | null;
-        }>('/geo');
-        
+        const geoResponse = await api.get<GeoResponse>('/geo');
         const { city, country_name, latitude, longitude } = geoResponse.data;
         
-        // Build location string
         let locationStr = '';
         if (city && country_name) {
           locationStr = `${city}, ${country_name}`;
@@ -592,28 +533,24 @@ export default function AlbumView() {
           locationStr = country_name;
         }
         
-        // Fetch weather data if we have coordinates
         if (latitude !== null && longitude !== null) {
           await fetchWeather(latitude, longitude, locationStr);
         } else {
-          // No coordinates, fallback to default Melbourne weather
           const defaultLocation = locationStr || DEFAULT_LOCATION;
           await fetchWeather(MELBOURNE.lat, MELBOURNE.lon, defaultLocation);
         }
       } catch (error) {
         console.error('Failed to fetch location:', error);
-        // Fallback to default Melbourne on error
         await fetchWeather(MELBOURNE.lat, MELBOURNE.lon, DEFAULT_LOCATION);
       }
     };
     
-    // Fast-first paint: fetch default Melbourne immediately, then refine with geolocation
     fetchWeather(MELBOURNE.lat, MELBOURNE.lon, DEFAULT_LOCATION).finally(() => {
       fetchLocationAndWeather();
     });
   }, []);
 
-  // Handle wheel events to control parallax reveal during reveal phase
+  // Handle wheel events
   useEffect(() => {
     const handleWheel = (e: WheelEvent) => {
       if (!scrollContainerRef.current) return;
@@ -622,9 +559,7 @@ export default function AlbumView() {
       const revealDistance = vh * 1.5;
       const scrollTop = scrollContainerRef.current.scrollTop;
       
-      // During reveal phase, control reveal manually for both directions
       if (scrollTop < revealDistance) {
-        // Scrolling down: expand reveal
         if (manualRevealProgress < 1 && e.deltaY > 0) {
           e.preventDefault();
           
@@ -632,7 +567,6 @@ export default function AlbumView() {
             const delta = e.deltaY;
             const newProgress = Math.max(0, Math.min(1, prev + delta / revealDistance));
             
-            // Once reveal completes, allow normal scrolling by setting scroll position
             if (newProgress >= 1 && scrollTop < revealDistance) {
               setTimeout(() => {
                 if (scrollContainerRef.current) {
@@ -644,7 +578,6 @@ export default function AlbumView() {
             return newProgress;
           });
         }
-        // Scrolling up: shrink reveal
         else if (manualRevealProgress > 0 && e.deltaY < 0) {
           e.preventDefault();
           
@@ -652,7 +585,6 @@ export default function AlbumView() {
             const delta = Math.abs(e.deltaY);
             const newProgress = Math.max(0, Math.min(1, prev - delta / revealDistance));
             
-            // Sync scroll position with reveal progress when shrinking
             if (scrollContainerRef.current) {
               const targetScrollTop = newProgress * revealDistance;
               scrollContainerRef.current.scrollTop = targetScrollTop;
@@ -676,24 +608,20 @@ export default function AlbumView() {
     };
   }, [manualRevealProgress, viewportHeight]);
 
-  // Capture track title refs after TrackPage components render
+  // Capture track title refs
   useEffect(() => {
     const updateTitleRefs = () => {
       TRACKS.forEach((_, index) => {
-        const titleElement = document.querySelector(`[data-track-index="${index}"] #track-title`) as HTMLHeadingElement | null;
+        const titleElement = document.querySelector(`[data-track-index="${index}"] #track-title`) as HTMLElement | null;
         if (titleElement) {
           trackTitleRefs.current[index] = titleElement;
         }
       });
     };
     
-    // Initial update
     updateTitleRefs();
-    
-    // Update after a short delay to ensure DOM is ready
     const timeoutId = setTimeout(updateTitleRefs, 100);
     
-    // Also update when content becomes visible
     if (contentVisible) {
       const visibleTimeoutId = setTimeout(updateTitleRefs, 200);
       return () => {
@@ -705,7 +633,7 @@ export default function AlbumView() {
     return () => clearTimeout(timeoutId);
   }, [contentVisible]);
 
-  // Handle scroll to create parallax effect
+  // Handle scroll for parallax effect
   useEffect(() => {
     let rafId: number | null = null;
 
@@ -718,51 +646,37 @@ export default function AlbumView() {
       const prevScrollTop = prevScrollTopRef.current;
       const isScrollingUp = scrollTop < prevScrollTop;
       
-      // Track maximum scroll position reached
       if (scrollTop > maxScrollTopRef.current) {
         maxScrollTopRef.current = scrollTop;
       }
       
-      // Calculate reveal: expands from center when scrolling down, shrinks when scrolling up (in specific conditions)
-      let reveal: number;
+      let reveal;
       
-      // Calculate shrink distance for first track (used for smooth transition)
-      const contentScrollMax = scrollContainerRef.current?.scrollHeight ?? 0;
+      const contentScrollMax = scrollContainerRef.current ? scrollContainerRef.current.scrollHeight : 0;
       const maxContentScroll = contentScrollMax - vh - revealDistance;
-      const shrinkDistance = Math.min(maxContentScroll * 0.1, revealDistance * 0.3); // Shrink over first 10% of content or 30% of reveal distance
+      const shrinkDistance = Math.min(maxContentScroll * 0.1, revealDistance * 0.3);
+      
+      const chatbotRect = chatbotSectionRef.current ? chatbotSectionRef.current.getBoundingClientRect() : null;
+      const isNearChatbot = chatbotRect && chatbotRect.top < vh * 1.5;
       
       if (scrollTop < revealDistance) {
-        // During reveal phase (album header and track list view)
         const scrollBasedReveal = Math.max(0, Math.min(1, scrollTop / revealDistance));
         
         if (isScrollingUp) {
-          // Scrolling up: continue shrinking from first track
-          // Use the same shrinkDistance mapping for smooth transition
-          // Map scrollTop from [revealDistance - shrinkDistance, revealDistance] to reveal [0, 1]
-          // When scrollTop = revealDistance, reveal = 1 (matches first track boundary)
-          // When scrollTop = revealDistance - shrinkDistance, reveal = 0 (fully shrunk)
-          const scrollBack = revealDistance - scrollTop; // Distance from revealDistance going up
-          let calculatedReveal: number;
+          const scrollBack = revealDistance - scrollTop;
+          let calculatedReveal;
           
           if (scrollBack >= 0 && scrollBack <= shrinkDistance && shrinkDistance > 0) {
-            // Smoothly map from [0, shrinkDistance] to [1, 0] for reveal
-            // When scrollBack = 0 (at revealDistance): reveal = 1
-            // When scrollBack = shrinkDistance: reveal = 0
             calculatedReveal = Math.max(0, Math.min(1, 1 - (scrollBack / shrinkDistance)));
           } else if (scrollBack > shrinkDistance) {
-            // Beyond shrink distance going up: fully shrunk
             calculatedReveal = 0;
           } else {
-            // At or past revealDistance: fully expanded
             calculatedReveal = 1;
           }
           
-          // Ensure reveal never increases when scrolling up (only shrinks)
           reveal = Math.min(calculatedReveal, maxRevealReachedRef.current);
           setManualRevealProgress(reveal);
         } else {
-          // Scrolling down: reveal increases from 0 to 1
-          // Use manual progress when it's ahead of scroll-based reveal (wheel-controlled)
           if (manualRevealProgress > scrollBasedReveal) {
             reveal = manualRevealProgress;
           } else {
@@ -770,83 +684,76 @@ export default function AlbumView() {
             setManualRevealProgress(scrollBasedReveal);
           }
         }
+      } else if (isNearChatbot) {
+        const chatbotProgress = chatbotRect ? clamp(1 - (chatbotRect.top / vh), 0, 1) : 0;
+        reveal = Math.max(0, 1 - chatbotProgress);
       } else {
-        // Past reveal distance: check if we're on first track
         const contentScroll = scrollTop - revealDistance;
         const currentScrollProgress = maxContentScroll > 0 
           ? Math.max(0, Math.min(1, contentScroll / maxContentScroll)) 
           : 0;
         
-        // Check if we're on first track (scrollProgress is 0 or very small)
         const isOnFirstTrack = currentScrollProgress < 0.1;
         
         if (isScrollingUp && isOnFirstTrack) {
-          // Scrolling up on first track: at top of first track (scrollTop = revealDistance), background is fully expanded (reveal = 1)
-          // As user scrolls up from revealDistance, background shrinks
-          // Map scrollTop from [revealDistance - shrinkDistance, revealDistance] to reveal [0, 1]
-          // When scrollTop = revealDistance, reveal = 1 (fully expanded - at top of first track)
-          // When scrollTop = revealDistance - shrinkDistance, reveal = 0 (fully shrunk)
-          const scrollBack = revealDistance - scrollTop; // Distance from revealDistance going up
-          let calculatedReveal: number;
+          const scrollBack = revealDistance - scrollTop;
+          let calculatedReveal;
           
           if (scrollBack >= 0 && scrollBack <= shrinkDistance && shrinkDistance > 0) {
-            // Smoothly map from [0, shrinkDistance] to [1, 0] for reveal
-            // When scrollBack = 0 (at revealDistance): reveal = 1
-            // When scrollBack = shrinkDistance: reveal = 0
-            // As scrollBack increases (scrolling up), reveal decreases
             calculatedReveal = Math.max(0, Math.min(1, 1 - (scrollBack / shrinkDistance)));
           } else if (scrollBack > shrinkDistance) {
-            // Beyond shrink distance going up: fully shrunk
             calculatedReveal = 0;
           } else {
-            // At or past revealDistance: fully expanded (at top of first track)
             calculatedReveal = 1;
           }
           
-          // Ensure reveal never increases when scrolling up (only shrinks)
           reveal = Math.min(calculatedReveal, maxRevealReachedRef.current);
         } else if (isOnFirstTrack) {
-          // Scrolling down on first track: keep reveal at 1 (fully expanded)
           reveal = 1;
         } else {
-          // Not on first track: keep reveal at 1 (fully expanded)
           reveal = 1;
         }
       }
       
-      // Update previous scroll position
       prevScrollTopRef.current = scrollTop;
       
-      // Throttle updates using requestAnimationFrame for smoother animation
       if (rafId === null) {
         rafId = requestAnimationFrame(() => {
-          // Update clipPath reveal - expands from center when scrolling down, shrinks when scrolling up
-          setClipPathReveal(reveal);
+          let adjustedReveal = reveal;
+          let nextChatbotProgress = 0;
+
+          if (chatbotSectionRef.current) {
+            const rect = chatbotSectionRef.current.getBoundingClientRect();
+            const viewportY = viewportHeight || vh;
+            if (viewportY > 0) {
+              const progress = clamp(1 - (rect.top / viewportY), 0, 1);
+              nextChatbotProgress = progress;
+              if (progress > 0) {
+                adjustedReveal = Math.max(0, 1 - progress);
+              }
+            }
+          }
+
+          setClipPathReveal(adjustedReveal);
+          setChatbotProgress(nextChatbotProgress);
           
-          // Store reveal value for next frame to prevent expansion when scrolling up
-          prevRevealRef.current = reveal;
+          prevRevealRef.current = adjustedReveal;
           
-          // Track maximum reveal reached (always update when reveal increases)
-          // This ensures scrolling up can only shrink from the maximum reached
-          if (reveal > maxRevealReachedRef.current) {
-            maxRevealReachedRef.current = reveal;
+          if (adjustedReveal > maxRevealReachedRef.current) {
+            maxRevealReachedRef.current = adjustedReveal;
           }
           
-          // Reset max reveal when we reach the top (scrollTop = 0) to allow fresh expansion
           if (scrollTop === 0) {
             maxRevealReachedRef.current = 0;
           }
           
-          // Phase 2: Content becomes visible after reveal completes
           if (reveal >= 1 && scrollTop >= revealDistance) {
             setContentVisible(true);
             
-            // Calculate scroll progress for content (starts after reveal phase)
             const contentScroll = scrollTop - revealDistance;
-            const contentScrollMax = scrollContainerRef.current?.scrollHeight ?? 0;
+            const contentScrollMax = scrollContainerRef.current ? scrollContainerRef.current.scrollHeight : 0;
             const maxContentScroll = contentScrollMax - vh - revealDistance;
             
-            // Simple linear scroll progress calculation - works for both directions
             const newScrollProgress = maxContentScroll > 0 
               ? Math.max(0, Math.min(1, contentScroll / maxContentScroll)) 
               : 0;
@@ -855,17 +762,14 @@ export default function AlbumView() {
             prevScrollProgressRef.current = newScrollProgress;
           } else {
             setContentVisible(false);
-            // Use reveal progress during reveal phase
             setScrollProgress(reveal);
             prevScrollProgressRef.current = reveal;
           }
 
-          // Calculate gradient color index based on scroll position (3x faster color changes)
-          const segmentSize = 27; // Smaller segment size = faster color changes (80/3 ≈ 27)
+          const segmentSize = 27;
           const newGradientColorIndex = Math.floor(scrollTop / segmentSize) % RAINBOW_COLORS.length;
           setGradientColorIndex(newGradientColorIndex);
 
-          // Track-specific progress + active track calculation
           const viewportY = viewportHeight || vh;
           if (viewportY > 0 && trackSectionRefs.current.length) {
             const rects = trackSectionRefs.current.map((section) =>
@@ -896,7 +800,7 @@ export default function AlbumView() {
 
             const activeRect = activeIndex >= 0 ? rects[activeIndex] : null;
             if (activeRect) {
-              const progress = clamp((viewportCenter - activeRect.top) / activeRect.height);
+              const progress = clamp((viewportCenter - activeRect.top) / activeRect.height, 0, 1);
 
               if (activeIndex >= 0) {
                 setCurrentTrackIndex((prev) =>
@@ -905,7 +809,7 @@ export default function AlbumView() {
               }
 
               setCurrentTrackProgress((prev) =>
-                Math.abs(prev - progress) > 0.01 ? clamp(progress) : prev
+                Math.abs(prev - progress) > 0.01 ? clamp(progress, 0, 1) : prev
               );
             } else {
               setCurrentTrackProgress(0);
@@ -920,12 +824,12 @@ export default function AlbumView() {
     const container = scrollContainerRef.current;
     if (container) {
       container.addEventListener('scroll', handleScroll, { passive: true });
-      handleScroll(); // Initial call
+      handleScroll();
     }
     
     return () => {
       if (container) {
-        container.removeEventListener('scroll', handleScroll as any);
+        container.removeEventListener('scroll', handleScroll);
       }
       if (rafId !== null) {
         cancelAnimationFrame(rafId);
@@ -933,7 +837,7 @@ export default function AlbumView() {
     };
   }, [manualRevealProgress, viewportHeight]);
 
-  // Hide body scrollbar while this view is mounted
+  // Hide body scrollbar
   useEffect(() => {
     const prevOverflow = document.body.style.overflow;
     document.body.style.overflow = 'hidden';
@@ -942,8 +846,8 @@ export default function AlbumView() {
 
   const handleAlbumImageClick = () => {
     setPlayerBarVisible(false);
-    pause(); // Stop audio playback
-    setCurrentTrack(null); // Clear current track so player bar doesn't render
+    pause();
+    setCurrentTrack(null);
   };
 
   const scrollToTrack = (trackIndex: number) => {
@@ -952,53 +856,30 @@ export default function AlbumView() {
     const track = TRACKS[trackIndex];
     if (!track) return;
     
-    // Don't set track in audio store when clicking from track list
-    // Only action buttons should open the player bar
-    
     const vh = viewportHeight || window.innerHeight;
     const revealDistance = vh * 1.5;
     
-    // Reset progress to 0
     setCurrentTrackProgress(0);
     setCurrentTrackIndex(trackIndex);
     
-    // Find the track title element and scroll to its exact position
     const titleElement = trackTitleRefs.current[trackIndex];
     
     if (titleElement && scrollContainerRef.current) {
-      // Use getBoundingClientRect to get the current visual position of the title
-      // This accounts for any transforms applied to parent elements
       const titleRect = titleElement.getBoundingClientRect();
       const containerRect = scrollContainerRef.current.getBoundingClientRect();
-      
-      // Calculate the current scroll position
       const currentScrollTop = scrollContainerRef.current.scrollTop;
-      
-      // Calculate where the title currently is relative to the container's top
-      // titleRect.top is relative to viewport, containerRect.top is also relative to viewport
-      // So titleRect.top - containerRect.top gives us the position relative to container
       const titleTopRelativeToContainer = titleRect.top - containerRect.top + currentScrollTop;
-      
-      // Add a small offset to position the title near the top of the viewport
-      // Account for sticky headers (hero + controls)
       const stickyOffset = heroHeight + controlsHeight;
-      const offsetFromTop = stickyOffset + 20; // Small additional offset
+      const offsetFromTop = stickyOffset + 20;
       const targetScrollPosition = titleTopRelativeToContainer - offsetFromTop;
-      
-      // Ensure we don't scroll before the reveal distance
       const finalScrollPosition = Math.max(revealDistance, targetScrollPosition);
       
-      // First, ensure reveal is complete if we're not past revealDistance
       const currentScroll = scrollContainerRef.current.scrollTop;
       if (currentScroll < revealDistance) {
-        // Complete the reveal first, then scroll to track title
         scrollContainerRef.current.scrollTo({ top: revealDistance, behavior: 'smooth' });
         
-        // Wait for reveal to complete, then scroll to track title
-        // We need to recalculate the position after the reveal completes
         setTimeout(() => {
           if (scrollContainerRef.current && titleElement) {
-            // Recalculate position after reveal
             const newTitleRect = titleElement.getBoundingClientRect();
             const newContainerRect = scrollContainerRef.current.getBoundingClientRect();
             const newScrollTop = scrollContainerRef.current.scrollTop;
@@ -1006,13 +887,11 @@ export default function AlbumView() {
             const newTargetScrollPosition = Math.max(revealDistance, newTitleTopRelativeToContainer - offsetFromTop);
             scrollContainerRef.current.scrollTo({ top: newTargetScrollPosition, behavior: 'smooth' });
           }
-        }, 500); // Adjust timing based on reveal animation
+        }, 500);
       } else {
-        // Already past reveal, just scroll to track title
         scrollContainerRef.current.scrollTo({ top: finalScrollPosition, behavior: 'smooth' });
       }
     } else {
-      // Fallback: if title element not found, use the old calculation method
       const offset = trackIndex === 0 ? vh * 0.25 : 0;
       const trackScrollPosition = revealDistance + (trackIndex * vh) + offset;
       
@@ -1030,29 +909,37 @@ export default function AlbumView() {
     }
   };
 
+  const scrollToAlbumView = () => {
+    if (!scrollContainerRef.current) return;
+    scrollContainerRef.current.scrollTo({ top: 0, behavior: 'smooth' });
+  };
+
+  const handleTrackTitleClick = (trackId: string) => {
+    const trackIndex = TRACKS.findIndex(t => t.id === trackId);
+    if (trackIndex >= 0) {
+      scrollToTrack(trackIndex);
+    }
+  };
+
+  const totalSections = TRACKS.length + 1;
+
   return (
     <div 
       ref={scrollContainerRef}
-      className="h-screen w-screen overflow-y-scroll overflow-x-hidden bg-[#0f0f0f]"
+      className="h-screen w-screen overflow-y-scroll overflow-x-hidden bg-[#0c0c0c]"
       style={{ scrollBehavior: 'smooth' }}
     >
-      {/* Accessibility live region */}
       <div ref={announceRef} aria-live="polite" className="sr-only" />
 
-      {/* Hero Section with Album Artwork - Fixed at top */}
-      <div ref={heroRef} className="sticky top-0 z-40 w-full bg-gradient-to-b from-[#1f2937] to-[#6b7280] flex flex-row items-center gap-1 sm:gap-2 md:gap-2.5 lg:gap-3 px-1.5 sm:px-2.5 md:px-4 lg:px-5 py-1 sm:py-1.5 md:py-2 lg:py-2.5 overflow-hidden max-h-[35vh] md:max-h-[25vh]">
-
-        {/* Album cover image */}
+      <div ref={heroRef} className="sticky top-0 z-40 w-full bg-gradient-to-b from-[#1f2937] to-[#0c0c0c] flex flex-row items-center gap-1 sm:gap-2 md:gap-2.5 lg:gap-3 px-1.5 sm:px-2.5 md:px-4 lg:px-5 py-1 sm:py-1.5 md:py-2 lg:py-2.5 overflow-hidden max-h-[35vh] md:max-h-[25vh]">
         <img
-          src="/images/album-cover.jpg"
+          src="/images/album-cover1.jpg"
           alt="Album cover"
           className="w-10 h-10 sm:w-12 sm:h-12 md:w-16 md:h-16 lg:w-20 lg:h-20 object-cover shadow-2xl rounded relative z-10 cursor-pointer flex-shrink-0"
           onClick={handleAlbumImageClick}
         />
 
-        {/* Album title and description */}
         <div className="text-left flex-1 relative z-10 min-w-0 flex flex-col justify-center overflow-visible max-w-[60%] sm:max-w-none">
-          {/* Title section - only as wide as content */}
           <div className="min-w-0">
             <Shuffle
               tag="p"
@@ -1083,7 +970,6 @@ export default function AlbumView() {
             </div>
           </div>
           
-          {/* Description */}
           <Shuffle
             tag="p"
             className="text-white/90 mb-0 text-[clamp(7px,2.8vw,9px)] sm:text-[clamp(8px,3vw,10px)] md:text-[10px] lg:text-xs break-words md:truncate md:whitespace-nowrap leading-snug"
@@ -1098,15 +984,12 @@ export default function AlbumView() {
           />
         </div>
 
-        {/* Contact info - Right side */}
         <div className="flex flex-col items-end justify-center gap-0.5 sm:gap-0.5 md:gap-1 text-white text-[8px] sm:text-[9px] md:text-[10px] lg:text-xs sm:flex-shrink-0 relative z-10 max-w-[40%] sm:max-w-none">
-          {/* Email and Phone */}
           <div className="flex flex-col items-end space-y-0 sm:space-y-0 md:space-y-0.5">
             <Shuffle tag="span" className="text-[8px] sm:text-[9px] md:text-[10px] truncate max-w-full" text="beuk.diego@gmail.com" duration={0.35} triggerOnHover triggerOnce threshold={0} rootMargin="0px" textAlign="right" />
             <Shuffle tag="span" className="text-[8px] sm:text-[9px] md:text-[10px] truncate max-w-full" text="+61 448 092 338" duration={0.35} triggerOnHover triggerOnce threshold={0} rootMargin="0px" textAlign="right" />
           </div>
 
-          {/* LinkedIn and GitHub icons - Below text */}
           <div className="flex space-x-1 sm:space-x-1.5 md:space-x-2 lg:space-x-2.5">
             <a
               href="https://www.linkedin.com/in/diego-beuk-8a9100288/"
@@ -1130,20 +1013,15 @@ export default function AlbumView() {
         </div>
       </div>
 
-      {/* Action Buttons - Combined for mobile */}
       <div ref={controlsRef} className="sticky z-40 w-full bg-transparent" style={{ top: `${heroHeight}px` }}>
-        {/* Action Buttons above Track List */}
         <div className="flex items-center gap-1.5 md:gap-2.5 px-3 md:px-6 py-2.5 md:py-4">
-          {/* Play Button */}
           <div className="relative group">
             <button 
               onClick={() => {
-                // If shuffle is enabled, select a random track
                 if (isShuffled) {
                   const randomTrack = TRACKS[Math.floor(Math.random() * TRACKS.length)];
                   setCurrentTrack(randomTrack.id);
                 } else {
-                  // If no track is selected or shuffle is off, select first track
                   if (!currentTrackId) {
                     setCurrentTrack(TRACKS[0].id);
                   }
@@ -1155,21 +1033,18 @@ export default function AlbumView() {
             >
               <FaPlay size={12} className="md:w-3.5 md:h-3.5" />
             </button>
-            {/* Tooltip */}
             <span className="absolute bottom-full mb-1.5 left-1/2 -translate-x-1/2 bg-black text-white text-[10px] px-1.5 py-0.5 rounded opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap">
               Play
             </span>
           </div>
 
-          {/* Shuffle Button */}
           <div className="relative group">
             <button 
               onClick={() => {
                 toggleShuffle();
-                // Shuffle button only toggles shuffle mode, doesn't play
               }}
               className={`flex items-center justify-center w-6 h-6 md:w-8 md:h-8 rounded-full bg-white/5 hover:bg-white/20 transition-colors focus:outline-none ${
-                isShuffled ? 'bg-white/20 text-[#ff6b35]' : 'text-white'
+                isShuffled ? 'bg-white/20 text-[#FFCD70]' : 'text-white'
               }`}
             >
               <FaRandom size={12} className="md:w-3.5 md:h-3.5" />
@@ -1179,7 +1054,6 @@ export default function AlbumView() {
             </span>
           </div>
 
-          {/* Invite Collaborator Button */}
           <div className="relative group">
             <button className="flex items-center justify-center w-6 h-6 md:w-8 md:h-8 rounded-full bg-white/5 hover:bg-white/20 text-white transition-colors">
               <FaUserPlus size={12} className="md:w-3.5 md:h-3.5" />
@@ -1191,7 +1065,6 @@ export default function AlbumView() {
         </div>
       </div>
 
-      {/* Track List Section */}
       <div 
         className="sticky z-40 bg-transparent w-full overflow-hidden"
         style={{ 
@@ -1207,12 +1080,11 @@ export default function AlbumView() {
             paddingBottom: '0.125rem'
           }}
         >
-          {/* Table Header */}
           <div className="grid grid-cols-12 text-white/70 text-[10px] md:text-xs font-semibold border-b border-white/20 pb-0.5 md:pb-1 mb-0.5 md:mb-1 px-1.5 md:px-3 flex-shrink-0">
             <div className="col-span-1 text-middle">#</div>
             <div className="col-span-6 text-middle">Title</div>
             <div className="col-span-3 text-middle hidden sm:block">Artist</div>
-            <div className="col-span-3 sm:col-span-2 flex items-center justify-end gap-0.5">
+            <div className="col-span-3 sm:col-span-2 flex items-center justify-end gap-0.5 mr-4 md:mr-5">
               <svg
                 xmlns="http://www.w3.org/2000/svg"
                 className="w-2.5 h-2.5 md:w-3 md:h-3"
@@ -1230,7 +1102,6 @@ export default function AlbumView() {
             </div>
           </div>
 
-          {/* Track List */}
           <div className="space-y-0.5 md:space-y-1 flex-1 min-h-0">
             {TRACKS.map((track, index) => {
               const isAIDJ = track.id === 'aiDj';
@@ -1242,7 +1113,7 @@ export default function AlbumView() {
               return (
                 <div
                   key={track.id}
-                  className={`grid grid-cols-12 items-center text-white hover:bg-white/5 rounded-lg px-1.5 md:px-3 py-0.5 md:py-1 transition-colors cursor-pointer focus:outline-none focus-visible:outline-none`}
+                  className={`grid grid-cols-12 items-center text-white hover:bg-[#6b7280]/15 rounded-lg px-1.5 md:px-3 py-0.5 md:py-1 transition-colors cursor-pointer focus:outline-none focus-visible:outline-none`}
                   role="button"
                   tabIndex={0}
                   onClick={() => scrollToTrack(index)}
@@ -1253,33 +1124,28 @@ export default function AlbumView() {
                     }
                   }}
                 >
-                  {/* Track Number */}
                   <div className="col-span-1 text-white/80 text-xs md:text-sm">{track.number}</div>
 
-                  {/* AI DJ Track Layout */}
                   {isAIDJ ? (
-                    <div className="col-span-11 flex justify-center items-end gap-1.5">
+                    <div className="col-span-11 flex justify-center items-center gap-3.5">
                       <img
-                        src={'/images/ai-dj.jpg'}
+                        src={'/images/bars-scale-middle.svg'}
                         alt="AI DJ"
-                        className="w-6 h-6 md:w-8 md:h-8 object-cover rounded mr-1.5 md:mr-3"
+                        className="w-3.5 h-3.5 md:w-4 md:h-4 object-cover rounded flex-shrink-0"
                       />
-                      <h3 className="text-xs md:text-sm font-semibold text-center">{track.title}</h3>
+                      <h3 className="text-xs md:text-sm font-semibold text-center m-0 leading-none">- {track.title}</h3>                    
                     </div>
                   ) : (
                     <>
-                      {/* Title */}
                       <div className="col-span-6 sm:col-span-6 text-white font-semibold text-xs md:text-sm truncate">
                         {track.title}
                       </div>
 
-                      {/* Artist */}
                       <div className="col-span-3 text-white/70 text-[10px] md:text-xs hidden sm:block truncate">
                         {track.artist || 'Diego Beuk'}
                       </div>
 
-                      {/* Duration */}
-                      <div className="col-span-3 sm:col-span-2 text-right text-white/70 text-[10px] md:text-xs">
+                      <div className="col-span-3 sm:col-span-2 flex items-center justify-end text-white/70 text-[10px] md:text-xs mr-2 md:mr-3">
                         {formattedDuration}
                       </div>
                     </>
@@ -1291,95 +1157,150 @@ export default function AlbumView() {
         </div>
       </div>
 
-
-
-
-      {/* Parallax Scrolling Content Area */}
       <div className="relative w-full">
-        {/* Parallax Background - Expands equally up and down from center */}
+        <div
+          className="fixed inset-0 pointer-events-none"
+          aria-hidden="true"
+          style={{
+            zIndex: 45,
+            opacity: chatbotProgress,
+            transition: 'opacity 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
+            background: 'radial-gradient(circle at center, #172554 0%, #0b1120 55%, #020617 100%)'
+          }}
+        />
+
         <div
           className="fixed inset-0"
           style={{
             top: 0,
             bottom: 0,
-            clipPath: `inset(${50 - Math.max(0, Math.min(1, clipPathReveal)) * 50}% 0% ${50 - Math.max(0, Math.min(1, clipPathReveal)) * 50}% 0%)`, // Expand equally up and down from center, can reverse
+            clipPath: `inset(${50 - Math.max(0, Math.min(1, clipPathReveal)) * 50}% 0% ${50 - Math.max(0, Math.min(1, clipPathReveal)) * 50}% 0%)`,
             transition: 'clip-path 0.1s cubic-bezier(0.4, 0, 0.2, 1)',
             willChange: 'clip-path',
             zIndex: 50,
-            backgroundColor: '#0F172A',
+            backgroundColor: '#E0E0E0',
             pointerEvents: contentVisible ? 'auto' : 'none'
           }}
         />
 
-
-        
-
-        {/* Track Content - appears after reveal and scrolls up */}
         <div 
-          className="relative z-[60] min-h-[400vh]"
+          className="relative z-[60]"
           style={{
+            minHeight: `${totalSections * 100}vh`,
             opacity: contentVisible ? 1 : 0,
             transform: contentVisible 
               ? `translate3d(0, ${(viewportHeight || window.innerHeight) - (scrollProgress * (viewportHeight || window.innerHeight) * 1.5)}px, 0)` 
-              : `translate3d(0, ${viewportHeight || window.innerHeight}px, 0)`, // Start below viewport, scroll up as user scrolls
+              : `translate3d(0, ${viewportHeight || window.innerHeight}px, 0)`,
             transition: 'opacity 0.5s cubic-bezier(0.4, 0, 0.2, 1)',
             willChange: contentVisible ? 'transform, opacity' : 'opacity',
-            backgroundColor: '#0F172A',
+            backgroundColor: 'transparent',
             margin: 0,
             padding: 0,
             fontSize: 0
           }}
         >
-          {TRACKS.map((track, index) => (
-            <div 
-              key={track.id}
-              data-track-index={index}
-              ref={(el) => {
-                trackSectionRefs.current[index] = el;
-              }}
-              className="w-full m-0 p-0"
-              style={{ 
-                backgroundColor: '#0F172A', 
-                margin: 0, 
-                padding: 0,
-                minHeight: '100vh',
-                display: 'block',
-                fontSize: '16px'
-              }}
-            >
-              <TrackPage
-                title={track.title}
-                trackNumber={track.number}
-                gradientColorIndex={gradientColorIndex}
-                content={
-                  <div style={{ fontFamily: "'Ubuntu', sans-serif" }}>
-                    <p>
-                      Content for {track.title}. Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed non risus. Suspendisse lectus tortor, dignissim sit amet, adipiscing nec.
-                    </p>
-                    <p>
-                      Cras elementum ultrices diam. Maecenas ligula massa, varius a, semper congue, euismod non, mi. Proin porttitor, orci nec nonummy molestie, enim est eleifend mi.
-                    </p>
-                    <p>
-                      Aenean fermentum, elit eget tincidunt condimentum, eros ipsum rutrum orci, sagittis tempus lacus enim ac dui. Donec non enim in turpis pulvinar facilisis.
-                    </p>
-                    <p>
-                      Ut felis. Praesent dapibus, neque id cursus faucibus, tortor neque egestas augue, eu vulputate magna eros eu erat. Aliquam erat volutpat.
-                    </p>
-                    <p>
-                      Nam dui mi, tincidunt quis, accumsan porttitor, facilisis luctus, metus. Phasellus ultrices nulla quis nibh. Quisque a lectus.
-                    </p>
-                  </div>
-                }
-                className="w-full h-full min-h-screen bg-[#0F172A]"
-                headerClassName="bg-[#0F172A]"
-                contentClassName="bg-[#0F172A]"
-              />
+          <div
+            style={{
+              opacity: Math.max(0, 1 - chatbotProgress),
+              transition: 'opacity 0.4s cubic-bezier(0.4, 0, 0.2, 1)',
+              pointerEvents: chatbotProgress >= 0.9 ? 'none' : 'auto'
+            }}
+          >
+            {TRACKS.map((track, index) => (
+              <div 
+                key={track.id}
+                data-track-index={index}
+                ref={(el) => {
+                  trackSectionRefs.current[index] = el;
+                }}
+                className="w-full m-0 p-0"
+                style={{ 
+                  backgroundColor: '#E0E0E0', 
+                  margin: 0, 
+                  padding: 0,
+                  minHeight: '100vh',
+                  display: 'block',
+                  fontSize: '16px'
+                }}
+              >
+                <TrackPage
+                  title={track.title}
+                  trackNumber={track.number}
+                  gradientColorIndex={gradientColorIndex}
+                  content={
+                    <div style={{ fontFamily: "'Ubuntu', sans-serif" }}>
+                      <p>
+                        Content for {track.title}. Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed non risus. Suspendisse lectus tortor, dignissim sit amet, adipiscing nec.
+                      </p>
+                      <p>
+                        Cras elementum ultrices diam. Maecenas ligula massa, varius a, semper congue, euismod non, mi. Proin porttitor, orci nec nonummy molestie, enim est eleifend mi.
+                      </p>
+                      <p>
+                        Aenean fermentum, elit eget tincidunt condimentum, eros ipsum rutrum orci, sagittis tempus lacus enim ac dui. Donec non enim in turpis pulvinar facilisis.
+                      </p>
+                      <p>
+                        Ut felis. Praesent dapibus, neque id cursus faucibus, tortor neque egestas augue, eu vulputate magna eros eu erat. Aliquam erat volutpat.
+                      </p>
+                      <p>
+                        Nam dui mi, tincidunt quis, accumsan porttitor, facilisis luctus, metus. Phasellus ultrices nulla quis nibh. Quisque a lectus.
+                      </p>
+                    </div>
+                  }
+                  className="w-full h-full min-h-screen bg-[#E0E0E0]"
+                  headerClassName="bg-[#E0E0E0]"
+                  contentClassName="bg-[#E0E0E0]"
+                />
+              </div>
+            ))}
+          </div>
+          <div
+            ref={chatbotSectionRef}
+            className="w-full min-h-screen flex flex-col items-center justify-center px-6 py-16"
+            style={{
+              backgroundColor: 'transparent',
+              color: '#E0E0E0',
+              opacity: chatbotProgress,
+              transition: 'opacity 0.4s cubic-bezier(0.4, 0, 0.2, 1)',
+              pointerEvents: chatbotProgress > 0.05 ? 'auto' : 'none'
+            }}
+          >
+            <div className="max-w-3xl w-full text-center space-y-6">
+              <div className="space-y-2">
+                <p className="text-xs uppercase tracking-[0.3em] text-slate-400">AI DJ</p>
+                <h2 className="text-3xl md:text-4xl font-extrabold text-slate-100">
+                  Meet the Chatbot Conductor
+                </h2>
+                <p className="text-base md:text-lg text-slate-300 max-w-2xl mx-auto">
+                  This conversational guide can dive deeper into any track, share behind-the-scenes stories,
+                  or help you explore Diego&rsquo;s work in a more interactive way. Scroll up to return to Track 6
+                  or stay here to connect with the AI DJ.
+                </p>
+              </div>
+              <div className="grid gap-4 grid-cols-1 md:grid-cols-2">
+                <div className="rounded-2xl border border-slate-700/60 bg-slate-900/40 p-6 shadow-lg backdrop-blur">
+                  <h3 className="text-lg font-semibold text-slate-100 mb-2">Ask About the Tracks</h3>
+                  <p className="text-sm text-slate-300">
+                    Curious about a specific achievement or project? The chatbot can surface highlights tailored to your questions.
+                  </p>
+                </div>
+                <div className="rounded-2xl border border-slate-700/60 bg-slate-900/40 p-6 shadow-lg backdrop-blur">
+                  <h3 className="text-lg font-semibold text-slate-100 mb-2">Plan Your Collaboration</h3>
+                  <p className="text-sm text-slate-300">
+                    Explore how Diego&rsquo;s experience aligns with your goals, gather resources, and get connected right away.
+                  </p>
+                </div>
+              </div>
+              <button
+                type="button"
+                className="inline-flex items-center justify-center px-6 py-3 rounded-full bg-orange-500/90 hover:bg-orange-400 text-slate-950 font-semibold shadow-md transition duration-200"
+              >
+                Launch Chatbot
+              </button>
             </div>
-          ))}
+          </div>
         </div>
       </div>
 
-      {/* Track Progress Grid */}
       <div
         className={`fixed top-4 left-4 z-[80] transition-all duration-500 ease-out ${
           contentVisible ? 'opacity-100 translate-y-0 pointer-events-auto' : 'opacity-0 -translate-y-6 pointer-events-none'
@@ -1389,7 +1310,7 @@ export default function AlbumView() {
           {TRACKS.map((track, index) => {
             const isActive = index === currentTrackIndex;
             const label = `${String(track.number).padStart(2, '0')} ${track.title}`;
-            const width = isActive ? `${Math.round(clamp(currentTrackProgress) * 100)}%` : '0%';
+            const width = isActive ? `${Math.round(clamp(currentTrackProgress, 0, 1) * 100)}%` : '0%';
 
             return (
               <button
@@ -1409,8 +1330,8 @@ export default function AlbumView() {
                 <span className="relative z-10 drop-shadow-[0_0_6px_rgba(0,0,0,0.6)]">{label}</span>
                 <div className="pointer-events-none absolute inset-0 overflow-hidden">
                   <div
-                    className="absolute inset-y-0 left-0 bg-orange-500 transition-all duration-300 ease-out"
-                    style={{ width, opacity: isActive ? 1 : 0 }}
+                    className="absolute inset-y-0 left-0 transition-all duration-300 ease-out"
+                    style={{ width, opacity: isActive ? 1 : 0, backgroundColor: '#A4A4A4' }}
                   />
                 </div>
               </button>
@@ -1419,10 +1340,13 @@ export default function AlbumView() {
         </div>
       </div>
 
-      {/* Player Bar */}
-      {/* Show player bar when play was clicked, and fade in when on track views */}
-      {/* Pass clipPathReveal to help determine when parallax is covering the player bar */}
-      <PlayerBar isVisible={playerBarVisible} contentVisible={contentVisible} clipPathReveal={clipPathReveal} />
+      <PlayerBar 
+        isVisible={playerBarVisible} 
+        contentVisible={contentVisible} 
+        clipPathReveal={clipPathReveal}
+        onAlbumImageClick={scrollToAlbumView}
+        onTrackTitleClick={handleTrackTitleClick}
+      />
     </div>
   );
 }

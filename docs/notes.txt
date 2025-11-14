@@ -4,6 +4,39 @@ Eerie Black - Text Colour - #191B20
 Gray - 2nd Text Colour - #757677
 
 
+#222222
+#FFFFFF
+
+chatbot colours:
+#F34213 orange text colour -> carpet orange red colour #9F1D05
+#E0E0E0 off white text colour
+#0c0c0c terminal black colour
+#D7FFF1 text highlighting colour
+#999 timestamp grey text colour
+
+#A4A4A4 animated icon, secondary text (grey text colour)
+
+
+#1f2937
+#6b7280
+#ff6b35
+
+
+#1db954
+#1338f3
+
+# blue album pic colours:
+#908F8D
+#101F36
+#F6E59F
+#111015
+#424651
+
+#2a1ad6
+#FFCD70 sunglow
+#FFD485 sunset
+
+
 PP Editorial New by Pangram Pangram 1st font (main body, navigation items, larger headings)
 GT America Mono by Frilli Type 2nd font (timestamp, location, monospaced, technical-looking elements)
 Gilroy Light font ?

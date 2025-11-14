@@ -43,6 +43,17 @@
     cursor: none; /* Hide default cursor */
   }
 
+  /* Text Selection Styling */
+  ::selection {
+    background-color: #D7FFF1;
+    color: #191B20; /* Dark text when selected (for white text) */
+  }
+
+  ::-moz-selection {
+    background-color: #D7FFF1;
+    color: #191B20; /* Dark text when selected (for white text) */
+  }
+
   /* Typography Hierarchy */
   h1, h2, h3, h4, h5, h6 {
     font-weight: 600;
