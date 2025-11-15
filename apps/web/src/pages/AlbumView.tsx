@@ -1,7 +1,8 @@
-import { useEffect, useRef, useState } from 'react';
-import { TRACKS } from '../data/tracks';
+import { useEffect, useRef, useState, type ReactNode } from 'react';
+import { TRACKS, type TrackId } from '../data/tracks';
 import { FaLinkedin, FaGithub } from 'react-icons/fa';
 import { FaPlay, FaRandom, FaUserPlus } from 'react-icons/fa';
+import { FaMapMarkerAlt, FaBriefcase, FaLanguage, FaCode, FaCircle } from 'react-icons/fa';
 import Shuffle from '../components/ui/Shuffle';
 import { api } from '../services/api';
 import { fetchWeatherApi } from 'openmeteo';
@@ -39,6 +40,385 @@ const clamp = (value: number, min?: number, max?: number): number => {
   const minVal = min === undefined ? 0 : min;
   const maxVal = max === undefined ? 1 : max;
   return Math.max(minVal, Math.min(maxVal, value));
+};
+
+/**
+ * Returns unique content for each track based on its ID
+ */
+const getTrackContent = (trackId: TrackId): ReactNode => {
+  const contentStyle = { fontFamily: "'Ubuntu', sans-serif" };
+
+  switch (trackId) {
+    case 'about':
+      return (
+        <div style={{...contentStyle, textAlign: 'left'}}>
+          <div style={{ display: 'flex', gap: '2rem', alignItems: 'flex-start', marginBottom: '2rem' }}>
+            {/* Album Image */}
+            <div style={{ flexShrink: 0 }}>
+              <img
+                src="/images/album-cover1.jpg"
+                alt="Diego Beuk"
+                style={{
+                  width: '200px',
+                  height: '200px',
+                  objectFit: 'cover',
+                  borderRadius: '12px',
+                  boxShadow: '0 4px 6px rgba(0, 0, 0, 0.1)'
+                }}
+              />
+            </div>
+
+            {/* Text Content - Vertically centered with image */}
+            <div style={{ 
+              display: 'flex', 
+              flexDirection: 'column', 
+              justifyContent: 'center',
+              flex: 1,
+              minHeight: '200px'
+            }}>
+              {/* Available to work with pulse rings icon */}
+              <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginBottom: '1rem' }}>
+                <div style={{ position: 'relative', width: '24px', height: '24px', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                  {/* Static inner circle */}
+                  <FaCircle 
+                    style={{ 
+                      position: 'absolute',
+                      color: '#10b981',
+                      fontSize: '8px',
+                      zIndex: 3
+                    }} 
+                  />
+                  {/* Pulsing outer ring 1 */}
+                  <FaCircle 
+                    className="pulse-ring-outer"
+                    style={{ 
+                      position: 'absolute',
+                      color: '#10b981',
+                      fontSize: '8px',
+                      opacity: 0.6,
+                      zIndex: 2
+                    }} 
+                  />
+                  {/* Pulsing outer ring 2 */}
+                  <FaCircle 
+                    className="pulse-ring-outer-delayed"
+                    style={{ 
+                      position: 'absolute',
+                      color: '#10b981',
+                      fontSize: '8px',
+                      opacity: 0.4,
+                      zIndex: 1
+                    }} 
+                  />
+                </div>
+                <span style={{ fontSize: '0.875rem', color: '#10b981', fontWeight: 500 }}>Available to work</span>
+              </div>
+
+              {/* Name */}
+              <h2 style={{ margin: '0 0 0.5rem 0', fontSize: '2rem', fontWeight: 'bold' }}>Diego Beuk</h2>
+
+              {/* Title */}
+              <p style={{ margin: '0', fontSize: '1.125rem', color: '#4b5563' }}>
+                I'm a Full Stack AI Developer
+              </p>
+
+              {/* Social Icons */}
+              <div style={{ 
+                display: 'flex', 
+                gap: '1rem', 
+                marginTop: '1rem'
+              }}>
+                <a
+                  href="https://www.linkedin.com/in/diego-beuk-8a9100288/"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  style={{
+                    color: '#000',
+                    transition: 'opacity 0.2s',
+                    textDecoration: 'none'
+                  }}
+                  onMouseEnter={(e) => e.currentTarget.style.opacity = '0.7'}
+                  onMouseLeave={(e) => e.currentTarget.style.opacity = '1'}
+                  aria-label="Diego Beuk LinkedIn profile"
+                >
+                  <FaLinkedin size={24} />
+                </a>
+                <a
+                  href="https://github.com/dbeukrf"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  style={{
+                    color: '#000',
+                    transition: 'opacity 0.2s',
+                    textDecoration: 'none'
+                  }}
+                  onMouseEnter={(e) => e.currentTarget.style.opacity = '0.7'}
+                  onMouseLeave={(e) => e.currentTarget.style.opacity = '1'}
+                  aria-label="Diego Beuk Github profile"
+                >
+                  <FaGithub size={24} />
+                </a>
+              </div>
+            </div>
+          </div>
+
+          {/* Additional Info Lines Below Image */}
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem', marginTop: '1.5rem' }}>
+            {/* Location */}
+            <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
+              <FaMapMarkerAlt style={{ color: '#6b7280', fontSize: '1.125rem' }} />
+              <span style={{ fontSize: '1rem' }}>Melbourne, Australia</span>
+            </div>
+
+            {/* Work Experience */}
+            <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
+              <FaBriefcase style={{ color: '#6b7280', fontSize: '1.125rem' }} />
+              <span style={{ fontSize: '1rem' }}>1 year</span>
+            </div>
+
+            {/* Languages */}
+            <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
+              <FaLanguage style={{ color: '#6b7280', fontSize: '1.125rem' }} />
+              <span style={{ fontSize: '1rem' }}>English, Spanish, Portuguese, French</span>
+            </div>
+
+            {/* Key Skills */}
+            <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
+              <FaCode style={{ color: '#6b7280', fontSize: '1.125rem' }} />
+              <span style={{ fontSize: '1rem' }}>Python, FastAPI, React/TypeScript, LangChain, RAG Systems, AI Agents, SQL/NoSQL</span>
+            </div>
+          </div>
+
+          {/* Add CSS for pulse animation */}
+          <style>{`
+            @keyframes pulse-ring {
+              0% {
+                transform: scale(1);
+                opacity: 0.6;
+              }
+              50% {
+                transform: scale(2);
+                opacity: 0.3;
+              }
+              100% {
+                transform: scale(3);
+                opacity: 0;
+              }
+            }
+            .pulse-ring-outer {
+              animation: pulse-ring 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+            }
+            .pulse-ring-outer-delayed {
+              animation: pulse-ring 2s cubic-bezier(0.4, 0, 0.6, 1) infinite 1s;
+            }
+          `}</style>
+        </div>
+      );
+
+    case 'education':
+      return (
+        <div style={{...contentStyle, textAlign: 'left'}}>
+          
+
+          {/* Monash University */}
+      <section style={{ marginBottom: '2rem' }}>
+        {/* Title row: left + right */}
+        <div style={{ display: 'flex', justifyContent: 'space-between' }}>
+          <h3>Monash University</h3>
+          <h3>Melbourne, Australia</h3>
+        </div>
+
+        {/* Degree + GPA row */}
+        <div style={{ display: 'flex', justifyContent: 'space-between' }}>
+          <p style={{ margin: '0.2rem 0' }}>
+            <strong>Bachelor of Information Technology</strong>
+          </p>
+          <p style={{ margin: '0.2rem 0' }}><strong>September 2025</strong></p>
+        </div>
+
+        <ul style={{ paddingLeft: '1.2rem', marginTop: '0.8rem' }}>
+          <li><strong>Major:</strong> Software Development | <strong>Minor:</strong> Cybersecurity</li>
+          <li><strong>GPA:</strong> 3.81/4.0</li>
+          <li>
+            <strong>Relevant Coursework:</strong>
+            <ul style={{ paddingLeft: '1.2rem', marginTop: '0.3rem', marginBottom: '0.3rem', listStyleType: 'circle' }}>
+              <li>Web Fundamentals</li>
+              <li>Algorithms & Data Structures</li>
+              <li>Computer Systems & Security</li>
+              <li>Databases</li>
+              <li>Cloud Computing</li>
+              <li>Mobile App Development</li>
+              <li>IT Project Management</li>
+            </ul>
+          </li>
+          <li>
+            <strong>Honours & Awards:</strong>
+            <ul style={{ paddingLeft: '1.2rem', marginTop: '0.3rem', marginBottom: '0.3rem', listStyleType: 'circle' }}>
+              <li>Top Student University Commendation (Semester 1, 2024)</li>
+              <li>Industry-Based Learning Placement Scholarship</li>
+            </ul>
+          </li>
+        </ul>
+      </section>
+
+
+
+      <section style={{ marginBottom: '2rem' }}>
+        {/* Title row: left + right */}
+        <div style={{ display: 'flex', justifyContent: 'space-between' }}>
+          <h3>Yonsei University</h3>
+          <h3>Seoul, South Korea</h3>
+        </div>
+
+        {/* Degree + GPA row */}
+        <div style={{ display: 'flex', justifyContent: 'space-between' }}>
+          <p style={{ margin: '0.2rem 0' }}>
+            <strong>College of Computing, Exchange Program</strong>
+          </p>
+          <p style={{ margin: '0.2rem 0' }}><strong>Fall Semester 2024</strong></p>
+        </div>
+
+        <ul style={{ paddingLeft: '1.2rem', marginTop: '0.8rem' }}>
+          <li>
+            <strong>Scholarship Award:</strong> Destination Australia Cheung Kong Exchange Program
+          </li>
+          <li>
+            <strong>GPA:</strong> 4.08/4.3
+          </li>
+          <li>
+            <strong>Activities & Societies:</strong>
+            <ul style={{ paddingLeft: '1.2rem', marginTop: '0.3rem', marginBottom: '0.3rem', listStyleType: 'circle' }}>
+              <li>Mentors Club</li>
+              <li>Yonsei English Society (YES)</li>
+            </ul>
+          </li>
+        </ul>
+      </section>
+        </div>
+      );
+
+    case 'workExperience':
+      return (
+        <div style={{...contentStyle, textAlign: 'left'}}>
+          <h2>Professional Journey</h2>
+          <p>
+            My work experience has been a journey of growth, collaboration, and impact. 
+            Each role has contributed to my development as a software engineer and team member.
+          </p>
+          <p>
+            Through various projects and challenges, I've learned to balance technical excellence 
+            with business objectives, working closely with cross-functional teams to deliver 
+            solutions that make a real difference.
+          </p>
+          <h3>Career Highlights</h3>
+          <p>
+            From building robust backend systems to creating intuitive user interfaces, 
+            my professional experience spans the full stack of modern software development. 
+            I've had the opportunity to work with cutting-edge technologies and contribute 
+            to products used by thousands of users.
+          </p>
+        </div>
+      );
+
+    case 'projects':
+      return (
+        <div style={{...contentStyle, textAlign: 'left'}}>
+          <h2>Creative Projects</h2>
+          <p>
+            Beyond my professional work, I'm passionate about building projects that solve 
+            real problems and explore new technologies. These side projects represent my 
+            curiosity, creativity, and commitment to continuous learning.
+          </p>
+          <p>
+            Each project is an opportunity to experiment, learn, and push the boundaries 
+            of what's possible. From web applications to mobile apps, I enjoy the entire 
+            process of bringing ideas to life.
+          </p>
+          <h3>Project Philosophy</h3>
+          <p>
+            I believe in building projects that are not just technically impressive, but 
+            also meaningful and useful. Whether it's a tool that simplifies a workflow 
+            or an app that brings joy to users, I aim to create something that matters.
+          </p>
+        </div>
+      );
+
+    case 'skillsLanguages':
+      return (
+        <div style={{...contentStyle, textAlign: 'left'}}>
+          <h2>Technical Skills & Languages</h2>
+          <p>
+            My technical toolkit spans multiple programming languages, frameworks, and tools. 
+            I'm comfortable working across the entire software development lifecycle, from 
+            initial design to deployment and maintenance.
+          </p>
+          <p>
+            While I have deep expertise in certain technologies, I'm always eager to learn 
+            new tools and approaches. The tech landscape evolves rapidly, and I believe in 
+            staying current with industry best practices and emerging technologies.
+          </p>
+          <h3>Language Proficiency</h3>
+          <p>
+            Beyond programming languages, I'm also multilingual, which has helped me 
+            collaborate effectively with diverse teams and understand different perspectives 
+            in our global tech community.
+          </p>
+        </div>
+      );
+
+    case 'hobbies':
+      return (
+        <div style={{...contentStyle, textAlign: 'left'}}>
+          <h2>Personal Interests</h2>
+          <p>
+            When I'm not coding, I enjoy exploring various hobbies that keep me balanced 
+            and inspired. These activities help me maintain creativity and bring fresh 
+            perspectives to my work.
+          </p>
+          <p>
+            Whether it's music, sports, reading, or other pursuits, I find that diverse 
+            interests enrich both my personal life and professional approach. They remind 
+            me that great work often comes from a well-rounded perspective.
+          </p>
+          <h3>Work-Life Balance</h3>
+          <p>
+            I believe that maintaining hobbies and interests outside of work is essential 
+            for long-term success and happiness. These activities recharge my energy and 
+            often spark new ideas that I bring back to my professional projects.
+          </p>
+        </div>
+      );
+
+    case 'aiDj':
+      return (
+        <div style={{...contentStyle, textAlign: 'left'}}>
+          <h2>AI DJ Experience</h2>
+          <p>
+            The AI DJ represents the intersection of technology and creativity. This interactive 
+            experience allows you to explore my portfolio in a conversational way, diving deeper 
+            into any aspect that interests you.
+          </p>
+          <p>
+            Powered by advanced AI, the chatbot can answer questions about my background, 
+            discuss specific projects in detail, and help you understand how my experience 
+            might align with your needs or interests.
+          </p>
+          <h3>Interactive Exploration</h3>
+          <p>
+            Feel free to ask about anything—from technical details about specific projects 
+            to my approach to problem-solving. The AI DJ is here to make your exploration 
+            of my portfolio more engaging and personalized.
+          </p>
+        </div>
+      );
+
+    default:
+      return (
+        <div style={{...contentStyle, textAlign: 'left'}}>
+          <p>Content for this track is coming soon.</p>
+        </div>
+      );
+  }
 };
 
 export default function AlbumView() {
@@ -973,7 +1353,7 @@ export default function AlbumView() {
           <Shuffle
             tag="p"
             className="text-white/90 mb-0 text-[clamp(7px,2.8vw,9px)] sm:text-[clamp(8px,3vw,10px)] md:text-[10px] lg:text-xs break-words md:truncate md:whitespace-nowrap leading-snug"
-            text="Diego Beuk • 2025 • 6 songs, 11 min"
+            text="Diego Beuk • 2025 • 7 songs, 12 min"
             duration={0.4}
             animationMode="random"
             triggerOnHover
@@ -1227,25 +1607,7 @@ export default function AlbumView() {
                   title={track.title}
                   trackNumber={track.number}
                   gradientColorIndex={gradientColorIndex}
-                  content={
-                    <div style={{ fontFamily: "'Ubuntu', sans-serif" }}>
-                      <p>
-                        Content for {track.title}. Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed non risus. Suspendisse lectus tortor, dignissim sit amet, adipiscing nec.
-                      </p>
-                      <p>
-                        Cras elementum ultrices diam. Maecenas ligula massa, varius a, semper congue, euismod non, mi. Proin porttitor, orci nec nonummy molestie, enim est eleifend mi.
-                      </p>
-                      <p>
-                        Aenean fermentum, elit eget tincidunt condimentum, eros ipsum rutrum orci, sagittis tempus lacus enim ac dui. Donec non enim in turpis pulvinar facilisis.
-                      </p>
-                      <p>
-                        Ut felis. Praesent dapibus, neque id cursus faucibus, tortor neque egestas augue, eu vulputate magna eros eu erat. Aliquam erat volutpat.
-                      </p>
-                      <p>
-                        Nam dui mi, tincidunt quis, accumsan porttitor, facilisis luctus, metus. Phasellus ultrices nulla quis nibh. Quisque a lectus.
-                      </p>
-                    </div>
-                  }
+                  content={getTrackContent(track.id)}
                   className="w-full h-full min-h-screen bg-[#E0E0E0]"
                   headerClassName="bg-[#E0E0E0]"
                   contentClassName="bg-[#E0E0E0]"
@@ -1272,7 +1634,7 @@ export default function AlbumView() {
                 </h2>
                 <p className="text-base md:text-lg text-slate-300 max-w-2xl mx-auto">
                   This conversational guide can dive deeper into any track, share behind-the-scenes stories,
-                  or help you explore Diego&rsquo;s work in a more interactive way. Scroll up to return to Track 6
+                  or help you explore Diego&rsquo;s work in a more interactive way. Scroll up to return to Track 7
                   or stay here to connect with the AI DJ.
                 </p>
               </div>

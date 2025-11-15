@@ -37,6 +37,9 @@ chatbot colours:
 #FFD485 sunset
 
 
+svg spinner icon: https://freesvgicons.com/packs/svg-spinners
+
+
 PP Editorial New by Pangram Pangram 1st font (main body, navigation items, larger headings)
 GT America Mono by Frilli Type 2nd font (timestamp, location, monospaced, technical-looking elements)
 Gilroy Light font ?
