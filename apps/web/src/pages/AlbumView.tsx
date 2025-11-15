@@ -53,7 +53,7 @@ const getTrackContent = (trackId: TrackId): ReactNode => {
     case 'about':
       return (
         <div style={{...contentStyle, textAlign: 'left'}}>
-          <div style={{ display: 'flex', gap: '2rem', alignItems: 'flex-start', marginBottom: '2rem' }}>
+          <div style={{ display: 'flex', gap: '2rem', alignItems: 'center', marginBottom: '2rem' }}>
             {/* Album Image */}
             <div style={{ flexShrink: 0 }}>
               <img
@@ -75,7 +75,7 @@ const getTrackContent = (trackId: TrackId): ReactNode => {
               flexDirection: 'column', 
               justifyContent: 'center',
               flex: 1,
-              minHeight: '200px'
+              height: '200px'
             }}>
               {/* Available to work with pulse rings icon */}
               <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginBottom: '1rem' }}>
@@ -112,16 +112,44 @@ const getTrackContent = (trackId: TrackId): ReactNode => {
                     }} 
                   />
                 </div>
-                <span style={{ fontSize: '0.875rem', color: '#10b981', fontWeight: 500 }}>Available to work</span>
+                <Shuffle
+                  tag="span"
+                  style={{ fontSize: '0.875rem', color: '#10b981', fontWeight: 500, lineHeight: 1, display: 'inline-flex', alignItems: 'center' }}
+                  text="Available to work"
+                  duration={0.35}
+                  animationMode="evenodd"
+                  triggerOnHover
+                  triggerOnce={false}
+                  threshold={0}
+                  rootMargin="0px"
+                />
               </div>
 
               {/* Name */}
-              <h2 style={{ margin: '0 0 0.5rem 0', fontSize: '2rem', fontWeight: 'bold' }}>Diego Beuk</h2>
+              <Shuffle
+                tag="h2"
+                style={{ margin: '0 0 0.5rem 0', fontSize: '2rem', fontWeight: 'bold' }}
+                text="Diego Beuk"
+                duration={0.4}
+                animationMode="evenodd"
+                triggerOnHover
+                triggerOnce={false}
+                threshold={0}
+                rootMargin="0px"
+              />
 
               {/* Title */}
-              <p style={{ margin: '0', fontSize: '1.125rem', color: '#4b5563' }}>
-                I'm a Full Stack AI Developer
-              </p>
+              <Shuffle
+                tag="p"
+                style={{ margin: '0', fontSize: '1.125rem', color: '#4b5563' }}
+                text="I'm a Full Stack AI Developer"
+                duration={0.4}
+                animationMode="evenodd"
+                triggerOnHover
+                triggerOnce={false}
+                threshold={0}
+                rootMargin="0px"
+              />
 
               {/* Social Icons */}
               <div style={{ 
