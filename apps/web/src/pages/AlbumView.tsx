@@ -9,6 +9,7 @@ import { fetchWeatherApi } from 'openmeteo';
 import PlayerBar from '../components/player/PlayerBar';
 import { useAudioStore } from '../stores/audioStore';
 import TrackPage, { RAINBOW_COLORS } from '../components/tracks/TrackPage';
+import ProjectCarousel, { type Project } from '../components/projects/ProjectCarousel';
 
 interface WeatherData {
   time: Date;
@@ -135,10 +136,12 @@ const getTrackContent = (trackId: TrackId): ReactNode => {
                   style={{
                     color: '#000',
                     transition: 'opacity 0.2s',
-                    textDecoration: 'none'
+                    textDecoration: 'none',
+                    outline: 'none'
                   }}
                   onMouseEnter={(e) => e.currentTarget.style.opacity = '0.7'}
                   onMouseLeave={(e) => e.currentTarget.style.opacity = '1'}
+                  onFocus={(e) => e.currentTarget.style.outline = 'none'}
                   aria-label="Diego Beuk LinkedIn profile"
                 >
                   <FaLinkedin size={24} />
@@ -150,10 +153,12 @@ const getTrackContent = (trackId: TrackId): ReactNode => {
                   style={{
                     color: '#000',
                     transition: 'opacity 0.2s',
-                    textDecoration: 'none'
+                    textDecoration: 'none',
+                    outline: 'none'
                   }}
                   onMouseEnter={(e) => e.currentTarget.style.opacity = '0.7'}
                   onMouseLeave={(e) => e.currentTarget.style.opacity = '1'}
+                  onFocus={(e) => e.currentTarget.style.outline = 'none'}
                   aria-label="Diego Beuk Github profile"
                 >
                   <FaGithub size={24} />
@@ -242,15 +247,13 @@ const getTrackContent = (trackId: TrackId): ReactNode => {
           <li>
             <strong>Relevant Coursework:</strong>
             <ul style={{ paddingLeft: '1.2rem', marginTop: '0.3rem', marginBottom: '0.3rem', listStyleType: 'circle' }}>
-              <li>Web Fundamentals</li>
-              <li>Algorithms & Data Structures</li>
-              <li>Computer Systems & Security</li>
-              <li>Databases</li>
-              <li>Cloud Computing</li>
-              <li>Mobile App Development</li>
-              <li>IT Project Management</li>
+              <li>Algorithms & Programming | Software Engineering & Architecture</li>
+              <li>Systems Development | Mobile & Web App Development</li>
+              <li>Databases & Advanced Database Design | Cybersecurity & Software Security</li>
+              <li>Computer Systems & Networks | IT Project Management</li>
             </ul>
           </li>
+    
           <li>
             <strong>Honours & Awards:</strong>
             <ul style={{ paddingLeft: '1.2rem', marginTop: '0.3rem', marginBottom: '0.3rem', listStyleType: 'circle' }}>
@@ -300,69 +303,199 @@ const getTrackContent = (trackId: TrackId): ReactNode => {
     case 'workExperience':
       return (
         <div style={{...contentStyle, textAlign: 'left'}}>
-          <h2>Professional Journey</h2>
-          <p>
-            My work experience has been a journey of growth, collaboration, and impact. 
-            Each role has contributed to my development as a software engineer and team member.
+          
+
+          {/* Coles Group */}
+      <section style={{ marginBottom: '2rem' }}>
+        {/* Title row: left + right */}
+        <div style={{ display: 'flex', justifyContent: 'space-between' }}>
+          <h3>Coles Group</h3>
+          <h3>Melbourne, Australia</h3>
+        </div>
+
+        {/* Position + Date row */}
+        <div style={{ display: 'flex', justifyContent: 'space-between' }}>
+          <p style={{ margin: '0.2rem 0' }}>
+            <strong>IT Infrastructure Project Management Intern</strong>
           </p>
-          <p>
-            Through various projects and challenges, I've learned to balance technical excellence 
-            with business objectives, working closely with cross-functional teams to deliver 
-            solutions that make a real difference.
+          <p style={{ margin: '0.2rem 0' }}><strong>January 2025 – June 2025</strong></p>
+        </div>
+
+        <ul style={{ paddingLeft: '1.2rem', marginTop: '0.8rem' }}>
+          <li>Led data analysis for the Lifecycle Cost Management Project, assessing over 12,000 devices to inform multi-year financial strategies for four business units.</li>
+          <li>Developed a dynamic Python-based cost estimation model for IT hardware procurement across the Ocado CFC portfolio, improving forecasting accuracy and reducing manual tracking effort for +200 purchase orders.</li>
+          <li>Streamlined Agile workflows using Confluence and Jira, while delivering IT governance and technical reports to senior leadership, strengthening project compliance and alignment with organisational objectives.</li>
+          <li><strong>Technologies:</strong> Python, Excel, Jira, Confluence, SharePoint, Infrastructure (Lifecycle, Governance, Network)</li>
+        </ul>
+      </section>
+
+
+
+      <section style={{ marginBottom: '2rem' }}>
+        {/* Title row: left + right */}
+        <div style={{ display: 'flex', justifyContent: 'space-between' }}>
+          <h3>RMIT University</h3>
+          <h3>Melbourne, Australia</h3>
+        </div>
+
+        {/* Position + Date row */}
+        <div style={{ display: 'flex', justifyContent: 'space-between' }}>
+          <p style={{ margin: '0.2rem 0' }}>
+            <strong>Research Assistant</strong>
           </p>
-          <h3>Career Highlights</h3>
-          <p>
-            From building robust backend systems to creating intuitive user interfaces, 
-            my professional experience spans the full stack of modern software development. 
-            I've had the opportunity to work with cutting-edge technologies and contribute 
-            to products used by thousands of users.
+          <p style={{ margin: '0.2rem 0' }}><strong>July 2024 – September 2024</strong></p>
+        </div>
+
+        <ul style={{ paddingLeft: '1.2rem', marginTop: '0.8rem' }}>
+          <li>Conducted a systematic literature review on indoor localisation, evaluating multi-sensor fusion methods (barometric pressure, Wi-Fi, and GPS) for real-world deployment.</li>
+          <li>Built an Android application prototype to determine user floor levels via multi-sensor integration.</li>
+          <li>Executed experiments integrating real-time weather station data for sensor calibration, enhancing global scalability and robustness of altitude-based floor estimation.</li>
+          <li><strong>Technologies:</strong> Android Studio, Java, Figma, Wi-Fi/GPS sensor APIs</li>
+        </ul>
+      </section>
+
+
+
+      <section style={{ marginBottom: '2rem' }}>
+        {/* Title row: left + right */}
+        <div style={{ display: 'flex', justifyContent: 'space-between' }}>
+          <h3>RMIT University</h3>
+          <h3>Melbourne, Australia</h3>
+        </div>
+
+        {/* Position + Date row */}
+        <div style={{ display: 'flex', justifyContent: 'space-between' }}>
+          <p style={{ margin: '0.2rem 0' }}>
+            <strong>Research Assistant</strong>
           </p>
+          <p style={{ margin: '0.2rem 0' }}><strong>September 2023 – November 2023</strong></p>
+        </div>
+
+        <ul style={{ paddingLeft: '1.2rem', marginTop: '0.8rem' }}>
+          <li>Designed and developed an AR wayfinding app, integrating live geospatial, visual, and graph-based data for seamless indoor-outdoor localisation.</li>
+          <li>Implemented a dynamic routing system using Google Street View, Geospatial API, and Neo4j for an immersive real-time graph-based navigation and immersive 3D visualisation solution.</li>
+          <li>Collaborated with Google and The GPT Group stakeholders, leading user requirement gathering, usability testing, and presenting findings to refine the system.</li>
+          <li><strong>Technologies:</strong> Android Studio, Java, Unity, Cesium 3D Tiles, Neo4j, Google APIs</li>
+        </ul>
+      </section>
         </div>
       );
 
     case 'projects':
+      const projects: Project[] = [
+        {
+          id: 'project-1',
+          title: 'Terminal-style AI Agent Career Chatbot',
+          description: "Built a terminal-style web interface featuring an AI-powered career assistant used to intelligently answer career-related questions about an individual's background, experience, and skills.",
+          image: '/images/project/chatbot-assistant.png',
+          githubUrl: 'https://github.com/dbeukrf/diego-chatbot',
+          technologies: [
+            '/images/project/react-typescript.png',
+            '/images/project/python.png',
+            '/images/project/fast-api.png',
+            '/images/project/langchain.svg',
+            '/images/project/chromadb.png',
+          ],
+        },
+        {
+          id: 'project-2',
+          title: 'ChatGPT-like LLM from Scratch',
+          description: "A LLM similar to the GPT-2 model built from scratch in PyTorch, based on Sebastian Raschka's \"Build a Large Language Model (From Scratch)\"",
+          image: '/images/project/llm-from-scratch.png',
+          githubUrl: 'https://github.com/dbeukrf/diego-llm',
+          technologies: [
+            '/images/project/python.png',
+            '/images/project/pytorch.png',
+            '/images/project/numpy.png',
+          ],
+        },
+        {
+          id: 'project-3',
+          title: 'Multi-Sensor Indoor Floor Detection App',
+          description: 'Developed an Android application prototype that determines user\'s floor levels by combining barometric pressure, Wi-Fi signals, GPS, and real-time weather-station data, enhancing both accuracy and global scalability.',
+          image: '/images/project/indoor-wayfinding.png',
+          githubUrl: 'https://github.com/dbeukrf/IndoorLocalization',
+          technologies: [
+            '/images/project/android-studio.png',
+            '/images/project/java.svg',
+          ],
+        },
+        {
+          id: 'project-4',
+          title: 'AR-Based Wayfinding App with Gamification',
+          description: 'Developed a prototype AR navigation system integrating Geospatial Anchors, Google Street View data, and Neo4j graph-based pathfinding to enable seamless indoor-outdoor navigation.',
+          image: '/images/project/ar-wayfinding.png',
+          githubUrl: 'https://github.com/dbeukrf/AR-Wayfinding',
+          technologies: [
+            '/images/project/android-studio.png',
+            '/images/project/java.svg',
+            '/images/project/neo4j.png',
+            '/images/project/unity.svg',
+            '/images/project/cesium-3d.avif',
+          ],
+        },
+      ];
+
       return (
-        <div style={{...contentStyle, textAlign: 'left'}}>
-          <h2>Creative Projects</h2>
-          <p>
-            Beyond my professional work, I'm passionate about building projects that solve 
-            real problems and explore new technologies. These side projects represent my 
-            curiosity, creativity, and commitment to continuous learning.
-          </p>
-          <p>
-            Each project is an opportunity to experiment, learn, and push the boundaries 
-            of what's possible. From web applications to mobile apps, I enjoy the entire 
-            process of bringing ideas to life.
-          </p>
-          <h3>Project Philosophy</h3>
-          <p>
-            I believe in building projects that are not just technically impressive, but 
-            also meaningful and useful. Whether it's a tool that simplifies a workflow 
-            or an app that brings joy to users, I aim to create something that matters.
-          </p>
+        <div style={{
+          ...contentStyle, 
+          textAlign: 'left', 
+          marginTop: '-5rem',
+          marginBottom: 0
+        }}>
+          <ProjectCarousel projects={projects} />
         </div>
       );
 
     case 'skillsLanguages':
       return (
         <div style={{...contentStyle, textAlign: 'left'}}>
-          <h2>Technical Skills & Languages</h2>
-          <p>
-            My technical toolkit spans multiple programming languages, frameworks, and tools. 
-            I'm comfortable working across the entire software development lifecycle, from 
-            initial design to deployment and maintenance.
-          </p>
-          <p>
-            While I have deep expertise in certain technologies, I'm always eager to learn 
-            new tools and approaches. The tech landscape evolves rapidly, and I believe in 
-            staying current with industry best practices and emerging technologies.
-          </p>
-          <h3>Language Proficiency</h3>
-          <p>
-            Beyond programming languages, I'm also multilingual, which has helped me 
-            collaborate effectively with diverse teams and understand different perspectives 
-            in our global tech community.
-          </p>
+          
+
+          {/* Technical Skills */}
+      <section style={{ marginBottom: '2rem' }}>
+        <h3 style={{ marginBottom: '0.8rem' }}>Technical Skills</h3>
+
+        <ul style={{ paddingLeft: '1.2rem', marginTop: '0.8rem' }}>
+          <li>
+            <strong>Languages:</strong> Python, Java, JavaScript/TypeScript, SQL, HTML, CSS, PHP
+          </li>
+          <li>
+            <strong>AI/ML & Data:</strong> FastAPI, Agno, LangChain, Google ADK, n8n, FastGPT, BMAD, PostgreSQL, MongoDB, Chroma DB, Neo4j
+          </li>
+          <li>
+            <strong>Frameworks/Tools:</strong> React, Vite, Android Studio, Unity, Jira, Trello, Confluence, Figma
+          </li>
+          <li>
+            <strong>Cloud & DevOps:</strong> GCP (Vertex AI), Firebase, AWS, Docker, Git, pnpm, Ubuntu/Linux
+          </li>
+        </ul>
+      </section>
+
+
+
+      <section style={{ marginBottom: '2rem' }}>
+        <h3 style={{ marginBottom: '0.8rem' }}>Professional Skills</h3>
+
+        <ul style={{ paddingLeft: '1.2rem', marginTop: '0.8rem' }}>
+          <li>
+            <strong>Project Management & Analysis:</strong> Agile/Scrum, Project Coordination, Stakeholder Communication, IT Governance, Data Analysis
+          </li>
+          <li>
+            <strong>Software Development:</strong> Full-Stack Development, System Architecture Design, Test Automations, AI Agents & RAG Workflows
+          </li>
+        </ul>
+      </section>
+
+
+
+      <section style={{ marginBottom: '2rem' }}>
+        <h3 style={{ marginBottom: '0.8rem' }}>Languages Spoken</h3>
+
+        <ul style={{ paddingLeft: '1.2rem', marginTop: '0.8rem' }}>
+          <li>English (Native); Portuguese (Advanced); Spanish (Advanced); French (Intermediate)</li>
+        </ul>
+      </section>
         </div>
       );
 
@@ -1375,7 +1508,7 @@ export default function AlbumView() {
               href="https://www.linkedin.com/in/diego-beuk-8a9100288/"
               target="_blank"
               rel="noopener noreferrer"
-              className="hover:text-primary-500 transition-colors focus:outline-none focus:ring-2 focus:ring-primary-500 rounded flex-shrink-0"
+              className="hover:text-primary-500 transition-colors focus:outline-none rounded flex-shrink-0"
               aria-label="Diego Beuk LinkedIn profile"
             >
               <FaLinkedin className="w-3 h-3 sm:w-[14px] sm:h-[14px] md:w-4 md:h-4 lg:w-[18px] lg:h-[18px]" color="white" />
@@ -1384,7 +1517,7 @@ export default function AlbumView() {
               href="https://github.com/dbeukrf"
               target="_blank"
               rel="noopener noreferrer"
-              className="hover:text-primary-500 transition-colors focus:outline-none focus:ring-2 focus:ring-primary-500 rounded flex-shrink-0"
+              className="hover:text-primary-500 transition-colors focus:outline-none rounded flex-shrink-0"
               aria-label="Diego Beuk Github profile"
             >
               <FaGithub className="w-3 h-3 sm:w-[14px] sm:h-[14px] md:w-4 md:h-4 lg:w-[18px] lg:h-[18px]" color="white" />
