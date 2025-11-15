@@ -250,81 +250,271 @@ const getTrackContent = (trackId: TrackId): ReactNode => {
 
     case 'education':
       return (
-        <div style={{...contentStyle, textAlign: 'left'}}>
+        <div style={{ ...contentStyle, textAlign: 'left', width: '100%' }}>
+          <style>{`
+            .education-section {
+              padding: 0.5rem 0;
+            }
+            .education-container {
+              display: flex;
+              flex-direction: column;
+              gap: 1rem;
+            }
+            .education-image-container {
+              width: 100%;
+              max-width: 300px;
+              order: 1;
+            }
+            .education-image-only {
+              order: 1;
+            }
+            .education-major-info {
+              order: 4;
+              display: block;
+            }
+            .education-major-info-desktop {
+              display: none;
+            }
+            .education-content {
+              flex: 1;
+              order: 2;
+            }
+            .education-degree-title {
+              order: 2;
+            }
+            .education-degree-date {
+              order: 3;
+            }
+            .education-h3 {
+              font-size: 1.125rem;
+              line-height: 1.4;
+              font-weight: 600;
+              margin: 0;
+            }
+            .education-p {
+              font-size: 0.875rem;
+              line-height: 1.5;
+              margin: 0.2rem 0;
+            }
+            .education-strong {
+              font-size: 0.875rem;
+              font-weight: 600;
+            }
+            .education-li {
+              font-size: 0.875rem;
+              line-height: 1.5;
+            }
+            .education-ul-nested {
+              font-size: 0.8125rem;
+            }
+            .education-major-p {
+              font-size: 0.875rem;
+              line-height: 1.5;
+            }
+            
+            @media (min-width: 640px) {
+              .education-section {
+                padding: 0.75rem 0;
+              }
+              .education-container {
+                flex-direction: row;
+                gap: 1.5rem;
+              }
+              .education-image-container {
+                width: 250px;
+                max-width: none;
+                order: 1;
+              }
+              .education-image-only {
+                order: 1;
+              }
+              .education-major-info {
+                display: none;
+              }
+              .education-major-info-desktop {
+                display: block;
+              }
+              .education-content {
+                order: 2;
+              }
+              .education-degree-title {
+                order: 0;
+              }
+              .education-degree-date {
+                order: 0;
+              }
+              .education-h3 {
+                font-size: 1.25rem;
+              }
+              .education-p {
+                font-size: 0.9375rem;
+              }
+              .education-strong {
+                font-size: 0.9375rem;
+              }
+              .education-li {
+                font-size: 0.9375rem;
+              }
+              .education-ul-nested {
+                font-size: 0.875rem;
+              }
+              .education-major-p {
+                font-size: 0.9375rem;
+              }
+            }
+            
+            @media (min-width: 768px) {
+              .education-section {
+                padding: 1rem 0;
+              }
+              .education-container {
+                gap: 2rem;
+              }
+              .education-image-container {
+                width: 300px;
+              }
+              .education-h3 {
+                font-size: 1.5rem;
+              }
+              .education-p {
+                font-size: 1rem;
+              }
+              .education-strong {
+                font-size: 1rem;
+              }
+              .education-li {
+                font-size: 1rem;
+              }
+              .education-ul-nested {
+                font-size: 0.9375rem;
+              }
+              .education-major-p {
+                font-size: 1rem;
+              }
+            }
+          `}</style>
           
+          {/* === Monash University === */}
+          <section className="education-section" style={{ borderBottom: '1px solid #A4A4A4' }}>
+            <div className="education-container">
+              
+              {/* LEFT — Institution Image */}
+              <div className="education-image-container" style={{ flexShrink: 0 }}>
+                <img 
+                  src="/images/education/monash.svg" 
+                  alt="Monash University" 
+                  style={{ width: '100%', height: 'auto', borderRadius: '4px' }} 
+                />
+                {/* Major and Minor below image - desktop only */}
+                <div className="education-major-info-desktop" style={{ paddingTop: '0.8rem' }}>
+                  <p className="education-major-p" style={{ marginTop: '0', marginBottom: 0, paddingLeft: '1.2rem' }}>
+                    <strong>Major:</strong> Software Development<br/>
+                    <strong>Minor:</strong> Cybersecurity<br/>
+                    <strong>GPA:</strong> 3.81/4.0
+                  </p>
+                </div>
+              </div>
+      
+              {/* RIGHT — Text Content */}
+              <div className="education-content">
+                {/* Title row with location on the right */}
+                <div className="education-degree-title" style={{ display: 'flex', justifyContent: 'flex-end' }}>
+                  <h3 className="education-h3">Bachelor of Information Technology</h3>
+                </div>
+      
+                {/* Degree row */}
+                <div className="education-degree-date" style={{ display: 'flex', justifyContent: 'flex-end' }}>
+                  <p className="education-p"><strong>September 2025</strong></p>
+                </div>
+      
+                {/* Major and Minor - separate for mobile ordering */}
+                <div className="education-major-info" style={{ paddingLeft: '1.2rem' }}>
+                  <p className="education-major-p" style={{ marginTop: '0.8rem', marginBottom: 0 }}>
+                    <strong>Major:</strong> Software Development<br/>
+                    <strong>Minor:</strong> Cybersecurity<br/>
+                    <strong>GPA:</strong> 3.81/4.0
+                  </p>
+                </div>
+      
+                {/* Body content */}
+                <ul style={{ paddingLeft: '1.2rem', marginTop: '0.8rem', listStyle: 'none' }}>      
+                  {/* Relevant Coursework */}
+                  <li className="education-li" style={{ marginBottom: '0.5rem' }}>
+                    <strong className="education-strong">Relevant Coursework:</strong>
+                    <ul className="education-ul-nested" style={{ paddingLeft: '1.2rem', marginTop: '0.3rem', marginBottom: '0.3rem', listStyleType: 'circle' }}>
+                      <li>Algorithms & Programming | Software Engineering & Architecture</li>
+                      <li>Systems Development | Mobile & Web App Development</li>
+                      <li>Databases & Advanced Database Design | Cybersecurity & Software Security</li>
+                      <li>Computer Systems & Networks | IT Project Management</li>
+                    </ul>
+                  </li>
+      
+                  {/* Honours & Awards */}
+                  <li className="education-li">
+                    <strong className="education-strong">Honours & Awards:</strong>
+                    <ul className="education-ul-nested" style={{ paddingLeft: '1.2rem', marginTop: '0.3rem', marginBottom: '0.3rem', listStyleType: 'circle' }}>
+                      <li>Top Student University Commendation (Semester 1, 2024)</li>
+                      <li>Industry-Based Learning Placement Scholarship</li>
+                    </ul>
+                  </li>
+                </ul>
+              </div>
+            </div>
+          </section>
 
-          {/* Monash University */}
-      <section style={{ marginBottom: '2rem' }}>
-        {/* Title row: left + right */}
-        <div style={{ display: 'flex', justifyContent: 'space-between' }}>
-          <h3>Monash University</h3>
-          <h3>Melbourne, Australia</h3>
-        </div>
-
-        {/* Degree + GPA row */}
-        <div style={{ display: 'flex', justifyContent: 'space-between' }}>
-          <p style={{ margin: '0.2rem 0' }}>
-            <strong>Bachelor of Information Technology</strong>
-          </p>
-          <p style={{ margin: '0.2rem 0' }}><strong>September 2025</strong></p>
-        </div>
-
-        <ul style={{ paddingLeft: '1.2rem', marginTop: '0.8rem' }}>
-          <li><strong>Major:</strong> Software Development | <strong>Minor:</strong> Cybersecurity</li>
-          <li><strong>GPA:</strong> 3.81/4.0</li>
-          <li>
-            <strong>Relevant Coursework:</strong>
-            <ul style={{ paddingLeft: '1.2rem', marginTop: '0.3rem', marginBottom: '0.3rem', listStyleType: 'circle' }}>
-              <li>Algorithms & Programming | Software Engineering & Architecture</li>
-              <li>Systems Development | Mobile & Web App Development</li>
-              <li>Databases & Advanced Database Design | Cybersecurity & Software Security</li>
-              <li>Computer Systems & Networks | IT Project Management</li>
-            </ul>
-          </li>
-    
-          <li>
-            <strong>Honours & Awards:</strong>
-            <ul style={{ paddingLeft: '1.2rem', marginTop: '0.3rem', marginBottom: '0.3rem', listStyleType: 'circle' }}>
-              <li>Top Student University Commendation (Semester 1, 2024)</li>
-              <li>Industry-Based Learning Placement Scholarship</li>
-            </ul>
-          </li>
-        </ul>
-      </section>
-
-
-
-      <section style={{ marginBottom: '2rem' }}>
-        {/* Title row: left + right */}
-        <div style={{ display: 'flex', justifyContent: 'space-between' }}>
-          <h3>Yonsei University</h3>
-          <h3>Seoul, South Korea</h3>
-        </div>
-
-        {/* Degree + GPA row */}
-        <div style={{ display: 'flex', justifyContent: 'space-between' }}>
-          <p style={{ margin: '0.2rem 0' }}>
-            <strong>College of Computing, Exchange Program</strong>
-          </p>
-          <p style={{ margin: '0.2rem 0' }}><strong>Fall Semester 2024</strong></p>
-        </div>
-
-        <ul style={{ paddingLeft: '1.2rem', marginTop: '0.8rem' }}>
-          <li>
-            <strong>Scholarship Award:</strong> Destination Australia Cheung Kong Exchange Program
-          </li>
-          <li>
-            <strong>GPA:</strong> 4.08/4.3
-          </li>
-          <li>
-            <strong>Activities & Societies:</strong>
-            <ul style={{ paddingLeft: '1.2rem', marginTop: '0.3rem', marginBottom: '0.3rem', listStyleType: 'circle' }}>
-              <li>Mentors Club</li>
-              <li>Yonsei English Society (YES)</li>
-            </ul>
-          </li>
-        </ul>
-      </section>
+          {/* === Yonsei University === */}
+          <section className="education-section">
+            <div className="education-container">
+              
+              {/* LEFT — Institution Image */}
+              <div className="education-image-container" style={{ flexShrink: 0 }}>
+                <img 
+                  src="/images/education/yonsei.png" 
+                  alt="Yonsei University" 
+                  style={{ width: '100%', height: 'auto', borderRadius: '4px' }} 
+                />
+                {/* GPA below image - desktop only */}
+                <div className="education-major-info-desktop" style={{ paddingTop: '0.8rem' }}>
+                  <p className="education-major-p" style={{ marginTop: '0', marginBottom: 0, paddingLeft: '1.2rem' }}>
+                    <strong>GPA:</strong> 4.08/4.3
+                  </p>
+                </div>
+              </div>
+      
+              {/* RIGHT — Text Content */}
+              <div className="education-content">
+                {/* Title row with location on the right */}
+                <div className="education-degree-title" style={{ display: 'flex', justifyContent: 'flex-end', flexWrap: 'wrap', gap: '0.5rem' }}>
+                  <h3 className="education-h3">College of Computing, Study Abroad</h3>
+                </div>
+      
+                {/* Degree row */}
+                <div className="education-degree-date" style={{ display: 'flex', justifyContent: 'flex-end', flexWrap: 'wrap', gap: '0.5rem' }}>
+                  <p className="education-p"><strong>Fall Semester 2024</strong></p>
+                </div>
+      
+                {/* Body content */}
+                <ul style={{ paddingLeft: '1.2rem', marginTop: '0.8rem', listStyle: 'none' }}>
+                  {/* Scholarship Award */}
+                  <li className="education-li" style={{ marginBottom: '0.5rem' }}>
+                    <strong className="education-strong">Scholarship Award:</strong>
+                    <ul className="education-ul-nested" style={{ paddingLeft: '1.2rem', marginTop: '0.3rem', marginBottom: '0.3rem', listStyleType: 'circle' }}>
+                      <li>Destination Australia Cheung Kong Exchange Program</li>
+                    </ul>
+                  </li>
+      
+                  {/* Activities & Societies */}
+                  <li className="education-li">
+                    <strong className="education-strong">Activities & Societies:</strong>
+                    <ul className="education-ul-nested" style={{ paddingLeft: '1.2rem', marginTop: '0.3rem', marginBottom: '0.3rem', listStyleType: 'circle' }}>
+                      <li>Mentors Club</li>
+                      <li>Yonsei English Society (YES)</li>
+                    </ul>
+                  </li>
+                </ul>
+              </div>
+            </div>
+          </section>
         </div>
       );
 

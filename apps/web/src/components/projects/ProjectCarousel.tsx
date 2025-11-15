@@ -178,7 +178,7 @@ export default function ProjectCarousel({ projects }: ProjectCarouselProps) {
       style={{
         width: '100%',
         position: 'relative',
-        padding: '0 0 1rem 0',
+        padding: '1.5rem 0 1.5rem 0',
         overflow: 'hidden',
         minHeight: '800px',
       }}
