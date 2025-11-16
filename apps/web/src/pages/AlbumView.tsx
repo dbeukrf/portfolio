@@ -654,13 +654,12 @@ const getTrackContent = (trackId: TrackId): ReactNode => {
       return (
         <div style={{...contentStyle, textAlign: 'left', width: '100%', height: '100%'}}>
           {/* Skills Force Layout */}
-          <div style={{ 
-            width: '100%', 
-            height: '900px', 
-            backgroundColor: 'transparent',
-            marginTop: '2.5rem',
-            marginBottom: '2rem'
-          }}>
+          <div 
+            className="w-full bg-transparent mb-8 mt-12 sm:mt-10 min-h-[400px] sm:min-h-[400px]"
+            style={{ 
+              height: 'auto',
+            }}
+          >
             <SkillsForceLayout skills={skillsData} width={1400} height={900} />
           </div>
         </div>
