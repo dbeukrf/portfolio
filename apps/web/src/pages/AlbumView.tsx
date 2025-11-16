@@ -667,23 +667,13 @@ const getTrackContent = (trackId: TrackId): ReactNode => {
 
     case 'aiDj':
       return (
-        <div style={{...contentStyle, textAlign: 'left'}}>
-          <h2>AI DJ Experience</h2>
-          <p>
-            The AI DJ represents the intersection of technology and creativity. This interactive 
-            experience allows you to explore my portfolio in a conversational way, diving deeper 
-            into any aspect that interests you.
+        <div style={{...contentStyle, textAlign: 'center'}} className="!text-center">
+          <p style={{ paddingTop: '6rem', marginBottom: '3rem', textAlign: 'center' }} className="!text-center">
+            The AI DJ is an interactive experience that allows you to explore my portfolio in a conversational way,
+            diving deeper into any aspect that interests you.
           </p>
-          <p>
-            Powered by advanced AI, the chatbot can answer questions about my background, 
-            discuss specific projects in detail, and help you understand how my experience 
-            might align with your needs or interests.
-          </p>
-          <h3>Interactive Exploration</h3>
-          <p>
-            Feel free to ask about anything—from technical details about specific projects 
-            to my approach to problem-solving. The AI DJ is here to make your exploration 
-            of my portfolio more engaging and personalized.
+          <p style={{ textAlign: 'center' }} className="!text-center">
+            Continue scrolling to discover the terminal-style chatbot.
           </p>
         </div>
       );

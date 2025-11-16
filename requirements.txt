@@ -3,7 +3,7 @@
 
 # FastAPI and ASGI Server
 fastapi==0.119.0
-uvicorn==0.37.0
+uvicorn[standard]==0.37.0
 starlette==0.48.0
 
 # HTTP Clients
@@ -25,6 +25,18 @@ python-dotenv==1.1.1
 # File Upload Support
 python-multipart==0.0.20
 
+# Core LangChain dependencies
+langchain
+langchain-core
+langchain-community
+langchain-openai
+langchain-chroma
+
+# Document processing
+pypdf
+pymupdf
+python-docx
+
 # Weather API
 openmeteo-requests==1.2.0
 
@@ -45,4 +57,5 @@ Pygments==2.19.2
 packaging==25.0
 pluggy==1.6.0
 iniconfig==2.1.0
+aiofiles
 
