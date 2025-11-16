@@ -703,7 +703,6 @@ export default function AlbumView() {
   const [currentTrackProgress, setCurrentTrackProgress] = useState(0);
   const [playerBarVisible, setPlayerBarVisible] = useState(false);
   const [gradientColorIndex, setGradientColorIndex] = useState(0);
-  const [chatbotProgress, setChatbotProgress] = useState(0);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   
   // Location state
@@ -854,7 +853,6 @@ export default function AlbumView() {
   const maxRevealReachedRef = useRef(0);
   const trackSectionRefs = useRef<(HTMLDivElement | null)[]>([]);
   const trackTitleRefs = useRef<(HTMLElement | null)[]>([]);
-  const chatbotSectionRef = useRef<HTMLDivElement>(null);
 
   // Compute hero height
   useEffect(() => {
@@ -1304,9 +1302,6 @@ export default function AlbumView() {
       const maxContentScroll = contentScrollMax - vh - revealDistance;
       const shrinkDistance = Math.min(maxContentScroll * 0.1, revealDistance * 0.3);
       
-      const chatbotRect = chatbotSectionRef.current ? chatbotSectionRef.current.getBoundingClientRect() : null;
-      const isNearChatbot = chatbotRect && chatbotRect.top < vh * 1.5;
-      
       if (scrollTop < revealDistance) {
         const scrollBasedReveal = Math.max(0, Math.min(1, scrollTop / revealDistance));
         
@@ -1332,9 +1327,6 @@ export default function AlbumView() {
             setManualRevealProgress(scrollBasedReveal);
           }
         }
-      } else if (isNearChatbot) {
-        const chatbotProgress = chatbotRect ? clamp(1 - (chatbotRect.top / vh), 0, 1) : 0;
-        reveal = Math.max(0, 1 - chatbotProgress);
       } else {
         const contentScroll = scrollTop - revealDistance;
         const currentScrollProgress = maxContentScroll > 0 
@@ -1367,28 +1359,12 @@ export default function AlbumView() {
       
       if (rafId === null) {
         rafId = requestAnimationFrame(() => {
-          let adjustedReveal = reveal;
-          let nextChatbotProgress = 0;
-
-          if (chatbotSectionRef.current) {
-            const rect = chatbotSectionRef.current.getBoundingClientRect();
-            const viewportY = viewportHeight || vh;
-            if (viewportY > 0) {
-              const progress = clamp(1 - (rect.top / viewportY), 0, 1);
-              nextChatbotProgress = progress;
-              if (progress > 0) {
-                adjustedReveal = Math.max(0, 1 - progress);
-              }
-            }
-          }
-
-          setClipPathReveal(adjustedReveal);
-          setChatbotProgress(nextChatbotProgress);
+          setClipPathReveal(reveal);
           
-          prevRevealRef.current = adjustedReveal;
+          prevRevealRef.current = reveal;
           
-          if (adjustedReveal > maxRevealReachedRef.current) {
-            maxRevealReachedRef.current = adjustedReveal;
+          if (reveal > maxRevealReachedRef.current) {
+            maxRevealReachedRef.current = reveal;
           }
           
           if (scrollTop === 0) {
@@ -1823,17 +1799,6 @@ export default function AlbumView() {
 
       <div className="relative w-full">
         <div
-          className="fixed inset-0 pointer-events-none"
-          aria-hidden="true"
-          style={{
-            zIndex: 45,
-            opacity: chatbotProgress,
-            transition: 'opacity 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
-            background: 'radial-gradient(circle at center, #172554 0%, #0b1120 55%, #020617 100%)'
-          }}
-        />
-
-        <div
           className="fixed inset-0"
           style={{
             top: 0,
@@ -1863,87 +1828,34 @@ export default function AlbumView() {
             fontSize: 0
           }}
         >
-          <div
-            style={{
-              opacity: Math.max(0, 1 - chatbotProgress),
-              transition: 'opacity 0.4s cubic-bezier(0.4, 0, 0.2, 1)',
-              pointerEvents: chatbotProgress >= 0.9 ? 'none' : 'auto'
-            }}
-          >
-            {TRACKS.map((track, index) => (
-              <div 
-                key={track.id}
-                data-track-index={index}
-                ref={(el) => {
-                  trackSectionRefs.current[index] = el;
-                }}
-                className="w-full m-0 p-0"
-                style={{ 
-                  backgroundColor: '#F5F5F5', 
-                  margin: 0, 
-                  padding: 0,
-                  minHeight: '100vh',
-                  display: 'block',
-                  fontSize: '16px'
-                }}
-              >
-                <TrackPage
-                  title={track.title}
-                  trackNumber={track.number}
-                  gradientColorIndex={gradientColorIndex}
-                  content={getTrackContent(track.id)}
-                  className="w-full h-full min-h-screen bg-[#F5F5F5]"
-                  headerClassName="bg-[#F5F5F5]"
-                  contentClassName="bg-[#F5F5F5]"
-                />
-              </div>
-            ))}
-          </div>
-          <div
-            ref={chatbotSectionRef}
-            className="w-full min-h-screen flex flex-col items-center justify-center px-6 py-16"
-            style={{
-              backgroundColor: 'transparent',
-              color: '#F5F5F5',
-              opacity: chatbotProgress,
-              transition: 'opacity 0.4s cubic-bezier(0.4, 0, 0.2, 1)',
-              pointerEvents: chatbotProgress > 0.05 ? 'auto' : 'none'
-            }}
-          >
-            <div className="max-w-3xl w-full text-center space-y-6">
-              <div className="space-y-2">
-                <p className="text-xs uppercase tracking-[0.3em] text-slate-400">AI DJ</p>
-                <h2 className="text-3xl md:text-4xl font-extrabold text-slate-100">
-                  Meet the Chatbot Conductor
-                </h2>
-                <p className="text-base md:text-lg text-slate-300 max-w-2xl mx-auto">
-                  This conversational guide can dive deeper into any track, share behind-the-scenes stories,
-                  or help you explore Diego&rsquo;s work in a more interactive way. Scroll up to return to Track 6
-                  or stay here to connect with the AI DJ.
-                </p>
-              </div>
-              <div className="grid gap-4 grid-cols-1 md:grid-cols-2">
-                <div className="rounded-2xl border border-slate-700/60 bg-slate-900/40 p-6 shadow-lg backdrop-blur">
-                  <h3 className="text-lg font-semibold text-slate-100 mb-2">Ask About the Tracks</h3>
-                  <p className="text-sm text-slate-300">
-                    Curious about a specific achievement or project? The chatbot can surface highlights tailored to your questions.
-                  </p>
-                </div>
-                <div className="rounded-2xl border border-slate-700/60 bg-slate-900/40 p-6 shadow-lg backdrop-blur">
-                  <h3 className="text-lg font-semibold text-slate-100 mb-2">Plan Your Collaboration</h3>
-                  <p className="text-sm text-slate-300">
-                    Explore how Diego&rsquo;s experience aligns with your goals, gather resources, and get connected right away.
-                  </p>
-                </div>
-              </div>
-              <button
-                type="button"
-                className="inline-flex items-center justify-center px-6 py-3 rounded-full bg-orange-500/90 hover:bg-orange-400 text-slate-950 font-semibold shadow-md transition duration-200"
-              >
-                Launch Chatbot
-              </button>
+          {TRACKS.map((track, index) => (
+            <div 
+              key={track.id}
+              data-track-index={index}
+              ref={(el) => {
+                trackSectionRefs.current[index] = el;
+              }}
+              className="w-full m-0 p-0"
+              style={{ 
+                backgroundColor: '#F5F5F5', 
+                margin: 0, 
+                padding: 0,
+                minHeight: '100vh',
+                display: 'block',
+                fontSize: '16px'
+              }}
+            >
+              <TrackPage
+                title={track.title}
+                trackNumber={track.number}
+                gradientColorIndex={gradientColorIndex}
+                content={getTrackContent(track.id)}
+                className="w-full h-full min-h-screen bg-[#F5F5F5]"
+                headerClassName="bg-[#F5F5F5]"
+                contentClassName="bg-[#F5F5F5]"
+              />
             </div>
-          </div>
+          ))}
         </div>
       </div>
 
