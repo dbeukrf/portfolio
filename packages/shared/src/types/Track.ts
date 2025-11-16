@@ -1,4 +1,4 @@
-export type TrackId = 'about' | 'education' | 'workExperience' | 'projects' | 'skillsLanguages' | 'hobbies' | 'aiDj';
+export type TrackId = 'about' | 'education' | 'workExperience' | 'projects' | 'skillsLanguages' | 'aiDj';
 
 export interface Track {
   id: TrackId;
@@ -52,16 +52,8 @@ export const TRACKS: Track[] = [
     duration: 200,
   },
   {
-    id: 'hobbies',
-    number: 6,
-    title: 'Hobbies',
-    artist: 'Diego Beuk',
-    audioUrl: '/audio/track-6-hobbies.mp3',
-    duration: 160,
-  },
-  {
     id: 'aiDj',
-    number: 7,
+    number: 6,
     title: 'AI DJ',
     artist: 'Diego Beuk',
     audioUrl: '/audio/track-7-dj.mp3',

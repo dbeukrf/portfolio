@@ -45,11 +45,11 @@ describe('AlbumView', () => {
     renderWithRouter(<AlbumView />);
     
     // Check all track titles
+    expect(screen.getByText('About')).toBeInTheDocument();
     expect(screen.getByText('Education')).toBeInTheDocument();
     expect(screen.getByText('Work Experience')).toBeInTheDocument();
     expect(screen.getByText('Projects')).toBeInTheDocument();
     expect(screen.getByText('Skills & Languages')).toBeInTheDocument();
-    expect(screen.getByText('Hobbies')).toBeInTheDocument();
     expect(screen.getByText('AI DJ')).toBeInTheDocument();
     
     // Check track numbers
@@ -120,11 +120,11 @@ describe('AlbumView', () => {
     
     // Filter out the start button to check only track cards
     const trackCardButtons = trackCards.filter(card => 
+      card.textContent?.includes('About') ||
       card.textContent?.includes('Education') || 
       card.textContent?.includes('Work Experience') ||
       card.textContent?.includes('Projects') ||
       card.textContent?.includes('Skills & Languages') ||
-      card.textContent?.includes('Hobbies') ||
       card.textContent?.includes('AI DJ')
     );
     

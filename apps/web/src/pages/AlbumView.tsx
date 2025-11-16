@@ -566,29 +566,6 @@ const getTrackContent = (trackId: TrackId): ReactNode => {
         </div>
       );
 
-    case 'hobbies':
-      return (
-        <div style={{...contentStyle, textAlign: 'left'}}>
-          <h2>Personal Interests</h2>
-          <p>
-            When I'm not coding, I enjoy exploring various hobbies that keep me balanced 
-            and inspired. These activities help me maintain creativity and bring fresh 
-            perspectives to my work.
-          </p>
-          <p>
-            Whether it's music, sports, reading, or other pursuits, I find that diverse 
-            interests enrich both my personal life and professional approach. They remind 
-            me that great work often comes from a well-rounded perspective.
-          </p>
-          <h3>Work-Life Balance</h3>
-          <p>
-            I believe that maintaining hobbies and interests outside of work is essential 
-            for long-term success and happiness. These activities recharge my energy and 
-            often spark new ideas that I bring back to my professional projects.
-          </p>
-        </div>
-      );
-
     case 'aiDj':
       return (
         <div style={{...contentStyle, textAlign: 'left'}}>
@@ -1553,7 +1530,7 @@ export default function AlbumView() {
           <Shuffle
             tag="p"
             className="text-white/90 mb-0 text-[clamp(7px,2.8vw,9px)] sm:text-[clamp(8px,3vw,10px)] md:text-[10px] lg:text-xs break-words md:truncate md:whitespace-nowrap leading-snug"
-            text="Diego Beuk • 2025 • 7 songs, 12 min"
+            text="Diego Beuk • 2025 • 6 songs, 12 min"
             duration={0.4}
             animationMode="random"
             triggerOnHover
@@ -1850,7 +1827,7 @@ export default function AlbumView() {
                 </h2>
                 <p className="text-base md:text-lg text-slate-300 max-w-2xl mx-auto">
                   This conversational guide can dive deeper into any track, share behind-the-scenes stories,
-                  or help you explore Diego&rsquo;s work in a more interactive way. Scroll up to return to Track 7
+                  or help you explore Diego&rsquo;s work in a more interactive way. Scroll up to return to Track 6
                   or stay here to connect with the AI DJ.
                 </p>
               </div>

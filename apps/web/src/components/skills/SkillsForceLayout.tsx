@@ -49,7 +49,7 @@ export default function SkillsForceLayout({
   const simulationRef = useRef<d3.Simulation<Node, undefined> | null>(null);
   const nodesRef = useRef<Map<string, { x: number; y: number }>>(new Map());
   const [selectedCategories, setSelectedCategories] = useState<Set<string>>(
-    new Set(['ai', 'cloud-devops', 'languages', 'frameworks', 'management'])
+    new Set(['ai/ml', 'cloud-devops', 'languages', 'frameworks', 'management'])
   );
   const [draggedNode, setDraggedNode] = useState<Node | null>(null);
 
@@ -164,6 +164,22 @@ export default function SkillsForceLayout({
             return nodesWithSavedPositions.has(d.id) ? 0.15 : 0.3;
           })
       );
+    
+      // Add gentle drifting movement
+    function driftForce(alpha: number) {
+      nodes.forEach((node) => {
+        // Ensure velocity exists
+        node.vx = node.vx ?? 0;
+        node.vy = node.vy ?? 0;
+
+        // Tiny random movement each tick
+        node.vx += (Math.random() - 0.5) * 0.05;
+        node.vy += (Math.random() - 0.5) * 0.05;
+      });
+    }
+
+    simulation.force("drift", driftForce);
+
 
     // Group nodes by category for clustering
     // Only initialize positions if they don't exist (first render or new nodes)

@@ -37,6 +37,14 @@ chatbot colours:
 #FFD485 sunset
 
 
+bubble graph:
+#FFDDA1 
+#FFD151 
+#F8C537 
+#EDB230
+#E77728 
+
+
 svg spinner icon: https://freesvgicons.com/packs/svg-spinners
 
 

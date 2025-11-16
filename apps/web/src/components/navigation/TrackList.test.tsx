@@ -14,11 +14,11 @@ describe('TrackList', () => {
   it('renders all track links', () => {
     renderWithRouter(<TrackList />);
     
+    expect(screen.getByText('About')).toBeInTheDocument();
     expect(screen.getByText('Education')).toBeInTheDocument();
     expect(screen.getByText('Work Experience')).toBeInTheDocument();
     expect(screen.getByText('Projects')).toBeInTheDocument();
     expect(screen.getByText('Skills & Languages')).toBeInTheDocument();
-    expect(screen.getByText('Hobbies')).toBeInTheDocument();
     expect(screen.getByText('AI DJ')).toBeInTheDocument();
   });
 
@@ -47,9 +47,6 @@ describe('TrackList', () => {
     
     const skillsLink = screen.getByText('Skills & Languages');
     expect(skillsLink.closest('a')).toHaveAttribute('href', '/track/skillsLanguages');
-    
-    const hobbiesLink = screen.getByText('Hobbies');
-    expect(hobbiesLink.closest('a')).toHaveAttribute('href', '/track/hobbies');
     
     const aiDjLink = screen.getByText('AI DJ');
     expect(aiDjLink.closest('a')).toHaveAttribute('href', '/track/aiDj');
