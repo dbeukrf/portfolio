@@ -10,6 +10,7 @@ import PlayerBar from '../components/player/PlayerBar';
 import { useAudioStore } from '../stores/audioStore';
 import TrackPage, { RAINBOW_COLORS } from '../components/tracks/TrackPage';
 import ProjectCarousel, { type Project } from '../components/projects/ProjectCarousel';
+import './AlbumView.css';
 
 interface WeatherData {
   time: Date;
@@ -221,179 +222,12 @@ const getTrackContent = (trackId: TrackId): ReactNode => {
               <span style={{ fontSize: '1rem' }}>Python, FastAPI, React/TypeScript, LangChain, RAG Systems, AI Agents, SQL/NoSQL</span>
             </div>
           </div>
-
-          {/* Add CSS for pulse animation */}
-          <style>{`
-            @keyframes pulse-ring {
-              0% {
-                transform: scale(1);
-                opacity: 0.6;
-              }
-              50% {
-                transform: scale(2);
-                opacity: 0.3;
-              }
-              100% {
-                transform: scale(3);
-                opacity: 0;
-              }
-            }
-            .pulse-ring-outer {
-              animation: pulse-ring 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
-            }
-            .pulse-ring-outer-delayed {
-              animation: pulse-ring 2s cubic-bezier(0.4, 0, 0.6, 1) infinite 1s;
-            }
-          `}</style>
         </div>
       );
 
     case 'education':
       return (
-        <div style={{ ...contentStyle, textAlign: 'left', width: '100%' }}>
-          <style>{`
-            .education-section {
-              padding: 0.5rem 0;
-            }
-            .education-container {
-              display: flex;
-              flex-direction: column;
-              gap: 1rem;
-            }
-            .education-image-container {
-              width: 100%;
-              max-width: 300px;
-              order: 1;
-            }
-            .education-image-only {
-              order: 1;
-            }
-            .education-major-info {
-              order: 4;
-              display: block;
-            }
-            .education-major-info-desktop {
-              display: none;
-            }
-            .education-content {
-              flex: 1;
-              order: 2;
-            }
-            .education-degree-title {
-              order: 2;
-            }
-            .education-degree-date {
-              order: 3;
-            }
-            .education-h3 {
-              font-size: 1.125rem;
-              line-height: 1.4;
-              font-weight: 600;
-              margin: 0;
-            }
-            .education-p {
-              font-size: 0.875rem;
-              line-height: 1.5;
-              margin: 0.2rem 0;
-            }
-            .education-strong {
-              font-size: 0.875rem;
-              font-weight: 600;
-            }
-            .education-li {
-              font-size: 0.875rem;
-              line-height: 1.5;
-            }
-            .education-ul-nested {
-              font-size: 0.8125rem;
-            }
-            .education-major-p {
-              font-size: 0.875rem;
-              line-height: 1.5;
-            }
-            
-            @media (min-width: 640px) {
-              .education-section {
-                padding: 0.75rem 0;
-              }
-              .education-container {
-                flex-direction: row;
-                gap: 1.5rem;
-              }
-              .education-image-container {
-                width: 250px;
-                max-width: none;
-                order: 1;
-              }
-              .education-image-only {
-                order: 1;
-              }
-              .education-major-info {
-                display: none;
-              }
-              .education-major-info-desktop {
-                display: block;
-              }
-              .education-content {
-                order: 2;
-              }
-              .education-degree-title {
-                order: 0;
-              }
-              .education-degree-date {
-                order: 0;
-              }
-              .education-h3 {
-                font-size: 1.25rem;
-              }
-              .education-p {
-                font-size: 0.9375rem;
-              }
-              .education-strong {
-                font-size: 0.9375rem;
-              }
-              .education-li {
-                font-size: 0.9375rem;
-              }
-              .education-ul-nested {
-                font-size: 0.875rem;
-              }
-              .education-major-p {
-                font-size: 0.9375rem;
-              }
-            }
-            
-            @media (min-width: 768px) {
-              .education-section {
-                padding: 1rem 0;
-              }
-              .education-container {
-                gap: 2rem;
-              }
-              .education-image-container {
-                width: 300px;
-              }
-              .education-h3 {
-                font-size: 1.5rem;
-              }
-              .education-p {
-                font-size: 1rem;
-              }
-              .education-strong {
-                font-size: 1rem;
-              }
-              .education-li {
-                font-size: 1rem;
-              }
-              .education-ul-nested {
-                font-size: 0.9375rem;
-              }
-              .education-major-p {
-                font-size: 1rem;
-              }
-            }
-          `}</style>
-          
+        <div style={{ ...contentStyle, textAlign: 'left', width: '100%' }} className="education-track-content">
           {/* === Monash University === */}
           <section className="education-section" style={{ borderBottom: '1px solid #A4A4A4' }}>
             <div className="education-container">
@@ -1727,6 +1561,14 @@ export default function AlbumView() {
               target="_blank"
               rel="noopener noreferrer"
               className="hover:text-primary-500 transition-colors focus:outline-none rounded flex-shrink-0"
+              style={{
+                transition: 'opacity 0.2s',
+                textDecoration: 'none',
+                outline: 'none'
+              }}
+              onMouseEnter={(e) => e.currentTarget.style.opacity = '0.7'}
+              onMouseLeave={(e) => e.currentTarget.style.opacity = '1'}
+              onFocus={(e) => e.currentTarget.style.outline = 'none'}
               aria-label="Diego Beuk LinkedIn profile"
             >
               <FaLinkedin className="w-3 h-3 sm:w-[14px] sm:h-[14px] md:w-4 md:h-4 lg:w-[18px] lg:h-[18px]" color="white" />
@@ -1736,6 +1578,14 @@ export default function AlbumView() {
               target="_blank"
               rel="noopener noreferrer"
               className="hover:text-primary-500 transition-colors focus:outline-none rounded flex-shrink-0"
+              style={{
+                transition: 'opacity 0.2s',
+                textDecoration: 'none',
+                outline: 'none'
+              }}
+              onMouseEnter={(e) => e.currentTarget.style.opacity = '0.7'}
+              onMouseLeave={(e) => e.currentTarget.style.opacity = '1'}
+              onFocus={(e) => e.currentTarget.style.outline = 'none'}
               aria-label="Diego Beuk Github profile"
             >
               <FaGithub className="w-3 h-3 sm:w-[14px] sm:h-[14px] md:w-4 md:h-4 lg:w-[18px] lg:h-[18px]" color="white" />

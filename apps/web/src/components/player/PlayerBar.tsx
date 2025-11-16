@@ -243,8 +243,10 @@ export default function PlayerBar({ isVisible, contentVisible, clipPathReveal: _
             <div className="relative group">
               <button
                 onClick={toggleShuffle}
-                className={`p-1 md:p-1.5 text-white/70 hover:text-white transition-colors focus:outline-none ${
-                  isShuffled ? 'text-[#FFCD70]' : ''
+                className={`p-1 md:p-1.5 transition-colors focus:outline-none ${
+                  isShuffled 
+                    ? 'text-[#FFCD70] hover:text-[#FFCD70]' 
+                    : 'text-white/70 hover:text-white'
                 }`}
                 aria-label="Shuffle"
               >
@@ -313,8 +315,10 @@ export default function PlayerBar({ isVisible, contentVisible, clipPathReveal: _
             <div className="relative group">
               <button
                 onClick={toggleLoop}
-                className={`p-1 md:p-1.5 text-white/70 hover:text-white transition-colors focus:outline-none ${
-                  isLooping ? 'text-[#FFCD70]' : ''
+                className={`p-1 md:p-1.5 transition-colors focus:outline-none ${
+                  isLooping 
+                    ? 'text-[#FFCD70] hover:text-[#FFCD70]' 
+                    : 'text-white/70 hover:text-white'
                 }`}
                 aria-label="Repeat"
               >
