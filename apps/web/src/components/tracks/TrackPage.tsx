@@ -333,8 +333,12 @@ export default function TrackPage({
         `}
         role="main"
         aria-label={`Content for ${title}`}
+        style={{
+          minHeight: title === 'Skills & Languages' ? '120vh' : undefined,
+          paddingTop: '1rem',
+        }}
       >
-        <div className="max-w-4xl mx-auto">
+        <div className={title === 'Skills & Languages' ? 'max-w-full mx-auto' : 'max-w-4xl mx-auto'}>
           {/* Content wrapper with proper semantic structure */}
           <div
             className={`

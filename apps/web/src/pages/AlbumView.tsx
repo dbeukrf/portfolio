@@ -10,6 +10,7 @@ import PlayerBar from '../components/player/PlayerBar';
 import { useAudioStore } from '../stores/audioStore';
 import TrackPage, { RAINBOW_COLORS } from '../components/tracks/TrackPage';
 import ProjectCarousel, { type Project } from '../components/projects/ProjectCarousel';
+import SkillsForceLayout, { type Skill } from '../components/skills/SkillsForceLayout';
 import './AlbumView.css';
 
 interface WeatherData {
@@ -54,7 +55,7 @@ const getTrackContent = (trackId: TrackId): ReactNode => {
     case 'about':
       return (
         <div style={{...contentStyle, textAlign: 'left'}}>
-          <div style={{ display: 'flex', gap: '2rem', alignItems: 'center', marginBottom: '2rem' }}>
+          <div style={{ display: 'flex', gap: '2rem', alignItems: 'center', marginBottom: '1.5rem' }}>
             {/* Album Image */}
             <div style={{ flexShrink: 0 }}>
               <img
@@ -86,7 +87,7 @@ const getTrackContent = (trackId: TrackId): ReactNode => {
                     style={{ 
                       position: 'absolute',
                       color: '#10b981',
-                      fontSize: '8px',
+                      fontSize: '10px',
                       zIndex: 3
                     }} 
                   />
@@ -96,7 +97,7 @@ const getTrackContent = (trackId: TrackId): ReactNode => {
                     style={{ 
                       position: 'absolute',
                       color: '#10b981',
-                      fontSize: '8px',
+                      fontSize: '10px',
                       opacity: 0.6,
                       zIndex: 2
                     }} 
@@ -107,7 +108,7 @@ const getTrackContent = (trackId: TrackId): ReactNode => {
                     style={{ 
                       position: 'absolute',
                       color: '#10b981',
-                      fontSize: '8px',
+                      fontSize: '10px',
                       opacity: 0.4,
                       zIndex: 1
                     }} 
@@ -127,23 +128,15 @@ const getTrackContent = (trackId: TrackId): ReactNode => {
               </div>
 
               {/* Name */}
-              <Shuffle
-                tag="h2"
-                style={{ margin: '0 0 0.5rem 0', fontSize: '2rem', fontWeight: 'bold' }}
-                text="Diego Beuk"
-                duration={0.4}
-                animationMode="evenodd"
-                triggerOnHover
-                triggerOnce={false}
-                threshold={0}
-                rootMargin="0px"
-              />
+              <h2 style={{ margin: '0 0 0.5rem 0', fontSize: '2rem', fontWeight: 'normal' }}>
+                Hi, I'm <strong>Diego!</strong>
+              </h2>
 
               {/* Title */}
               <Shuffle
                 tag="p"
                 style={{ margin: '0', fontSize: '1.125rem', color: '#4b5563' }}
-                text="I'm a Full Stack AI Developer"
+                text="Full Stack AI Developer"
                 duration={0.4}
                 animationMode="evenodd"
                 triggerOnHover
@@ -354,7 +347,7 @@ const getTrackContent = (trackId: TrackId): ReactNode => {
 
     case 'workExperience':
       return (
-        <div style={{...contentStyle, textAlign: 'left'}}>
+        <div style={{...contentStyle, textAlign: 'left', marginTop: '2rem'}}>
           
 
           {/* Coles Group */}
@@ -492,7 +485,7 @@ const getTrackContent = (trackId: TrackId): ReactNode => {
         <div style={{
           ...contentStyle, 
           textAlign: 'left', 
-          marginTop: '-5rem',
+          marginTop: '-2rem',
           marginBottom: 0
         }}>
           <ProjectCarousel projects={projects} />
@@ -500,54 +493,76 @@ const getTrackContent = (trackId: TrackId): ReactNode => {
       );
 
     case 'skillsLanguages':
+      // Define skills data organized by categories
+      const skillsData: Skill[] = [
+        // --- AI & Machine Learning ---
+        { id: 'langchain', name: 'LangChain', category: 'ai/ml' },
+        { id: 'agno', name: 'Agno', category: 'ai/ml' },
+        { id: 'google-adk', name: 'Google ADK', category: 'ai/ml' },
+        { id: 'n8n', name: 'n8n', category: 'ai/ml' }, // workflow automation
+        { id: 'fastgpt', name: 'FastGPT', category: 'ai/ml' },
+        { id: 'vertex-ai', name: 'GCP Vertex AI', category: 'ai/ml' },
+        { id: 'ai-agents', name: 'AI Agents', category: 'ai/ml' },
+        { id: 'rag', name: 'RAG Workflows', category: 'ai/ml' },
+        { id: 'chroma-db', name: 'Chroma DB', category: 'ai/ml' },
+        { id: 'pytorch', name: 'PyTorch', category: 'ai/ml' },
+        { id: 'numpy', name: 'NumPy', category: 'ai/ml' },
+        
+        // --- Cloud & DevOps ---
+        { id: 'gcp', name: 'GCP', category: 'cloud-devops' },
+        { id: 'firebase', name: 'Firebase', category: 'cloud-devops' },
+        { id: 'aws', name: 'AWS', category: 'cloud-devops' },
+        { id: 'docker', name: 'Docker', category: 'cloud-devops' },
+        { id: 'git', name: 'Git', category: 'cloud-devops' },
+        { id: 'ubuntu', name: 'Ubuntu/Linux', category: 'cloud-devops' },
+        
+        // --- Languages ---
+        { id: 'python', name: 'Python', category: 'languages' },
+        { id: 'java', name: 'Java', category: 'languages' },
+        { id: 'javascript', name: 'JavaScript', category: 'languages' },
+        { id: 'typescript', name: 'TypeScript', category: 'languages' },
+        { id: 'sql', name: 'SQL', category: 'languages' },
+        { id: 'php', name: 'PHP', category: 'languages' },
+        { id: 'html', name: 'HTML', category: 'languages' },
+        { id: 'css', name: 'CSS', category: 'languages' },
+
+
+        // --- Frameworks & Tools ---
+        { id: 'fastapi', name: 'FastAPI', category: 'frameworks' },
+        { id: 'react', name: 'React', category: 'frameworks' },
+        { id: 'android-studio', name: 'Android Studio', category: 'frameworks' },
+        { id: 'bmad', name: 'BMAD', category: 'frameworks' },
+
+        // Databases
+        { id: 'postgresql', name: 'PostgreSQL', category: 'frameworks' },
+        { id: 'mongodb', name: 'MongoDB', category: 'frameworks' },
+        { id: 'neo4j', name: 'Neo4j', category: 'frameworks' },
+
+        // Engineering Skills
+        { id: 'full-stack', name: 'Full-Stack Development', category: 'frameworks' },
+        { id: 'system-architecture', name: 'System Architecture Design', category: 'frameworks' },
+        { id: 'test-automation', name: 'Test Automations', category: 'frameworks' },
+        
+        // --- Management & Delivery ---
+        { id: 'agile-scrum', name: 'Agile/Scrum', category: 'management' },
+        { id: 'project-coordination', name: 'Project Coordination', category: 'management' },
+        { id: 'stakeholder-communication', name: 'Stakeholder Communication', category: 'management' },
+        { id: 'it-governance', name: 'IT Governance', category: 'management' },
+        { id: 'data-analysis', name: 'Data Analysis', category: 'management' },
+      ];
+
       return (
-        <div style={{...contentStyle, textAlign: 'left'}}>
-          
-
-          {/* Technical Skills */}
-      <section style={{ marginBottom: '2rem' }}>
-        <h3 style={{ marginBottom: '0.8rem' }}>Technical Skills</h3>
-
-        <ul style={{ paddingLeft: '1.2rem', marginTop: '0.8rem' }}>
-          <li>
-            <strong>Languages:</strong> Python, Java, JavaScript/TypeScript, SQL, HTML, CSS, PHP
-          </li>
-          <li>
-            <strong>AI/ML & Data:</strong> FastAPI, Agno, LangChain, Google ADK, n8n, FastGPT, BMAD, PostgreSQL, MongoDB, Chroma DB, Neo4j
-          </li>
-          <li>
-            <strong>Frameworks/Tools:</strong> React, Vite, Android Studio, Unity, Jira, Trello, Confluence, Figma
-          </li>
-          <li>
-            <strong>Cloud & DevOps:</strong> GCP (Vertex AI), Firebase, AWS, Docker, Git, pnpm, Ubuntu/Linux
-          </li>
-        </ul>
-      </section>
-
-
-
-      <section style={{ marginBottom: '2rem' }}>
-        <h3 style={{ marginBottom: '0.8rem' }}>Professional Skills</h3>
-
-        <ul style={{ paddingLeft: '1.2rem', marginTop: '0.8rem' }}>
-          <li>
-            <strong>Project Management & Analysis:</strong> Agile/Scrum, Project Coordination, Stakeholder Communication, IT Governance, Data Analysis
-          </li>
-          <li>
-            <strong>Software Development:</strong> Full-Stack Development, System Architecture Design, Test Automations, AI Agents & RAG Workflows
-          </li>
-        </ul>
-      </section>
-
-
-
-      <section style={{ marginBottom: '2rem' }}>
-        <h3 style={{ marginBottom: '0.8rem' }}>Languages Spoken</h3>
-
-        <ul style={{ paddingLeft: '1.2rem', marginTop: '0.8rem' }}>
-          <li>English (Native); Portuguese (Advanced); Spanish (Advanced); French (Intermediate)</li>
-        </ul>
-      </section>
+        <div style={{...contentStyle, textAlign: 'left', width: '100%', height: '100%'}}>
+          {/* Skills Force Layout */}
+          <div style={{ 
+            width: '100%', 
+            height: '900px', 
+            backgroundColor: 'transparent',
+            marginTop: '2.5rem',
+            marginBottom: '2rem'
+          }}>
+            <SkillsForceLayout skills={skillsData} width={1400} height={900} />
+          </div>
         </div>
       );
 
