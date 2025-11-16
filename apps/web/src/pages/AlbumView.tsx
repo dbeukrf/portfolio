@@ -2,7 +2,7 @@ import { useEffect, useRef, useState, type ReactNode } from 'react';
 import { TRACKS, type TrackId } from '../data/tracks';
 import { FaLinkedin, FaGithub } from 'react-icons/fa';
 import { FaPlay, FaRandom, FaUserPlus } from 'react-icons/fa';
-import { FaMapMarkerAlt, FaBriefcase, FaLanguage, FaCode, FaCircle } from 'react-icons/fa';
+import { FaMapMarkerAlt, FaBriefcase, FaLanguage, FaCode, FaCircle, FaBars, FaTimes } from 'react-icons/fa';
 import Shuffle from '../components/ui/Shuffle';
 import { api } from '../services/api';
 import { fetchWeatherApi } from 'openmeteo';
@@ -61,12 +61,17 @@ const getTrackContent = (trackId: TrackId): ReactNode => {
               <img
                 src="/images/album-cover1.jpg"
                 alt="Diego Beuk"
+                draggable={false}
                 style={{
                   width: '200px',
                   height: '200px',
                   objectFit: 'cover',
                   borderRadius: '12px',
-                  boxShadow: '0 4px 6px rgba(0, 0, 0, 0.1)'
+                  boxShadow: '0 4px 6px rgba(0, 0, 0, 0.1)',
+                  userSelect: 'none',
+                  WebkitUserSelect: 'none',
+                  MozUserSelect: 'none',
+                  msUserSelect: 'none'
                 }}
               />
             </div>
@@ -128,9 +133,17 @@ const getTrackContent = (trackId: TrackId): ReactNode => {
               </div>
 
               {/* Name */}
-              <h2 style={{ margin: '0 0 0.5rem 0', fontSize: '2rem', fontWeight: 'normal' }}>
-                Hi, I'm <strong>Diego!</strong>
-              </h2>
+              <Shuffle
+                tag="h2"
+                style={{ margin: '0 0 0.5rem 0', fontSize: '2rem', fontWeight: 'normal' }}
+                text="Hi, I'm Diego!"
+                duration={0.4}
+                animationMode="evenodd"
+                triggerOnHover
+                triggerOnce={false}
+                threshold={0}
+                rootMargin="0px"
+              />
 
               {/* Title */}
               <Shuffle
@@ -220,7 +233,7 @@ const getTrackContent = (trackId: TrackId): ReactNode => {
 
     case 'education':
       return (
-        <div style={{ ...contentStyle, textAlign: 'left', width: '100%' }} className="education-track-content">
+        <div style={{ ...contentStyle, textAlign: 'left', width: '100%' }} className="education-track-content education-track-content-wrapper">
           {/* === Monash University === */}
           <section className="education-section" style={{ borderBottom: '1px solid #A4A4A4' }}>
             <div className="education-container">
@@ -230,10 +243,19 @@ const getTrackContent = (trackId: TrackId): ReactNode => {
                 <img 
                   src="/images/education/monash.svg" 
                   alt="Monash University" 
-                  style={{ width: '100%', height: 'auto', borderRadius: '4px' }} 
+                  draggable={false}
+                  style={{ 
+                    width: '100%', 
+                    height: 'auto', 
+                    borderRadius: '4px',
+                    userSelect: 'none',
+                    WebkitUserSelect: 'none',
+                    MozUserSelect: 'none',
+                    msUserSelect: 'none'
+                  }} 
                 />
                 {/* Major and Minor below image - desktop only */}
-                <div className="education-major-info-desktop" style={{ paddingTop: '0.8rem' }}>
+                <div className="education-major-info-desktop" style={{ paddingTop: '2.3rem' }}>
                   <p className="education-major-p" style={{ marginTop: '0', marginBottom: 0, paddingLeft: '1.2rem' }}>
                     <strong>Major:</strong> Software Development<br/>
                     <strong>Minor:</strong> Cybersecurity<br/>
@@ -298,10 +320,19 @@ const getTrackContent = (trackId: TrackId): ReactNode => {
                 <img 
                   src="/images/education/yonsei.png" 
                   alt="Yonsei University" 
-                  style={{ width: '100%', height: 'auto', borderRadius: '4px' }} 
+                  draggable={false}
+                  style={{ 
+                    width: '100%', 
+                    height: 'auto', 
+                    borderRadius: '4px',
+                    userSelect: 'none',
+                    WebkitUserSelect: 'none',
+                    MozUserSelect: 'none',
+                    msUserSelect: 'none'
+                  }} 
                 />
                 {/* GPA below image - desktop only */}
-                <div className="education-major-info-desktop" style={{ paddingTop: '0.8rem' }}>
+                <div className="education-major-info-desktop" style={{ paddingTop: '2.3rem' }}>
                   <p className="education-major-p" style={{ marginTop: '0', marginBottom: 0, paddingLeft: '1.2rem' }}>
                     <strong>GPA:</strong> 4.08/4.3
                   </p>
@@ -347,82 +378,151 @@ const getTrackContent = (trackId: TrackId): ReactNode => {
 
     case 'workExperience':
       return (
-        <div style={{...contentStyle, textAlign: 'left', marginTop: '2rem'}}>
-          
+        <div style={{ ...contentStyle, textAlign: 'left', width: '100%' }} className="education-track-content work-track-content">
+          {/* === Coles Group === */}
+          <section className="education-section" style={{ borderBottom: '1px solid #A4A4A4' }}>
+            <div className="education-container">
+              
+              {/* LEFT — Company Image */}
+              <div className="education-image-container" style={{ flexShrink: 0 }}>
+                <img 
+                  src="/images/work/colesgroup.png" 
+                  alt="Coles Group" 
+                  draggable={false}
+                  style={{ 
+                    width: '100%', 
+                    height: 'auto', 
+                    borderRadius: '4px',
+                    userSelect: 'none',
+                    WebkitUserSelect: 'none',
+                    MozUserSelect: 'none',
+                    msUserSelect: 'none'
+                  }} 
+                />
+                {/* Location and Date row below image - desktop only */}
+                <div className="education-major-info-desktop" style={{ paddingTop: '1.7rem' }}>
+                  <p className="education-p" style={{ margin: 0, marginBottom: '0.3rem', textAlign: 'left', paddingLeft: '1.2rem' }}><strong>Melbourne, Australia</strong></p>
+                  <p className="education-p" style={{ margin: 0, textAlign: 'left', paddingLeft: '1.2rem' }}><strong>January - June 2025</strong></p>
+                </div>
+              </div>
+      
+              {/* RIGHT — Text Content */}
+              <div className="education-content" style={{ width: '100%' }}>
+                {/* Title row with role */}
+                <div className="education-degree-title" style={{ display: 'flex', justifyContent: 'flex-end', flexWrap: 'wrap', gap: '0.5rem' }}>
+                  <h3 className="education-h3">IT Infrastructure Project Management Intern</h3>
+                </div>
+      
+                {/* Location and Date - mobile only */}
+                <div className="rmit-location-mobile rmit-location-mobile-first" style={{ paddingTop: '1rem', paddingBottom: '1rem' }}>
+                  <p className="education-p" style={{ margin: 0, marginBottom: '0.3rem', textAlign: 'left', paddingLeft: '1.2rem' }}><strong>Melbourne, Australia</strong></p>
+                  <p className="education-p" style={{ margin: 0, textAlign: 'left', paddingLeft: '1.2rem' }}><strong>January 2025 - June 2025</strong></p>
+                </div>
+      
+                {/* Body content */}
+                <ul className="work-body-content" style={{ paddingLeft: '1.2rem', listStyle: 'disc', width: '100%' }}>      
+                  <li className="education-li" style={{ marginBottom: '0.5rem' }}>
+                    Led data analysis for the Lifecycle Cost Management Project, assessing over 12,000 devices to inform multi-year financial strategies for four business units.
+                  </li>
+                  <li className="education-li" style={{ marginBottom: '0.5rem' }}>
+                    Developed a dynamic Python-based cost estimation model for IT hardware procurement across the Ocado CFC portfolio, improving forecasting accuracy and reducing manual tracking effort for +200 purchase orders.
+                  </li>
+                  <li className="education-li" style={{ marginBottom: '0.5rem' }}>
+                    Streamlined Agile workflows using Confluence and Jira, while delivering IT governance and technical reports to senior leadership, strengthening project compliance and alignment with organisational objectives.
+                  </li>
+                </ul>
+                <p className="education-li" style={{ paddingLeft: '1.2rem', paddingBottom: '2rem', marginTop: '0.5rem', marginBottom: 0 }}>
+                  <strong className="education-strong">Technologies:</strong> <span className="education-li">Python, Excel, Jira, Confluence, SharePoint</span>
+                </p>
+              </div>
+            </div>
+          </section>
 
-          {/* Coles Group */}
-      <section style={{ marginBottom: '2rem' }}>
-        {/* Title row: left + right */}
-        <div style={{ display: 'flex', justifyContent: 'space-between' }}>
-          <h3>Coles Group</h3>
-          <h3>Melbourne, Australia</h3>
-        </div>
+          {/* === RMIT University (Research Assistant) === */}
+          <section className="education-section">
+            <div className="education-container">
+              
+              {/* LEFT — Company Image */}
+              <div className="education-image-container" style={{ flexShrink: 0 }}>
+                <img 
+                  src="/images/work/rmit.svg" 
+                  alt="RMIT University" 
+                  draggable={false}
+                  style={{ 
+                    width: '80%', 
+                    height: 'auto', 
+                    borderRadius: '4px',
+                    userSelect: 'none',
+                    WebkitUserSelect: 'none',
+                    MozUserSelect: 'none',
+                    msUserSelect: 'none'
+                  }} 
+                />
+                {/* Location and Date row below image for first position */}
+                <div className="education-major-info-desktop" style={{ paddingTop: '1.4rem' }}>
+                  <p className="education-p" style={{ margin: 0, marginBottom: '0.3rem', textAlign: 'left', paddingLeft: '1.2rem' }}><strong>Melbourne, Australia</strong></p>
+                  <p className="education-p" style={{ margin: 0, textAlign: 'left', paddingLeft: '1.2rem' }}><strong>July - September 2024</strong></p>
+                </div>
+                {/* Location and Date row below image for second position */}
+                <div className="education-major-info-desktop" style={{ paddingTop: '16.5rem' }}>
+                  <p className="education-p" style={{ margin: 0, marginBottom: '0.3rem', textAlign: 'left', paddingLeft: '1.2rem' }}><strong>Melbourne, Australia</strong></p>
+                  <p className="education-p" style={{ margin: 0, textAlign: 'left', paddingLeft: '1.2rem' }}><strong>September - November 2023</strong></p>
+                </div>
+              </div>
+      
+              {/* RIGHT — Text Content */}
+              <div className="education-content" style={{ width: '100%' }}>
+                {/* Title row with role */}
+                <div className="education-degree-title" style={{ display: 'flex', justifyContent: 'flex-end', flexWrap: 'wrap', gap: '0.5rem' }}>
+                  <h3 className="education-h3">Research Assistant</h3>
+                </div>
+      
+                {/* Location and Date for first position - mobile only */}
+                <div className="rmit-location-mobile rmit-location-mobile-first" style={{ paddingTop: '0.8rem' }}>
+                  <p className="education-p" style={{ margin: 0, marginBottom: '0.3rem', textAlign: 'left', paddingLeft: '1.2rem' }}><strong>Melbourne, Australia</strong></p>
+                  <p className="education-p" style={{ margin: 0, textAlign: 'left', paddingLeft: '1.2rem' }}><strong>July - September 2024</strong></p>
+                </div>
+      
+                {/* Body content for first position */}
+                <ul className="work-body-content" style={{ paddingLeft: '1.2rem', paddingTop: '1rem', listStyle: 'disc', width: '100%' }}>
+                  <li className="education-li" style={{ marginBottom: '0.5rem' }}>
+                    Conducted a systematic literature review on indoor localisation, evaluating multi-sensor fusion methods (barometric pressure, Wi-Fi, and GPS) for real-world deployment.
+                  </li>
+                  <li className="education-li" style={{ marginBottom: '0.5rem' }}>
+                    Built an Android application prototype to determine user floor levels via multi-sensor integration.
+                  </li>
+                  <li className="education-li" style={{ marginBottom: '0.5rem' }}>
+                    Executed experiments integrating real-time weather station data for sensor calibration, enhancing global scalability and robustness of altitude-based floor estimation.
+                  </li>
+                </ul>
+                <p className="education-li" style={{ paddingLeft: '1.2rem', marginTop: '0.5rem', marginBottom: '1rem' }}>
+                  <strong className="education-strong">Technologies:</strong> <span className="education-li">Android Studio, Java, Figma, Wi-Fi/GPS sensor APIs</span>
+                </p>
 
-        {/* Position + Date row */}
-        <div style={{ display: 'flex', justifyContent: 'space-between' }}>
-          <p style={{ margin: '0.2rem 0' }}>
-            <strong>IT Infrastructure Project Management Intern</strong>
-          </p>
-          <p style={{ margin: '0.2rem 0' }}><strong>January 2025 – June 2025</strong></p>
-        </div>
+                {/* Location and Date for second position - mobile only */}
+                <div className="rmit-location-mobile rmit-location-mobile-second" style={{ paddingTop: '2rem' }}>
+                  <p className="education-p" style={{ margin: 0, marginBottom: '0.3rem', textAlign: 'left', paddingLeft: '1.2rem' }}><strong>Melbourne, Australia</strong></p>
+                  <p className="education-p" style={{ margin: 0, textAlign: 'left', paddingLeft: '1.2rem' }}><strong>September - November 2023</strong></p>
+                </div>
 
-        <ul style={{ paddingLeft: '1.2rem', marginTop: '0.8rem' }}>
-          <li>Led data analysis for the Lifecycle Cost Management Project, assessing over 12,000 devices to inform multi-year financial strategies for four business units.</li>
-          <li>Developed a dynamic Python-based cost estimation model for IT hardware procurement across the Ocado CFC portfolio, improving forecasting accuracy and reducing manual tracking effort for +200 purchase orders.</li>
-          <li>Streamlined Agile workflows using Confluence and Jira, while delivering IT governance and technical reports to senior leadership, strengthening project compliance and alignment with organisational objectives.</li>
-          <li><strong>Technologies:</strong> Python, Excel, Jira, Confluence, SharePoint, Infrastructure (Lifecycle, Governance, Network)</li>
-        </ul>
-      </section>
-
-
-
-      <section style={{ marginBottom: '2rem' }}>
-        {/* Title row: left + right */}
-        <div style={{ display: 'flex', justifyContent: 'space-between' }}>
-          <h3>RMIT University</h3>
-          <h3>Melbourne, Australia</h3>
-        </div>
-
-        {/* Position + Date row */}
-        <div style={{ display: 'flex', justifyContent: 'space-between' }}>
-          <p style={{ margin: '0.2rem 0' }}>
-            <strong>Research Assistant</strong>
-          </p>
-          <p style={{ margin: '0.2rem 0' }}><strong>July 2024 – September 2024</strong></p>
-        </div>
-
-        <ul style={{ paddingLeft: '1.2rem', marginTop: '0.8rem' }}>
-          <li>Conducted a systematic literature review on indoor localisation, evaluating multi-sensor fusion methods (barometric pressure, Wi-Fi, and GPS) for real-world deployment.</li>
-          <li>Built an Android application prototype to determine user floor levels via multi-sensor integration.</li>
-          <li>Executed experiments integrating real-time weather station data for sensor calibration, enhancing global scalability and robustness of altitude-based floor estimation.</li>
-          <li><strong>Technologies:</strong> Android Studio, Java, Figma, Wi-Fi/GPS sensor APIs</li>
-        </ul>
-      </section>
-
-
-
-      <section style={{ marginBottom: '2rem' }}>
-        {/* Title row: left + right */}
-        <div style={{ display: 'flex', justifyContent: 'space-between' }}>
-          <h3>RMIT University</h3>
-          <h3>Melbourne, Australia</h3>
-        </div>
-
-        {/* Position + Date row */}
-        <div style={{ display: 'flex', justifyContent: 'space-between' }}>
-          <p style={{ margin: '0.2rem 0' }}>
-            <strong>Research Assistant</strong>
-          </p>
-          <p style={{ margin: '0.2rem 0' }}><strong>September 2023 – November 2023</strong></p>
-        </div>
-
-        <ul style={{ paddingLeft: '1.2rem', marginTop: '0.8rem' }}>
-          <li>Designed and developed an AR wayfinding app, integrating live geospatial, visual, and graph-based data for seamless indoor-outdoor localisation.</li>
-          <li>Implemented a dynamic routing system using Google Street View, Geospatial API, and Neo4j for an immersive real-time graph-based navigation and immersive 3D visualisation solution.</li>
-          <li>Collaborated with Google and The GPT Group stakeholders, leading user requirement gathering, usability testing, and presenting findings to refine the system.</li>
-          <li><strong>Technologies:</strong> Android Studio, Java, Unity, Cesium 3D Tiles, Neo4j, Google APIs</li>
-        </ul>
-      </section>
+                {/* Body content for second position */}
+                <ul className="work-body-content work-body-content-second" style={{ paddingLeft: '1.2rem', listStyle: 'disc', width: '100%' }}>
+                  <li className="education-li" style={{ marginBottom: '0.5rem' }}>
+                    Designed and developed an AR wayfinding app, integrating live geospatial, visual, and graph-based data for seamless indoor-outdoor localisation.
+                  </li>
+                  <li className="education-li" style={{ marginBottom: '0.5rem' }}>
+                    Implemented a dynamic routing system using Google Street View, Geospatial API, and Neo4j for an immersive real-time graph-based navigation and immersive 3D visualisation solution.
+                  </li>
+                  <li className="education-li" style={{ marginBottom: '0.5rem' }}>
+                    Collaborated with Google and The GPT Group stakeholders, leading user requirement gathering, usability testing, and presenting findings to refine the system.
+                  </li>
+                </ul>
+                <p className="education-li" style={{ paddingLeft: '1.2rem', marginTop: '0.5rem', marginBottom: 0 }}>
+                  <strong className="education-strong">Technologies:</strong> <span className="education-li">Android Studio, Java, Unity, Cesium 3D Tiles, Neo4j, Google APIs</span>
+                </p>
+              </div>
+            </div>
+          </section>
         </div>
       );
 
@@ -615,6 +715,7 @@ export default function AlbumView() {
   const [playerBarVisible, setPlayerBarVisible] = useState(false);
   const [gradientColorIndex, setGradientColorIndex] = useState(0);
   const [chatbotProgress, setChatbotProgress] = useState(0);
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   
   // Location state
   const [locationText, setLocationText] = useState('Melbourne, Australia');
@@ -874,8 +975,9 @@ export default function AlbumView() {
 
           setLocationText((prevText) => {
             const temp = Math.round(updated.temperatureC);
-            const rainStatus = updated.rainMm > 0 ? `, ${Math.round(updated.rainMm)}mm rain` : '';
-            const currentText = `${temp}°C ${rainStatus}`;
+            // const rainStatus = updated.rainMm > 0 ? `, ${Math.round(updated.rainMm)}mm rain` : '';
+            // const currentText = `${temp}°C ${rainStatus}`;
+            const currentText = `${temp}°C`;
             const parts = prevText.split(' - ');
             if (parts.length >= 2) {
               return `${parts[0]} - ${currentText}`;
@@ -1751,7 +1853,7 @@ export default function AlbumView() {
             transition: 'clip-path 0.1s cubic-bezier(0.4, 0, 0.2, 1)',
             willChange: 'clip-path',
             zIndex: 50,
-            backgroundColor: '#E0E0E0',
+            backgroundColor: '#F5F5F5',
             pointerEvents: contentVisible ? 'auto' : 'none'
           }}
         />
@@ -1788,7 +1890,7 @@ export default function AlbumView() {
                 }}
                 className="w-full m-0 p-0"
                 style={{ 
-                  backgroundColor: '#E0E0E0', 
+                  backgroundColor: '#F5F5F5', 
                   margin: 0, 
                   padding: 0,
                   minHeight: '100vh',
@@ -1801,9 +1903,9 @@ export default function AlbumView() {
                   trackNumber={track.number}
                   gradientColorIndex={gradientColorIndex}
                   content={getTrackContent(track.id)}
-                  className="w-full h-full min-h-screen bg-[#E0E0E0]"
-                  headerClassName="bg-[#E0E0E0]"
-                  contentClassName="bg-[#E0E0E0]"
+                  className="w-full h-full min-h-screen bg-[#F5F5F5]"
+                  headerClassName="bg-[#F5F5F5]"
+                  contentClassName="bg-[#F5F5F5]"
                 />
               </div>
             ))}
@@ -1813,7 +1915,7 @@ export default function AlbumView() {
             className="w-full min-h-screen flex flex-col items-center justify-center px-6 py-16"
             style={{
               backgroundColor: 'transparent',
-              color: '#E0E0E0',
+              color: '#F5F5F5',
               opacity: chatbotProgress,
               transition: 'opacity 0.4s cubic-bezier(0.4, 0, 0.2, 1)',
               pointerEvents: chatbotProgress > 0.05 ? 'auto' : 'none'
@@ -1856,42 +1958,64 @@ export default function AlbumView() {
         </div>
       </div>
 
+      {/* Progress bar table / Mobile hamburger menu */}
       <div
         className={`fixed top-4 left-4 z-[80] transition-all duration-500 ease-out ${
           contentVisible ? 'opacity-100 translate-y-0 pointer-events-auto' : 'opacity-0 -translate-y-6 pointer-events-none'
         }`}
       >
-        <div className="grid gap-1">
-          {TRACKS.map((track, index) => {
-            const isActive = index === currentTrackIndex;
-            const label = `${String(track.number).padStart(2, '0')} ${track.title}`;
-            const width = isActive ? `${Math.round(clamp(currentTrackProgress, 0, 1) * 100)}%` : '0%';
+        {/* Hamburger icon - mobile only */}
+        <button
+          onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
+          className="md:hidden w-10 h-10 flex items-center justify-center text-white bg-black/50 rounded-md hover:bg-black/70 transition-colors focus:outline-none focus:ring-2 focus:ring-white/50"
+          aria-label="Toggle track menu"
+          aria-expanded={isMobileMenuOpen}
+        >
+          {isMobileMenuOpen ? (
+            <FaTimes className="w-5 h-5" />
+          ) : (
+            <FaBars className="w-5 h-5" />
+          )}
+        </button>
 
-            return (
-              <button
-                key={track.id}
-                onClick={() => scrollToTrack(index)}
-                onKeyDown={(e) => {
-                  if (e.key === 'Enter' || e.key === ' ') {
-                    e.preventDefault();
+        {/* Progress bar table - desktop always visible, mobile only when menu is open */}
+        <div className={`${isMobileMenuOpen ? 'block' : 'hidden'} md:block absolute top-12 md:top-0 left-0 md:left-0 bg-black/90 md:bg-transparent rounded-md md:rounded-none p-2 md:p-0 shadow-lg md:shadow-none`}>
+          <div className="grid gap-1">
+            {TRACKS.map((track, index) => {
+              const isActive = index === currentTrackIndex;
+              const label = `${String(track.number).padStart(2, '0')} ${track.title}`;
+              const width = isActive ? `${Math.round(clamp(currentTrackProgress, 0, 1) * 100)}%` : '0%';
+
+              return (
+                <button
+                  key={track.id}
+                  onClick={() => {
                     scrollToTrack(index);
-                  }
-                }}
-                className={`relative min-w-[140px] px-2 py-1 text-left text-white text-[10px] font-semibold rounded-md overflow-hidden transition-transform duration-300 focus:outline-none focus-visible:outline-none focus:ring-0 ring-0 ${
-                  isActive ? 'shadow-lg scale-[1.02]' : 'opacity-80 hover:opacity-100 hover:scale-[1.01]'
-                }`}
-                aria-pressed={isActive}
-              >
-                <span className="relative z-10 drop-shadow-[0_0_6px_rgba(0,0,0,0.6)]">{label}</span>
-                <div className="pointer-events-none absolute inset-0 overflow-hidden">
-                  <div
-                    className="absolute inset-y-0 left-0 transition-all duration-300 ease-out"
-                    style={{ width, opacity: isActive ? 1 : 0, backgroundColor: '#A4A4A4' }}
-                  />
-                </div>
-              </button>
-            );
-          })}
+                    setIsMobileMenuOpen(false);
+                  }}
+                  onKeyDown={(e) => {
+                    if (e.key === 'Enter' || e.key === ' ') {
+                      e.preventDefault();
+                      scrollToTrack(index);
+                      setIsMobileMenuOpen(false);
+                    }
+                  }}
+                  className={`relative min-w-[140px] px-2 py-1 text-left text-white text-[10px] font-semibold rounded-md overflow-hidden transition-transform duration-300 focus:outline-none focus-visible:outline-none focus:ring-0 ring-0 ${
+                    isActive ? 'shadow-lg scale-[1.02]' : 'opacity-80 hover:opacity-100 hover:scale-[1.01]'
+                  }`}
+                  aria-pressed={isActive}
+                >
+                  <span className="relative z-10 drop-shadow-[0_0_6px_rgba(0,0,0,0.6)]">{label}</span>
+                  <div className="pointer-events-none absolute inset-0 overflow-hidden">
+                    <div
+                      className="absolute inset-y-0 left-0 transition-all duration-300 ease-out"
+                      style={{ width, opacity: isActive ? 1 : 0, backgroundColor: '#A4A4A4' }}
+                    />
+                  </div>
+                </button>
+              );
+            })}
+          </div>
         </div>
       </div>
 

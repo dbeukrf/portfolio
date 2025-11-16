@@ -16,6 +16,8 @@ chatbot colours:
 
 #A4A4A4 animated icon, secondary text (grey text colour)
 
+#E0E0E0 off white text colour
+#F5F5F5 White Smoke
 
 #1f2937
 #6b7280

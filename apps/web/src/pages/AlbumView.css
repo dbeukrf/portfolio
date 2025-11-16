@@ -35,7 +35,7 @@
 
 .education-image-container {
   width: 100%;
-  max-width: 300px;
+  max-width: 200px;
   order: 1;
 }
 
@@ -116,7 +116,7 @@
   }
   
   .education-image-container {
-    width: 250px;
+    width: 180px;
     max-width: none;
     order: 1;
   }
@@ -188,7 +188,7 @@
   }
   
   .education-image-container {
-    width: 300px;
+    width: 220px;
   }
   
   .education-h3 {
@@ -223,4 +223,152 @@
     font-size: inherit !important;
   }
 }
+
+/* Work experience body content alignment */
+.work-body-content {
+  margin-top: 0.8rem;
+}
+
+@media (min-width: 640px) {
+  .work-body-content {
+    margin-top: 2.5rem;
+    padding-left: 2rem !important;
+  }
+}
+
+@media (min-width: 768px) {
+  .work-body-content {
+    padding-left: 2.5rem !important;
+  }
+}
+
+/* Adjust Technologies paragraph padding in work track to match body content */
+.work-track-content .education-content > p.education-li {
+  padding-left: 1.2rem;
+}
+
+@media (min-width: 640px) {
+  .work-track-content .education-content > p.education-li {
+    padding-left: 2rem !important;
+  }
+}
+
+@media (min-width: 768px) {
+  .work-track-content .education-content > p.education-li {
+    padding-left: 2.5rem !important;
+  }
+}
+
+/* Prevent date text from wrapping in work experience section */
+.work-track-content .education-major-info-desktop p.education-p {
+  white-space: nowrap;
+}
+
+/* Increase width of image container in work track to accommodate longer date text */
+@media (min-width: 640px) {
+  .work-track-content .education-image-container {
+    width: 200px;
+  }
+}
+
+@media (min-width: 768px) {
+  .work-track-content .education-image-container {
+    width: 240px;
+  }
+}
+
+/* Second body content for RMIT (aligns with second location row) */
+.work-body-content.work-body-content-second {
+  margin-top: 3rem;
+}
+
+@media (min-width: 640px) {
+  .work-body-content.work-body-content-second {
+    margin-top: 4rem;
+  }
+}
+
+/* RMIT mobile location info - show only on mobile */
+.rmit-location-mobile {
+  display: block;
+}
+
+@media (min-width: 640px) {
+  .rmit-location-mobile {
+    display: none;
+  }
+}
+
+/* Adjust body content margin on mobile when location is in content area */
+@media (max-width: 639px) {
+  .rmit-location-mobile-first + .work-body-content {
+    margin-top: 0.5rem;
+  }
+  
+  .rmit-location-mobile-second + .work-body-content {
+    margin-top: 0.5rem;
+  }
+}
+
+/* Work track specific font size reductions */
+.work-track-content .education-h3 {
+  font-size: 1.22rem;
+}
+
+.work-track-content .education-p {
+  font-size: 0.98rem;
+}
+
+@media (min-width: 640px) {
+  .work-track-content .education-h3 {
+    font-size: 1.3rem;
+  }
+  
+  .work-track-content .education-p {
+    font-size: 1.06rem;
+  }
+}
+
+@media (min-width: 768px) {
+  .work-track-content .education-h3 {
+    font-size: 1.46rem;
+  }
+  
+  .work-track-content .education-p {
+    font-size: 1.14rem;
+  }
+}
+
+/* Education track specific font size reductions for titles and subtitles */
+.education-track-content-wrapper .education-h3 {
+  font-size: 1.342rem;
+}
+
+.education-track-content-wrapper .education-degree-date .education-p {
+  font-size: 0.98rem;
+}
+
+@media (min-width: 640px) {
+  .education-track-content-wrapper .education-h3 {
+    font-size: 1.43rem;
+  }
+  
+  .education-track-content-wrapper .education-degree-date .education-p {
+    font-size: 1.06rem;
+  }
+}
+
+@media (min-width: 768px) {
+  .education-track-content-wrapper .education-h3 {
+    font-size: 1.606rem;
+  }
+  
+  .education-track-content-wrapper .education-degree-date .education-p {
+    font-size: 1.14rem;
+  }
+}
+
+
+
+
 
