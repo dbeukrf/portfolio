@@ -699,14 +699,17 @@ export default function AlbumView() {
   const [clipPathReveal, setClipPathReveal] = useState(0);
   const [contentVisible, setContentVisible] = useState(false);
   const [viewportHeight, setViewportHeight] = useState(0);
-  const [manualRevealProgress, setManualRevealProgress] = useState(0);
   const [currentTrackIndex, setCurrentTrackIndex] = useState(0);
   const [currentTrackProgress, setCurrentTrackProgress] = useState(0);
   const [playerBarVisible, setPlayerBarVisible] = useState(false);
   const [gradientColorIndex, setGradientColorIndex] = useState(0);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
-  const [parallaxProgress, setParallaxProgress] = useState(0);
-  const [manualParallaxProgress, setManualParallaxProgress] = useState(0);
+  // First parallax: Album view to track 1
+  const [manualAlbumRevealProgress, setManualAlbumRevealProgress] = useState(0);
+  
+  // Second parallax: aiDj track to chatbot
+  const [chatbotParallaxProgress, setChatbotParallaxProgress] = useState(0);
+  const [manualChatbotParallaxProgress, setManualChatbotParallaxProgress] = useState(0);
   
   // Location state
   const [locationText, setLocationText] = useState('Melbourne, Australia');
@@ -852,12 +855,17 @@ export default function AlbumView() {
   const maxScrollTopRef = useRef(0);
   const prevScrollTopRef = useRef(0);
   const prevScrollProgressRef = useRef(0);
-  const prevRevealRef = useRef(0);
-  const maxRevealReachedRef = useRef(0);
+  
+  // First parallax refs: Album view to track 1
+  const prevAlbumRevealRef = useRef(0);
+  const maxAlbumRevealReachedRef = useRef(0);
+  
+  // Second parallax refs: aiDj track to chatbot
+  const maxChatbotParallaxReachedRef = useRef(0);
+  const prevChatbotParallaxProgressRef = useRef(0);
+  
   const trackSectionRefs = useRef<(HTMLDivElement | null)[]>([]);
   const trackTitleRefs = useRef<(HTMLElement | null)[]>([]);
-  const maxParallaxReachedRef = useRef(0);
-  const prevParallaxProgressRef = useRef(0);
 
   // Compute hero height
   useEffect(() => {
@@ -1144,15 +1152,17 @@ export default function AlbumView() {
         
         if (finalCurrent) {
           const temp = Math.round(finalCurrent.temperatureC);
-          const rainStatus = finalCurrent.rainMm > 0 ? `, ${Math.round(finalCurrent.rainMm)}mm rain` : '';
-          const currentText = `${temp}°C ${rainStatus}`;
-          let dailyText = '';
-          if (finalDaily && finalDaily.temperatureMaxC.length > 0 && finalDaily.temperatureMinC.length > 0) {
-            const hi = Math.round(finalDaily.temperatureMaxC[0]);
-            const lo = Math.round(finalDaily.temperatureMinC[0]);
-            dailyText = ` • H/L ${hi}/${lo}°C`;
-          }
-          const full = `${currentText}${dailyText}`;
+          // const rainStatus = finalCurrent.rainMm > 0 ? `, ${Math.round(finalCurrent.rainMm)}mm rain` : '';
+          // const currentText = `${temp}°C ${rainStatus}`;
+          const currentText = `${temp}°C`;
+          // let dailyText = '';
+          // if (finalDaily && finalDaily.temperatureMaxC.length > 0 && finalDaily.temperatureMinC.length > 0) {
+          //   const hi = Math.round(finalDaily.temperatureMaxC[0]);
+          //   const lo = Math.round(finalDaily.temperatureMinC[0]);
+          //   dailyText = ` • H/L ${hi}/${lo}°C`;
+          // }
+          // const full = `${currentText}${dailyText}`;
+          const full = `${currentText}`;
           if (locationStr) setLocationText(`${locationStr} - ${full}`); else setLocationText(full);
         } else if (locationStr) {
           setLocationText(locationStr);
@@ -1210,12 +1220,12 @@ export default function AlbumView() {
       const revealDistance = vh * 1.5;
       const scrollTop = scrollContainerRef.current.scrollTop;
       
-      // Original wheel handling for album view reveal
+      // ===== FIRST PARALLAX: Album view to track 1 =====
       if (scrollTop < revealDistance) {
-        if (manualRevealProgress < 1 && e.deltaY > 0) {
+        if (manualAlbumRevealProgress < 1 && e.deltaY > 0) {
           e.preventDefault();
           
-          setManualRevealProgress((prev) => {
+          setManualAlbumRevealProgress((prev) => {
             const delta = e.deltaY;
             const newProgress = Math.max(0, Math.min(1, prev + delta / revealDistance));
             
@@ -1230,10 +1240,10 @@ export default function AlbumView() {
             return newProgress;
           });
         }
-        else if (manualRevealProgress > 0 && e.deltaY < 0) {
+        else if (manualAlbumRevealProgress > 0 && e.deltaY < 0) {
           e.preventDefault();
           
-          setManualRevealProgress((prev) => {
+          setManualAlbumRevealProgress((prev) => {
             const delta = Math.abs(e.deltaY);
             const newProgress = Math.max(0, Math.min(1, prev - delta / revealDistance));
             
@@ -1247,7 +1257,7 @@ export default function AlbumView() {
         }
       }
       
-      // Parallax scrolling from track 6 (aiDj) to chatbot - exact same pattern as album view to track 1
+      // ===== SECOND PARALLAX: aiDj track to chatbot =====
       const aiDjTrackIndex = TRACKS.findIndex(t => t.id === 'aiDj');
       const aiDjSection = trackSectionRefs.current[aiDjTrackIndex];
       
@@ -1255,39 +1265,39 @@ export default function AlbumView() {
         const aiDjRect = aiDjSection.getBoundingClientRect();
         const viewportBottom = vh;
         const distanceFromBottom = aiDjRect.bottom - viewportBottom;
-        const parallaxRevealDistance = vh * 1.5;
+        const chatbotParallaxRevealDistance = vh * 1.5;
         
-        // Check if we're in the parallax zone (similar to scrollTop < revealDistance for album view)
-        // Start parallax when we're within revealDistance of the end (distanceFromBottom <= parallaxRevealDistance)
-        // Continue until we've fully scrolled past (distanceFromBottom >= -parallaxRevealDistance)
-        if (distanceFromBottom <= parallaxRevealDistance && distanceFromBottom >= -parallaxRevealDistance) {
-          const parallaxScrollPosition = distanceFromBottom <= 0 
+        // Check if we're in the chatbot parallax zone
+        // Start parallax when we're within revealDistance of the end (distanceFromBottom <= chatbotParallaxRevealDistance)
+        // Continue until we've fully scrolled past (distanceFromBottom >= -chatbotParallaxRevealDistance)
+        if (distanceFromBottom <= chatbotParallaxRevealDistance && distanceFromBottom >= -chatbotParallaxRevealDistance) {
+          const chatbotParallaxScrollPosition = distanceFromBottom <= 0 
             ? Math.abs(distanceFromBottom) 
-            : parallaxRevealDistance - distanceFromBottom;
-          const progress = Math.max(0, Math.min(1, parallaxScrollPosition / parallaxRevealDistance));
+            : chatbotParallaxRevealDistance - distanceFromBottom;
+          const chatbotProgress = Math.max(0, Math.min(1, chatbotParallaxScrollPosition / chatbotParallaxRevealDistance));
           
-          if (progress < 1 && e.deltaY > 0) {
+          if (chatbotProgress < 1 && e.deltaY > 0) {
             // Scrolling down - minimize the background (increase progress to 1)
             e.preventDefault();
             
-            setManualParallaxProgress((prev) => {
+            setManualChatbotParallaxProgress((prev) => {
               const delta = e.deltaY;
-              const newProgress = Math.max(0, Math.min(1, prev + delta / parallaxRevealDistance));
+              const newProgress = Math.max(0, Math.min(1, prev + delta / chatbotParallaxRevealDistance));
               
               return newProgress;
             });
             return;
           }
-          else if (manualParallaxProgress > 0 && e.deltaY < 0) {
+          else if (manualChatbotParallaxProgress > 0 && e.deltaY < 0) {
             // Scrolling up - expand the background (decrease progress to 0)
             e.preventDefault();
             
-            setManualParallaxProgress((prev) => {
+            setManualChatbotParallaxProgress((prev) => {
               const delta = Math.abs(e.deltaY);
-              const newProgress = Math.max(0, Math.min(1, prev - delta / parallaxRevealDistance));
+              const newProgress = Math.max(0, Math.min(1, prev - delta / chatbotParallaxRevealDistance));
               
               if (newProgress === 0) {
-                maxParallaxReachedRef.current = 0;
+                maxChatbotParallaxReachedRef.current = 0;
               }
               
               return newProgress;
@@ -1308,7 +1318,7 @@ export default function AlbumView() {
         container.removeEventListener('wheel', handleWheel);
       }
     };
-  }, [manualRevealProgress, manualParallaxProgress, viewportHeight]);
+  }, [manualAlbumRevealProgress, manualChatbotParallaxProgress, viewportHeight]);
 
   // Capture track title refs
   useEffect(() => {
@@ -1352,11 +1362,12 @@ export default function AlbumView() {
         maxScrollTopRef.current = scrollTop;
       }
       
-      let reveal;
+      // ===== FIRST PARALLAX: Album view to track 1 =====
+      let albumReveal;
       
       const contentScrollMax = scrollContainerRef.current ? scrollContainerRef.current.scrollHeight : 0;
       const maxContentScroll = contentScrollMax - vh - revealDistance;
-      const shrinkDistance = Math.min(maxContentScroll * 0.1, revealDistance * 0.3);
+      const albumShrinkDistance = Math.min(maxContentScroll * 0.1, revealDistance * 0.3);
       
       if (scrollTop < revealDistance) {
         const scrollBasedReveal = Math.max(0, Math.min(1, scrollTop / revealDistance));
@@ -1365,22 +1376,22 @@ export default function AlbumView() {
           const scrollBack = revealDistance - scrollTop;
           let calculatedReveal;
           
-          if (scrollBack >= 0 && scrollBack <= shrinkDistance && shrinkDistance > 0) {
-            calculatedReveal = Math.max(0, Math.min(1, 1 - (scrollBack / shrinkDistance)));
-          } else if (scrollBack > shrinkDistance) {
+          if (scrollBack >= 0 && scrollBack <= albumShrinkDistance && albumShrinkDistance > 0) {
+            calculatedReveal = Math.max(0, Math.min(1, 1 - (scrollBack / albumShrinkDistance)));
+          } else if (scrollBack > albumShrinkDistance) {
             calculatedReveal = 0;
           } else {
             calculatedReveal = 1;
           }
           
-          reveal = Math.min(calculatedReveal, maxRevealReachedRef.current);
-          setManualRevealProgress(reveal);
+          albumReveal = Math.min(calculatedReveal, maxAlbumRevealReachedRef.current);
+          setManualAlbumRevealProgress(albumReveal);
         } else {
-          if (manualRevealProgress > scrollBasedReveal) {
-            reveal = manualRevealProgress;
+          if (manualAlbumRevealProgress > scrollBasedReveal) {
+            albumReveal = manualAlbumRevealProgress;
           } else {
-            reveal = scrollBasedReveal;
-            setManualRevealProgress(scrollBasedReveal);
+            albumReveal = scrollBasedReveal;
+            setManualAlbumRevealProgress(scrollBasedReveal);
           }
         }
       } else {
@@ -1395,19 +1406,19 @@ export default function AlbumView() {
           const scrollBack = revealDistance - scrollTop;
           let calculatedReveal;
           
-          if (scrollBack >= 0 && scrollBack <= shrinkDistance && shrinkDistance > 0) {
-            calculatedReveal = Math.max(0, Math.min(1, 1 - (scrollBack / shrinkDistance)));
-          } else if (scrollBack > shrinkDistance) {
+          if (scrollBack >= 0 && scrollBack <= albumShrinkDistance && albumShrinkDistance > 0) {
+            calculatedReveal = Math.max(0, Math.min(1, 1 - (scrollBack / albumShrinkDistance)));
+          } else if (scrollBack > albumShrinkDistance) {
             calculatedReveal = 0;
           } else {
             calculatedReveal = 1;
           }
           
-          reveal = Math.min(calculatedReveal, maxRevealReachedRef.current);
+          albumReveal = Math.min(calculatedReveal, maxAlbumRevealReachedRef.current);
         } else if (isOnFirstTrack) {
-          reveal = 1;
+          albumReveal = 1;
         } else {
-          reveal = 1;
+          albumReveal = 1;
         }
       }
       
@@ -1415,19 +1426,20 @@ export default function AlbumView() {
       
       if (rafId === null) {
         rafId = requestAnimationFrame(() => {
-          setClipPathReveal(reveal);
+          // Update first parallax (album reveal)
+          setClipPathReveal(albumReveal);
           
-          prevRevealRef.current = reveal;
+          prevAlbumRevealRef.current = albumReveal;
           
-          if (reveal > maxRevealReachedRef.current) {
-            maxRevealReachedRef.current = reveal;
+          if (albumReveal > maxAlbumRevealReachedRef.current) {
+            maxAlbumRevealReachedRef.current = albumReveal;
           }
           
           if (scrollTop === 0) {
-            maxRevealReachedRef.current = 0;
+            maxAlbumRevealReachedRef.current = 0;
           }
           
-          if (reveal >= 1 && scrollTop >= revealDistance) {
+          if (albumReveal >= 1 && scrollTop >= revealDistance) {
             setContentVisible(true);
             
             const contentScroll = scrollTop - revealDistance;
@@ -1442,14 +1454,15 @@ export default function AlbumView() {
             prevScrollProgressRef.current = newScrollProgress;
           } else {
             setContentVisible(false);
-            setScrollProgress(reveal);
-            prevScrollProgressRef.current = reveal;
+            setScrollProgress(albumReveal);
+            prevScrollProgressRef.current = albumReveal;
           }
 
           const segmentSize = 27;
           const newGradientColorIndex = Math.floor(scrollTop / segmentSize) % RAINBOW_COLORS.length;
           setGradientColorIndex(newGradientColorIndex);
 
+          // ===== SECOND PARALLAX: aiDj track to chatbot =====
           const viewportY = viewportHeight || vh;
           if (viewportY > 0 && trackSectionRefs.current.length) {
             const rects = trackSectionRefs.current.map((section) =>
@@ -1495,7 +1508,7 @@ export default function AlbumView() {
               setCurrentTrackProgress(0);
             }
 
-            // Parallax scrolling from track 6 (aiDj) to chatbot - exact same pattern as album view to track 1
+            // Second parallax: aiDj track to chatbot
             const aiDjTrackIndex = TRACKS.findIndex(t => t.id === 'aiDj');
             const aiDjRect = rects[aiDjTrackIndex];
             const isOnAiDjTrack = activeIndex === aiDjTrackIndex;
@@ -1504,89 +1517,89 @@ export default function AlbumView() {
               const trackBottom = aiDjRect.bottom;
               const viewportBottom = viewportY;
               const distanceFromBottom = trackBottom - viewportBottom;
-              const parallaxRevealDistance = vh * 1.5;
+              const chatbotParallaxRevealDistance = vh * 1.5;
               
-              // Calculate shrink distance similar to album view
-              const contentScrollMax = scrollContainerRef.current ? scrollContainerRef.current.scrollHeight : 0;
-              const maxContentScroll = contentScrollMax - vh - parallaxRevealDistance;
-              const shrinkDistance = Math.min(maxContentScroll * 0.1, parallaxRevealDistance * 0.3);
+              // Calculate shrink distance for chatbot parallax
+              const chatbotContentScrollMax = scrollContainerRef.current ? scrollContainerRef.current.scrollHeight : 0;
+              const chatbotMaxContentScroll = chatbotContentScrollMax - vh - chatbotParallaxRevealDistance;
+              const chatbotShrinkDistance = Math.min(chatbotMaxContentScroll * 0.1, chatbotParallaxRevealDistance * 0.3);
               
-              let parallaxReveal;
+              let chatbotParallaxReveal;
               
-              // Check if we're in the parallax zone (similar to scrollTop < revealDistance)
-              // Start parallax when we're within revealDistance of the end (distanceFromBottom <= parallaxRevealDistance)
-              // Continue until we've fully scrolled past (distanceFromBottom >= -parallaxRevealDistance)
-              if (distanceFromBottom <= parallaxRevealDistance && distanceFromBottom >= -parallaxRevealDistance) {
-                // Calculate progress: 0 when distanceFromBottom = parallaxRevealDistance, 1 when distanceFromBottom = -parallaxRevealDistance
-                const parallaxScrollPosition = distanceFromBottom <= 0 
+              // Check if we're in the chatbot parallax zone
+              // Start parallax when we're within revealDistance of the end (distanceFromBottom <= chatbotParallaxRevealDistance)
+              // Continue until we've fully scrolled past (distanceFromBottom >= -chatbotParallaxRevealDistance)
+              if (distanceFromBottom <= chatbotParallaxRevealDistance && distanceFromBottom >= -chatbotParallaxRevealDistance) {
+                // Calculate progress: 0 when distanceFromBottom = chatbotParallaxRevealDistance, 1 when distanceFromBottom = -chatbotParallaxRevealDistance
+                const chatbotParallaxScrollPosition = distanceFromBottom <= 0 
                   ? Math.abs(distanceFromBottom) 
-                  : parallaxRevealDistance - distanceFromBottom;
-                const scrollBasedReveal = Math.max(0, Math.min(1, parallaxScrollPosition / parallaxRevealDistance));
+                  : chatbotParallaxRevealDistance - distanceFromBottom;
+                const chatbotScrollBasedReveal = Math.max(0, Math.min(1, chatbotParallaxScrollPosition / chatbotParallaxRevealDistance));
                 
                 if (isScrollingUp) {
                   // Scrolling up - expand the background (decrease progress toward 0)
-                  const scrollBack = parallaxRevealDistance - parallaxScrollPosition;
-                  let calculatedReveal;
+                  const chatbotScrollBack = chatbotParallaxRevealDistance - chatbotParallaxScrollPosition;
+                  let chatbotCalculatedReveal;
                   
-                  if (scrollBack >= 0 && scrollBack <= shrinkDistance && shrinkDistance > 0) {
-                    calculatedReveal = Math.max(0, Math.min(1, 1 - (scrollBack / shrinkDistance)));
-                  } else if (scrollBack > shrinkDistance) {
-                    calculatedReveal = 0;
+                  if (chatbotScrollBack >= 0 && chatbotScrollBack <= chatbotShrinkDistance && chatbotShrinkDistance > 0) {
+                    chatbotCalculatedReveal = Math.max(0, Math.min(1, 1 - (chatbotScrollBack / chatbotShrinkDistance)));
+                  } else if (chatbotScrollBack > chatbotShrinkDistance) {
+                    chatbotCalculatedReveal = 0;
                   } else {
-                    calculatedReveal = 1;
+                    chatbotCalculatedReveal = 1;
                   }
                   
-                  parallaxReveal = Math.min(calculatedReveal, maxParallaxReachedRef.current);
-                  setManualParallaxProgress(parallaxReveal);
+                  chatbotParallaxReveal = Math.min(chatbotCalculatedReveal, maxChatbotParallaxReachedRef.current);
+                  setManualChatbotParallaxProgress(chatbotParallaxReveal);
                 } else {
                   // Scrolling down - minimize the background (increase progress toward 1)
-                  if (manualParallaxProgress > scrollBasedReveal) {
-                    parallaxReveal = manualParallaxProgress;
+                  if (manualChatbotParallaxProgress > chatbotScrollBasedReveal) {
+                    chatbotParallaxReveal = manualChatbotParallaxProgress;
                   } else {
-                    parallaxReveal = scrollBasedReveal;
-                    setManualParallaxProgress(scrollBasedReveal);
+                    chatbotParallaxReveal = chatbotScrollBasedReveal;
+                    setManualChatbotParallaxProgress(chatbotScrollBasedReveal);
                   }
                 }
-              } else if (distanceFromBottom < -parallaxRevealDistance) {
-                // Fully scrolled past
+              } else if (distanceFromBottom < -chatbotParallaxRevealDistance) {
+                // Fully scrolled past chatbot parallax zone
                 const isOnLastTrack = true;
                 
                 if (isScrollingUp && isOnLastTrack) {
-                  const parallaxScrollPosition = Math.abs(distanceFromBottom);
-                  const scrollBack = parallaxRevealDistance - parallaxScrollPosition;
-                  let calculatedReveal;
+                  const chatbotParallaxScrollPosition = Math.abs(distanceFromBottom);
+                  const chatbotScrollBack = chatbotParallaxRevealDistance - chatbotParallaxScrollPosition;
+                  let chatbotCalculatedReveal;
                   
-                  if (scrollBack >= 0 && scrollBack <= shrinkDistance && shrinkDistance > 0) {
-                    calculatedReveal = Math.max(0, Math.min(1, 1 - (scrollBack / shrinkDistance)));
-                  } else if (scrollBack > shrinkDistance) {
-                    calculatedReveal = 0;
+                  if (chatbotScrollBack >= 0 && chatbotScrollBack <= chatbotShrinkDistance && chatbotShrinkDistance > 0) {
+                    chatbotCalculatedReveal = Math.max(0, Math.min(1, 1 - (chatbotScrollBack / chatbotShrinkDistance)));
+                  } else if (chatbotScrollBack > chatbotShrinkDistance) {
+                    chatbotCalculatedReveal = 0;
                   } else {
-                    calculatedReveal = 1;
+                    chatbotCalculatedReveal = 1;
                   }
                   
-                  parallaxReveal = Math.min(calculatedReveal, maxParallaxReachedRef.current);
+                  chatbotParallaxReveal = Math.min(chatbotCalculatedReveal, maxChatbotParallaxReachedRef.current);
                 } else if (isOnLastTrack) {
-                  parallaxReveal = 1; // Minimized when fully scrolled past
+                  chatbotParallaxReveal = 1; // Minimized when fully scrolled past
                 } else {
-                  parallaxReveal = 1;
+                  chatbotParallaxReveal = 1;
                 }
               } else {
-                parallaxReveal = 0; // Expanded when not in parallax zone
+                chatbotParallaxReveal = 0; // Expanded when not in chatbot parallax zone
               }
               
-              if (parallaxReveal > maxParallaxReachedRef.current) {
-                maxParallaxReachedRef.current = parallaxReveal;
+              if (chatbotParallaxReveal > maxChatbotParallaxReachedRef.current) {
+                maxChatbotParallaxReachedRef.current = chatbotParallaxReveal;
               }
               
-              if (distanceFromBottom > parallaxRevealDistance) {
-                maxParallaxReachedRef.current = 0;
+              if (distanceFromBottom > chatbotParallaxRevealDistance) {
+                maxChatbotParallaxReachedRef.current = 0;
               }
               
-              setParallaxProgress(parallaxReveal);
-              prevParallaxProgressRef.current = parallaxReveal;
+              setChatbotParallaxProgress(chatbotParallaxReveal);
+              prevChatbotParallaxProgressRef.current = chatbotParallaxReveal;
             } else {
-              setParallaxProgress(0); // Expanded when not on aiDj track
-              maxParallaxReachedRef.current = 0;
+              setChatbotParallaxProgress(0); // Expanded when not on aiDj track
+              maxChatbotParallaxReachedRef.current = 0;
             }
           }
           
@@ -1609,7 +1622,7 @@ export default function AlbumView() {
         cancelAnimationFrame(rafId);
       }
     };
-  }, [manualRevealProgress, manualParallaxProgress, viewportHeight]);
+  }, [manualAlbumRevealProgress, manualChatbotParallaxProgress, viewportHeight]);
 
   // Hide body scrollbar
   useEffect(() => {
@@ -1703,14 +1716,14 @@ export default function AlbumView() {
       className="h-screen w-screen overflow-y-scroll overflow-x-hidden bg-[#0c0c0c]"
       style={{ scrollBehavior: 'smooth' }}
     >
-      {/* Chatbot page behind parallax animation */}
+      {/* Chatbot page behind second parallax animation */}
       <div
         className="fixed inset-0 z-[30]"
         style={{
-          opacity: parallaxProgress > 0 ? Math.max(0.3, parallaxProgress) : 0,
+          opacity: chatbotParallaxProgress > 0 ? Math.max(0.3, chatbotParallaxProgress) : 0,
           transition: 'opacity 0.3s ease-out',
-          pointerEvents: parallaxProgress >= 1 ? 'auto' : 'none',
-          visibility: parallaxProgress > 0 ? 'visible' : 'hidden'
+          pointerEvents: chatbotParallaxProgress >= 1 ? 'auto' : 'none',
+          visibility: chatbotParallaxProgress > 0 ? 'visible' : 'hidden'
         }}
       >
         <Chatbot />
@@ -1722,9 +1735,9 @@ export default function AlbumView() {
         ref={heroRef} 
         className="sticky top-0 z-40 w-full bg-gradient-to-b from-[#1f2937] to-[#0c0c0c] flex flex-row items-center gap-1 sm:gap-2 md:gap-2.5 lg:gap-3 px-1.5 sm:px-2.5 md:px-4 lg:px-5 py-1 sm:py-1.5 md:py-2 lg:py-2.5 overflow-hidden max-h-[35vh] md:max-h-[25vh]"
         style={{
-          opacity: parallaxProgress > 0 ? 0 : 1,
+          opacity: chatbotParallaxProgress > 0 ? 0 : 1,
           transition: 'opacity 0.3s ease-out',
-          pointerEvents: parallaxProgress > 0 ? 'none' : 'auto'
+          pointerEvents: chatbotParallaxProgress > 0 ? 'none' : 'auto'
         }}
       >
         <img
@@ -1829,9 +1842,9 @@ export default function AlbumView() {
         className="sticky z-40 w-full bg-transparent" 
         style={{ 
           top: `${heroHeight}px`,
-          opacity: parallaxProgress > 0 ? 0 : 1,
+          opacity: chatbotParallaxProgress > 0 ? 0 : 1,
           transition: 'opacity 0.3s ease-out',
-          pointerEvents: parallaxProgress > 0 ? 'none' : 'auto'
+          pointerEvents: chatbotParallaxProgress > 0 ? 'none' : 'auto'
         }}
       >
         <div className="flex items-center gap-1.5 md:gap-2.5 px-3 md:px-6 py-2.5 md:py-4">
@@ -1891,9 +1904,9 @@ export default function AlbumView() {
           top: `${heroHeight + controlsHeight}px`,
           height: `calc(100vh - ${heroHeight + controlsHeight}px)`,
           maxHeight: `calc(100vh - ${heroHeight + controlsHeight}px)`,
-          opacity: parallaxProgress > 0 ? 0 : 1,
+          opacity: chatbotParallaxProgress > 0 ? 0 : 1,
           transition: 'opacity 0.3s ease-out',
-          pointerEvents: parallaxProgress > 0 ? 'none' : 'auto'
+          pointerEvents: chatbotParallaxProgress > 0 ? 'none' : 'auto'
         }}
       >
         <div 
@@ -1986,16 +1999,16 @@ export default function AlbumView() {
           style={{
             top: 0,
             bottom: 0,
-            clipPath: parallaxProgress > 0
-              ? `inset(${50 - Math.max(0, Math.min(1, parallaxProgress)) * 50}% 0% ${50 - Math.max(0, Math.min(1, parallaxProgress)) * 50}% 0%)`
+            clipPath: chatbotParallaxProgress > 0
+              ? `inset(${50 - Math.max(0, Math.min(1, chatbotParallaxProgress)) * 50}% 0% ${50 - Math.max(0, Math.min(1, chatbotParallaxProgress)) * 50}% 0%)`
               : `inset(${50 - Math.max(0, Math.min(1, clipPathReveal)) * 50}% 0% ${50 - Math.max(0, Math.min(1, clipPathReveal)) * 50}% 0%)`,
-            transition: parallaxProgress > 0 
+            transition: chatbotParallaxProgress > 0 
               ? 'clip-path 0.1s cubic-bezier(0.4, 0, 0.2, 1)'
               : 'clip-path 0.1s cubic-bezier(0.4, 0, 0.2, 1)',
             willChange: 'clip-path',
             zIndex: 50,
             backgroundColor: '#F5F5F5',
-            pointerEvents: contentVisible && parallaxProgress < 1 ? 'auto' : 'none'
+            pointerEvents: contentVisible && chatbotParallaxProgress < 1 ? 'auto' : 'none'
           }}
         />
 
@@ -2013,10 +2026,10 @@ export default function AlbumView() {
             margin: 0,
             padding: 0,
             fontSize: 0,
-            clipPath: parallaxProgress > 0
-              ? `inset(${50 - Math.max(0, Math.min(1, parallaxProgress)) * 50}% 0% ${50 - Math.max(0, Math.min(1, parallaxProgress)) * 50}% 0%)`
+            clipPath: chatbotParallaxProgress > 0
+              ? `inset(${50 - Math.max(0, Math.min(1, chatbotParallaxProgress)) * 50}% 0% ${50 - Math.max(0, Math.min(1, chatbotParallaxProgress)) * 50}% 0%)`
               : 'none',
-            pointerEvents: parallaxProgress >= 1 ? 'none' : 'auto'
+            pointerEvents: chatbotParallaxProgress >= 1 ? 'none' : 'auto'
           }}
         >
           {TRACKS.map((track, index) => (
