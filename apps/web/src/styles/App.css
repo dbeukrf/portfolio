@@ -1,15 +1,13 @@
-/* Terminal Container - scoped to avoid conflicts with other pages */
+/* Terminal Container */
 .terminal-container {
-  width: 100%;
-  height: 100%;
-  position: relative;
+  width: 100vw;
+  height: 100vh;
   background-image:
     linear-gradient(rgba(0, 0, 0, 0.4), rgba(0, 0, 0, 0.4)),
-    url('/images/chatbot/samsung-galaxy-note10-bubble-dark-stock-black-background-3040x3040-727.jpg');
+    url('media/samsung-galaxy-note10-bubble-dark-stock-black-background-3040x3040-727.jpg');
   background-repeat: no-repeat;
   background-size: 130% auto;
   background-position: 15% center;
-  background-attachment: fixed;
   color: #D7FFF1;
   font-family: 'Courier New', 'Monaco', 'Menlo', monospace;
   font-size: 14px;
@@ -17,38 +15,6 @@
   overflow: hidden;
   display: flex;
   flex-direction: column;
-}
-
-/* Standalone mode - when accessed via /chatbot route */
-.terminal-container.terminal-standalone {
-  min-height: 100vh;
-  min-width: 100vw;
-  position: fixed;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  z-index: 50;
-  cursor: text;
-}
-
-.terminal-container.terminal-standalone * {
-  cursor: inherit;
-}
-
-.terminal-container.terminal-standalone .terminal-input {
-  cursor: text;
-}
-
-/* Embedded mode - when used in AlbumView overlay */
-.terminal-container.terminal-embedded {
-  width: 100%;
-  height: 100%;
-  position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
 }
 
 /* Terminal Header */
@@ -354,8 +320,8 @@
   background: rgba(215, 255, 241, 0.1);
 }
 
-/* Selection styles - scoped to terminal container */
-.terminal-container ::selection {
+/* Selection styles */
+::selection {
   background: #D7FFF1;
   color: #0c0c0c;
 }

@@ -1,7 +1,8 @@
 import { useState, useEffect, useRef } from 'react'
-import '../styles/App.css'
-import AnimatedAscii from './AnimatedAscii'
+import '../App.css'
+import AnimatedAscii from '../components/ui/AnimatedAscii'
 import { useAsciiFrames } from '../hooks/useAsciiFrames'
+import { useLocation } from 'react-router-dom'
 
 interface Message {
   id: number
@@ -10,13 +11,15 @@ interface Message {
   timestamp: Date
 }
 
-function App() {
+function Chatbot() {
+  const location = useLocation()
+  const isStandalone = location.pathname === '/chatbot'
   const { frames, metadata, loading: asciiLoading, error } = useAsciiFrames()
   
   // Debug logging
   useEffect(() => {
-    console.log('App: asciiLoading =', asciiLoading, 'frames.length =', frames.length, 'error =', error)
-  }, [asciiLoading, frames.length, error])
+    console.log('Chatbot: asciiLoading =', asciiLoading, 'frames.length =', frames.length, 'error =', error, 'isStandalone =', isStandalone)
+  }, [asciiLoading, frames.length, error, isStandalone])
   const [messages, setMessages] = useState<Message[]>([
     {
       id: 0,
@@ -51,6 +54,16 @@ function App() {
   useEffect(() => {
     scrollToBottom()
   }, [messages])
+
+  // Ensure input is focused when in standalone mode
+  useEffect(() => {
+    if (isStandalone && inputRef.current && document.activeElement !== inputRef.current) {
+      const timer = setTimeout(() => {
+        inputRef.current?.focus()
+      }, 200)
+      return () => clearTimeout(timer)
+    }
+  }, [isStandalone])
 
   const handleKeyPress = (e: React.KeyboardEvent) => {
     if (e.key === 'Enter') {
@@ -198,19 +211,19 @@ function App() {
   }
 
   return (
-    <div className="terminal-container">
+    <div className={`terminal-container ${isStandalone ? 'terminal-standalone' : 'terminal-embedded'}`}>
     {/* Terminal Header */}
     <div className="terminal-header">
       {asciiLoading ? (
-        <div className="terminal-title">
-          Diego Beuk's AI DJ
+        <div className="header-content">
+          <span className="title-text">Diego Beuk's AI DJ</span>
         </div>
       ) : error ? (
         <div className="header-content">
-          <span className="error-text">Error loading ASCII art</span>
+          <span className="error-text">Error loading ASCII art: {error}</span>
           <span className="title-text">Diego Beuk's AI DJ</span>
         </div>
-      ) : (
+      ) : frames.length > 0 && metadata ? (
         <>
           <div className="header-content">
             <span className="title-text">Diego Beuk's AI DJ</span>
@@ -218,11 +231,15 @@ function App() {
           <div className="ascii-container">
             <AnimatedAscii 
               frames={frames} 
-              fps={metadata?.fps || 8} 
+              fps={metadata.fps} 
               className="header-ascii"
             />
           </div>
         </>
+      ) : (
+        <div className="header-content">
+          <span className="title-text">Diego Beuk's AI DJ</span>
+        </div>
       )}
     </div>
 
@@ -277,4 +294,4 @@ function App() {
   )
 }
 
-export default App
+export default Chatbot

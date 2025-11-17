@@ -35,11 +35,18 @@ const getShadingClass = (char: string): string => {
 
 // Function to render ASCII with shading
 const renderAsciiWithShading = (asciiText: string): JSX.Element => {
+  // Split by lines to preserve line structure, then render each line
+  const lines = asciiText.split('\n')
   return (
     <>
-      {asciiText.split('').map((char, index) => (
-        <span key={index} className={getShadingClass(char)}>
-          {char}
+      {lines.map((line, lineIndex) => (
+        <span key={lineIndex}>
+          {line.split('').map((char, charIndex) => (
+            <span key={charIndex} className={getShadingClass(char)}>
+              {char}
+            </span>
+          ))}
+          {lineIndex < lines.length - 1 && '\n'}
         </span>
       ))}
     </>
@@ -53,20 +60,31 @@ const AnimatedAscii: React.FC<AsciiAnimationProps> = ({ frames, fps, className =
     console.log('AnimatedAscii: frames.length =', frames.length, 'fps =', fps)
     if (frames.length === 0) return
 
+    // Reset to first frame when frames change
+    setCurrentFrame(0)
+
     const interval = setInterval(() => {
-      setCurrentFrame((prev) => (prev + 1) % frames.length)
+      setCurrentFrame((prev) => {
+        const next = (prev + 1) % frames.length
+        return next
+      })
     }, 1000 / fps)
 
     return () => clearInterval(interval)
   }, [frames, fps])
 
   if (frames.length === 0) {
-    console.log('AnimatedAscii: No frames available, showing loading')
-    return <div className={className}>Loading...</div>
+    console.log('AnimatedAscii: No frames available')
+    return null
+  }
+
+  if (!frames[currentFrame]) {
+    console.log('AnimatedAscii: Current frame is undefined', currentFrame)
+    return null
   }
 
   return (
-    <pre className={`ascii-art ${className}`}>
+    <pre className={className || 'header-ascii'}>
       {renderAsciiWithShading(frames[currentFrame])}
     </pre>
   )
