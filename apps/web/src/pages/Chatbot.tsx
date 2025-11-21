@@ -4,6 +4,9 @@ import AnimatedAscii from '../components/ui/AnimatedAscii'
 import { useAsciiFrames } from '../hooks/useAsciiFrames'
 import { useLocation } from 'react-router-dom'
 
+// Chatbot API base URL - points to the chatbot backend on port 8001
+const CHATBOT_API_BASE_URL = import.meta.env.VITE_CHATBOT_API_BASE_URL || 'http://localhost:8001/api'
+
 interface Message {
   id: number
   type: 'command' | 'response' | 'system'
@@ -128,15 +131,25 @@ function Chatbot() {
 
       case 'spin-profile':
         try {
-          const response = await fetch('/api/chat', {
+          console.log('Attempting to connect to:', `${CHATBOT_API_BASE_URL}/chat`)
+          const response = await fetch(`${CHATBOT_API_BASE_URL}/chat`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ message: 'Generate a recruiter-ready summary of Diego Beuk\'s profile - short, catchy, and impactful. Focus on his key experience, strengths, achievements, and what makes him stand out to employers.' })
           })
+          if (!response.ok) {
+            const errorText = await response.text()
+            console.error('HTTP error response:', response.status, errorText)
+            throw new Error(`HTTP error! status: ${response.status}, message: ${errorText}`)
+          }
           const result = await response.json()
           return result.response || 'No response received'
         } catch (error) {
-          return 'Error generating profile. Make sure the backend is running.'
+          console.error('Error generating profile:', error)
+          if (error instanceof TypeError && error.message.includes('fetch')) {
+            return `Error: Could not connect to chatbot backend at ${CHATBOT_API_BASE_URL}. Make sure it's running on port 8001. Check the console for startup messages.`
+          }
+          return `Error generating profile: ${error instanceof Error ? error.message : 'Unknown error'}. Make sure the chatbot backend is running on port 8001.`
         }
 
       case 'amplify':
@@ -145,15 +158,19 @@ function Chatbot() {
         }
         try {
           const skill = args.join(' ')
-          const response = await fetch('/api/chat', {
+          const response = await fetch(`${CHATBOT_API_BASE_URL}/chat`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ message: `Expand on Diego's ${skill} skills with measurable examples and impact statements. Show specific achievements and how this skill has contributed to his professional growth.` })
           })
+          if (!response.ok) {
+            throw new Error(`HTTP error! status: ${response.status}`)
+          }
           const result = await response.json()
           return result.response || 'No response received'
         } catch (error) {
-          return 'Error amplifying skill. Make sure the backend is running.'
+          console.error('Error amplifying skill:', error)
+          return 'Error amplifying skill. Make sure the chatbot backend is running on port 8001.'
         }
 
       case 'career-analysis':
@@ -162,15 +179,19 @@ function Chatbot() {
         }
         try {
           const jobRole = args.join(' ')
-          const response = await fetch('/api/chat', {
+          const response = await fetch(`${CHATBOT_API_BASE_URL}/chat`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ message: `Compare Diego's experiences and skills with the ${jobRole} role. Identify his strengths, potential gaps, and how his unique background could be an advantage for this position.` })
           })
+          if (!response.ok) {
+            throw new Error(`HTTP error! status: ${response.status}`)
+          }
           const result = await response.json()
           return result.response || 'No response received'
         } catch (error) {
-          return 'Error analysing career analysis. Make sure the backend is running.'
+          console.error('Error analyzing career:', error)
+          return 'Error analysing career analysis. Make sure the chatbot backend is running on port 8001.'
         }
 
       case 'clear':
@@ -193,15 +214,25 @@ function Chatbot() {
       default:
         // If it's not a recognized command, treat it as a natural conversation
         try {
-          const response = await fetch('/api/chat', {
+          console.log('Attempting to connect to:', `${CHATBOT_API_BASE_URL}/chat`)
+          const response = await fetch(`${CHATBOT_API_BASE_URL}/chat`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ message: command })
           })
+          if (!response.ok) {
+            const errorText = await response.text()
+            console.error('HTTP error response:', response.status, errorText)
+            throw new Error(`HTTP error! status: ${response.status}, message: ${errorText}`)
+          }
           const result = await response.json()
           return result.response || 'No response received'
         } catch (error) {
-          return `Unknown command: ${cmd}. Type \'help\' for available commands, or try chatting naturally!`
+          console.error('Error sending message:', error)
+          if (error instanceof TypeError && error.message.includes('fetch')) {
+            return `Error: Could not connect to chatbot backend at ${CHATBOT_API_BASE_URL}. Make sure it's running on port 8001. Check the console for startup messages.`
+          }
+          return `Error: ${error instanceof Error ? error.message : 'Could not connect to chatbot backend'}. Make sure it's running on port 8001.`
         }
     }
   }

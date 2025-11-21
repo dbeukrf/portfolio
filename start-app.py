@@ -20,6 +20,7 @@ FRONTEND_DIR = ROOT_DIR / "apps" / "web"
 
 # Global process references
 backend_process = None
+chatbot_backend_process = None
 frontend_process = None
 
 def signal_handler(sig, frame):
@@ -36,6 +37,14 @@ def signal_handler(sig, frame):
         except subprocess.TimeoutExpired:
             backend_process.kill()
     
+    if chatbot_backend_process:
+        print("Stopping chatbot backend server...")
+        chatbot_backend_process.terminate()
+        try:
+            chatbot_backend_process.wait(timeout=5)
+        except subprocess.TimeoutExpired:
+            chatbot_backend_process.kill()
+    
     if frontend_process:
         print("Stopping frontend server...")
         frontend_process.terminate()
@@ -46,6 +55,91 @@ def signal_handler(sig, frame):
     
     print("\nAll servers stopped.")
     sys.exit(0)
+
+def start_chatbot_backend():
+    """Start the chatbot backend API server in a separate thread."""
+    global chatbot_backend_process
+    
+    # Check if .env file exists
+    env_path = ROOT_DIR / '.env'
+    if not env_path.exists():
+        print("\n[Chatbot Backend] Warning: .env file not found. Please create one with your API keys.")
+        print("[Chatbot Backend] Required variables: OPENAI_API_KEY, LANGCHAIN_API_KEY")
+    
+    # Determine Python executable
+    venv_path = BACKEND_DIR / "venv"
+    python_cmd = sys.executable
+    
+    if venv_path.exists():
+        if platform.system() == "Windows":
+            python_cmd = str(venv_path / "Scripts" / "python.exe")
+        else:
+            python_cmd = str(venv_path / "bin" / "python")
+    
+    print("\n[Chatbot Backend] Starting server on http://127.0.0.1:8001")
+    
+    try:
+        if platform.system() == "Windows":
+            # Add apps directory to Python path and run from project root
+            env = os.environ.copy()
+            pythonpath = str(ROOT_DIR / "apps")
+            if "PYTHONPATH" in env:
+                env["PYTHONPATH"] = f"{pythonpath}{os.pathsep}{env['PYTHONPATH']}"
+            else:
+                env["PYTHONPATH"] = pythonpath
+            
+            chatbot_backend_process = subprocess.Popen(
+                [
+                    python_cmd, "-m", "uvicorn", 
+                    "backend.api_server:app", 
+                    "--host", "0.0.0.0", 
+                    "--port", "8001", 
+                    "--reload"
+                ],
+                cwd=ROOT_DIR,
+                shell=True,
+                stdout=subprocess.PIPE,
+                stderr=subprocess.STDOUT,
+                text=True,
+                bufsize=1,
+                env=env
+            )
+        else:
+            # Add apps directory to Python path and run from project root
+            env = os.environ.copy()
+            pythonpath = str(ROOT_DIR / "apps")
+            if "PYTHONPATH" in env:
+                env["PYTHONPATH"] = f"{pythonpath}{os.pathsep}{env['PYTHONPATH']}"
+            else:
+                env["PYTHONPATH"] = pythonpath
+            
+            chatbot_backend_process = subprocess.Popen(
+                [
+                    python_cmd, "-m", "uvicorn", 
+                    "backend.api_server:app", 
+                    "--host", "0.0.0.0", 
+                    "--port", "8001", 
+                    "--reload"
+                ],
+                cwd=ROOT_DIR,
+                stdout=subprocess.PIPE,
+                stderr=subprocess.STDOUT,
+                text=True,
+                bufsize=1,
+                env=env
+            )
+        
+        # Print chatbot backend output in a separate thread
+        def print_chatbot_output():
+            if chatbot_backend_process.stdout:
+                for line in chatbot_backend_process.stdout:
+                    print(f"[Chatbot Backend] {line.rstrip()}")
+        
+        output_thread = Thread(target=print_chatbot_output, daemon=True)
+        output_thread.start()
+        
+    except Exception as e:
+        print(f"\n[Chatbot Backend] Error: {e}")
 
 def start_backend():
     """Start the backend server in a separate thread."""
@@ -174,6 +268,13 @@ def main():
     # Give backend a moment to start
     time.sleep(2)
     
+    # Start chatbot backend in a thread
+    chatbot_backend_thread = Thread(target=start_chatbot_backend, daemon=True)
+    chatbot_backend_thread.start()
+    
+    # Give chatbot backend a moment to start
+    time.sleep(2)
+    
     # Start frontend in a thread
     frontend_thread = Thread(target=start_frontend, daemon=True)
     frontend_thread.start()
@@ -181,7 +282,8 @@ def main():
     print("\n" + "="*60)
     print("App servers are starting...")
     print("="*60)
-    print("\nBackend:  http://127.0.0.1:8000")
+    print("\nMain Backend:  http://127.0.0.1:8000")
+    print("Chatbot Backend: http://127.0.0.1:8001")
     print("Frontend: http://localhost:5173")
     print("\nPress Ctrl+C to stop the app")
     print("="*60 + "\n")
@@ -193,6 +295,8 @@ def main():
             # Check if processes are still running
             if backend_process and backend_process.poll() is not None:
                 print("\n[Backend] Server stopped unexpectedly")
+            if chatbot_backend_process and chatbot_backend_process.poll() is not None:
+                print("\n[Chatbot Backend] Server stopped unexpectedly")
             if frontend_process and frontend_process.poll() is not None:
                 print("\n[Frontend] Server stopped unexpectedly")
     except KeyboardInterrupt:
