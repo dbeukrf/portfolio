@@ -4,8 +4,8 @@ import AnimatedAscii from '../components/ui/AnimatedAscii'
 import { useAsciiFrames } from '../hooks/useAsciiFrames'
 import { useLocation } from 'react-router-dom'
 
-// Chatbot API base URL - points to the chatbot backend on port 8001
-const CHATBOT_API_BASE_URL = import.meta.env.VITE_CHATBOT_API_BASE_URL || 'http://localhost:8001/api'
+// Chatbot API base URL - points to the unified backend on port 8000
+const CHATBOT_API_BASE_URL = import.meta.env.VITE_CHATBOT_API_BASE_URL || 'http://localhost:8000/api'
 
 interface Message {
   id: number
@@ -18,7 +18,7 @@ function Chatbot() {
   const location = useLocation()
   const isStandalone = location.pathname === '/chatbot'
   const { frames, metadata, loading: asciiLoading, error } = useAsciiFrames()
-  
+
   // Debug logging
   useEffect(() => {
     console.log('Chatbot: asciiLoading =', asciiLoading, 'frames.length =', frames.length, 'error =', error, 'isStandalone =', isStandalone)
@@ -147,9 +147,9 @@ function Chatbot() {
         } catch (error) {
           console.error('Error generating profile:', error)
           if (error instanceof TypeError && error.message.includes('fetch')) {
-            return `Error: Could not connect to chatbot backend at ${CHATBOT_API_BASE_URL}. Make sure it's running on port 8001. Check the console for startup messages.`
+            return `Error: Could not connect to chatbot backend at ${CHATBOT_API_BASE_URL}. Make sure it's running on port 8000. Check the console for startup messages.`
           }
-          return `Error generating profile: ${error instanceof Error ? error.message : 'Unknown error'}. Make sure the chatbot backend is running on port 8001.`
+          return `Error generating profile: ${error instanceof Error ? error.message : 'Unknown error'}. Make sure the chatbot backend is running on port 8000.`
         }
 
       case 'amplify':
@@ -170,7 +170,7 @@ function Chatbot() {
           return result.response || 'No response received'
         } catch (error) {
           console.error('Error amplifying skill:', error)
-          return 'Error amplifying skill. Make sure the chatbot backend is running on port 8001.'
+          return 'Error amplifying skill. Make sure the chatbot backend is running on port 8000.'
         }
 
       case 'career-analysis':
@@ -191,7 +191,7 @@ function Chatbot() {
           return result.response || 'No response received'
         } catch (error) {
           console.error('Error analyzing career:', error)
-          return 'Error analysing career analysis. Make sure the chatbot backend is running on port 8001.'
+          return 'Error analysing career analysis. Make sure the chatbot backend is running on port 8000.'
         }
 
       case 'clear':
@@ -230,9 +230,9 @@ function Chatbot() {
         } catch (error) {
           console.error('Error sending message:', error)
           if (error instanceof TypeError && error.message.includes('fetch')) {
-            return `Error: Could not connect to chatbot backend at ${CHATBOT_API_BASE_URL}. Make sure it's running on port 8001. Check the console for startup messages.`
+            return `Error: Could not connect to chatbot backend at ${CHATBOT_API_BASE_URL}. Make sure it's running on port 8000. Check the console for startup messages.`
           }
-          return `Error: ${error instanceof Error ? error.message : 'Could not connect to chatbot backend'}. Make sure it's running on port 8001.`
+          return `Error: ${error instanceof Error ? error.message : 'Could not connect to chatbot backend'}. Make sure it's running on port 8000.`
         }
     }
   }
@@ -243,36 +243,36 @@ function Chatbot() {
 
   return (
     <div className={`terminal-container ${isStandalone ? 'terminal-standalone' : 'terminal-embedded'}`}>
-    {/* Terminal Header */}
-    <div className="terminal-header">
-      {asciiLoading ? (
-        <div className="header-content">
-          <span className="title-text">Diego Beuk's AI DJ</span>
-        </div>
-      ) : error ? (
-        <div className="header-content">
-          <span className="error-text">Error loading ASCII art: {error}</span>
-          <span className="title-text">Diego Beuk's AI DJ</span>
-        </div>
-      ) : frames.length > 0 && metadata ? (
-        <>
+      {/* Terminal Header */}
+      <div className="terminal-header">
+        {asciiLoading ? (
           <div className="header-content">
             <span className="title-text">Diego Beuk's AI DJ</span>
           </div>
-          <div className="ascii-container">
-            <AnimatedAscii 
-              frames={frames} 
-              fps={metadata.fps} 
-              className="header-ascii"
-            />
+        ) : error ? (
+          <div className="header-content">
+            <span className="error-text">Error loading ASCII art: {error}</span>
+            <span className="title-text">Diego Beuk's AI DJ</span>
           </div>
-        </>
-      ) : (
-        <div className="header-content">
-          <span className="title-text">Diego Beuk's AI DJ</span>
-        </div>
-      )}
-    </div>
+        ) : frames.length > 0 && metadata ? (
+          <>
+            <div className="header-content">
+              <span className="title-text">Diego Beuk's AI DJ</span>
+            </div>
+            <div className="ascii-container">
+              <AnimatedAscii
+                frames={frames}
+                fps={metadata.fps}
+                className="header-ascii"
+              />
+            </div>
+          </>
+        ) : (
+          <div className="header-content">
+            <span className="title-text">Diego Beuk's AI DJ</span>
+          </div>
+        )}
+      </div>
 
       {/* Terminal Body */}
       <div className="terminal-body" ref={terminalRef}>
