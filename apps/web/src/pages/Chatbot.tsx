@@ -138,18 +138,14 @@ function Chatbot() {
             body: JSON.stringify({ message: 'Generate a recruiter-ready summary of Diego Beuk\'s profile - short, catchy, and impactful. Focus on his key experience, strengths, achievements, and what makes him stand out to employers.' })
           })
           if (!response.ok) {
-            const errorText = await response.text()
-            console.error('HTTP error response:', response.status, errorText)
-            throw new Error(`HTTP error! status: ${response.status}, message: ${errorText}`)
+            console.error('HTTP error response:', response.status)
+            throw new Error('System unavailable')
           }
           const result = await response.json()
           return result.response || 'No response received'
         } catch (error) {
           console.error('Error generating profile:', error)
-          if (error instanceof TypeError && error.message.includes('fetch')) {
-            return `Error: Could not connect to chatbot backend at ${CHATBOT_API_BASE_URL}. Make sure it's running on port 8000. Check the console for startup messages.`
-          }
-          return `Error generating profile: ${error instanceof Error ? error.message : 'Unknown error'}. Make sure the chatbot backend is running on port 8000.`
+          return 'System is currently unavailable. Please try again later.'
         }
 
       case 'amplify':
@@ -164,13 +160,13 @@ function Chatbot() {
             body: JSON.stringify({ message: `Expand on Diego's ${skill} skills with measurable examples and impact statements. Show specific achievements and how this skill has contributed to his professional growth.` })
           })
           if (!response.ok) {
-            throw new Error(`HTTP error! status: ${response.status}`)
+            throw new Error('System unavailable')
           }
           const result = await response.json()
           return result.response || 'No response received'
         } catch (error) {
           console.error('Error amplifying skill:', error)
-          return 'Error amplifying skill. Make sure the chatbot backend is running on port 8000.'
+          return 'System is currently unavailable. Please try again later.'
         }
 
       case 'career-analysis':
@@ -185,13 +181,13 @@ function Chatbot() {
             body: JSON.stringify({ message: `Compare Diego's experiences and skills with the ${jobRole} role. Identify his strengths, potential gaps, and how his unique background could be an advantage for this position.` })
           })
           if (!response.ok) {
-            throw new Error(`HTTP error! status: ${response.status}`)
+            throw new Error('System unavailable')
           }
           const result = await response.json()
           return result.response || 'No response received'
         } catch (error) {
           console.error('Error analyzing career:', error)
-          return 'Error analysing career analysis. Make sure the chatbot backend is running on port 8000.'
+          return 'System is currently unavailable. Please try again later.'
         }
 
       case 'clear':
@@ -221,18 +217,14 @@ function Chatbot() {
             body: JSON.stringify({ message: command })
           })
           if (!response.ok) {
-            const errorText = await response.text()
-            console.error('HTTP error response:', response.status, errorText)
-            throw new Error(`HTTP error! status: ${response.status}, message: ${errorText}`)
+            console.error('HTTP error response:', response.status)
+            throw new Error('System unavailable')
           }
           const result = await response.json()
           return result.response || 'No response received'
         } catch (error) {
           console.error('Error sending message:', error)
-          if (error instanceof TypeError && error.message.includes('fetch')) {
-            return `Error: Could not connect to chatbot backend at ${CHATBOT_API_BASE_URL}. Make sure it's running on port 8000. Check the console for startup messages.`
-          }
-          return `Error: ${error instanceof Error ? error.message : 'Could not connect to chatbot backend'}. Make sure it's running on port 8000.`
+          return 'System is currently unavailable. Please try again later.'
         }
     }
   }

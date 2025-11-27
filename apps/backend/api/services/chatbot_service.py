@@ -39,10 +39,10 @@ CHROMA_PATH = backend_dir / "chroma_db"
 # RAG Configuration - optimized for performance
 RAG_CONFIG = {
     "chunk_size": 1000,
-    "chunk_overlap": 200,
+    "chunk_overlap": 175,
     "embedding_model": "text-embedding-3-small",
     "retrieval_k": 4,
-    "mmr_enabled": True,
+    "mmr_enabled": False,
     "mmr_lambda": 0.5,
     "temperature": {
         "factual": 0.0,
