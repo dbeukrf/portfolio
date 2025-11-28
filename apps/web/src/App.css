@@ -5,7 +5,7 @@
   position: relative;
   background-image:
     linear-gradient(rgba(0, 0, 0, 0.4), rgba(0, 0, 0, 0.4)),
-    url('/images/chatbot/samsung-galaxy-note10-bubble-dark-stock-black-background-3040x3040-727.jpg');
+    url('/images/chatbot/blue.png');
   background-repeat: no-repeat;
   background-size: 130% auto;
   background-position: 15% center;
@@ -58,7 +58,7 @@
   display: flex;
   justify-content: space-between;
   align-items: center;
-  border-bottom: 1px solid #940b0b;
+  border-bottom: 1px solid #1f2937;
   min-height: 100px;
   /* Fit ASCII frame height */
   overflow: hidden;
@@ -126,7 +126,7 @@
 
 /* ASCII Shading Classes */
 .ascii-shade-white {
-  color: #ad0a43;
+  color: #052B5D;
   text-shadow: 0 0 2px #000000;
 }
 
@@ -223,9 +223,9 @@
 }
 
 .user {
-  color: #F34213;
+  color: #FFD485;
   font-weight: bold;
-  text-shadow: 0 0 5px #F34213, 0 0 10px #F34213;
+  text-shadow: 0 0 5px #FFCD70, 0 0 10px #FFCD70;
 }
 
 .separator {

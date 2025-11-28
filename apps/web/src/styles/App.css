@@ -4,7 +4,7 @@
   height: 100vh;
   background-image:
     linear-gradient(rgba(0, 0, 0, 0.4), rgba(0, 0, 0, 0.4)),
-    url('media/samsung-galaxy-note10-bubble-dark-stock-black-background-3040x3040-727.jpg');
+    url('/images/chatbot/space.png');
   background-repeat: no-repeat;
   background-size: 130% auto;
   background-position: 15% center;

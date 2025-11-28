@@ -55,7 +55,7 @@ const getTrackContent = (trackId: TrackId): ReactNode => {
   switch (trackId) {
     case 'about':
       return (
-        <div style={{...contentStyle, textAlign: 'left'}}>
+        <div style={{ ...contentStyle, textAlign: 'left' }}>
           <div style={{ display: 'flex', gap: '2rem', alignItems: 'center', marginBottom: '1.5rem' }}>
             {/* Album Image */}
             <div style={{ flexShrink: 0 }}>
@@ -78,9 +78,9 @@ const getTrackContent = (trackId: TrackId): ReactNode => {
             </div>
 
             {/* Text Content - Vertically centered with image */}
-            <div style={{ 
-              display: 'flex', 
-              flexDirection: 'column', 
+            <div style={{
+              display: 'flex',
+              flexDirection: 'column',
               justifyContent: 'center',
               flex: 1,
               height: '200px'
@@ -89,35 +89,35 @@ const getTrackContent = (trackId: TrackId): ReactNode => {
               <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginBottom: '1rem' }}>
                 <div style={{ position: 'relative', width: '24px', height: '24px', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
                   {/* Static inner circle */}
-                  <FaCircle 
-                    style={{ 
+                  <FaCircle
+                    style={{
                       position: 'absolute',
                       color: '#10b981',
                       fontSize: '10px',
                       zIndex: 3
-                    }} 
+                    }}
                   />
                   {/* Pulsing outer ring 1 */}
-                  <FaCircle 
+                  <FaCircle
                     className="pulse-ring-outer"
-                    style={{ 
+                    style={{
                       position: 'absolute',
                       color: '#10b981',
                       fontSize: '10px',
                       opacity: 0.6,
                       zIndex: 2
-                    }} 
+                    }}
                   />
                   {/* Pulsing outer ring 2 */}
-                  <FaCircle 
+                  <FaCircle
                     className="pulse-ring-outer-delayed"
-                    style={{ 
+                    style={{
                       position: 'absolute',
                       color: '#10b981',
                       fontSize: '10px',
                       opacity: 0.4,
                       zIndex: 1
-                    }} 
+                    }}
                   />
                 </div>
                 <Shuffle
@@ -160,9 +160,9 @@ const getTrackContent = (trackId: TrackId): ReactNode => {
               />
 
               {/* Social Icons */}
-              <div style={{ 
-                display: 'flex', 
-                gap: '1rem', 
+              <div style={{
+                display: 'flex',
+                gap: '1rem',
                 marginTop: '1rem'
               }}>
                 <a
@@ -226,7 +226,7 @@ const getTrackContent = (trackId: TrackId): ReactNode => {
             {/* Key Skills */}
             <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
               <FaCode style={{ color: '#6b7280', fontSize: '1.125rem' }} />
-              <span style={{ fontSize: '1rem' }}>Python, FastAPI, React/TypeScript, LangChain, RAG Systems, AI Agents, SQL/NoSQL</span>
+              <span style={{ fontSize: '1rem' }}>Python, FastAPI, React/TypeScript, SQL/NoSQL, LangChain, RAG Systems, LLM Fine-Tuning</span>
             </div>
           </div>
         </div>
@@ -238,56 +238,56 @@ const getTrackContent = (trackId: TrackId): ReactNode => {
           {/* === Monash University === */}
           <section className="education-section" style={{ borderBottom: '1px solid #A4A4A4' }}>
             <div className="education-container">
-              
+
               {/* LEFT — Institution Image */}
               <div className="education-image-container" style={{ flexShrink: 0 }}>
-                <img 
-                  src="/images/education/monash.svg" 
-                  alt="Monash University" 
+                <img
+                  src="/images/education/monash.svg"
+                  alt="Monash University"
                   draggable={false}
-                  style={{ 
-                    width: '100%', 
-                    height: 'auto', 
+                  style={{
+                    width: '100%',
+                    height: 'auto',
                     borderRadius: '4px',
                     userSelect: 'none',
                     WebkitUserSelect: 'none',
                     MozUserSelect: 'none',
                     msUserSelect: 'none'
-                  }} 
+                  }}
                 />
                 {/* Major and Minor below image - desktop only */}
                 <div className="education-major-info-desktop" style={{ paddingTop: '2.3rem' }}>
                   <p className="education-major-p" style={{ marginTop: '0', marginBottom: 0, paddingLeft: '1.2rem' }}>
-                    <strong>Major:</strong> Software Development<br/>
-                    <strong>Minor:</strong> Cybersecurity<br/>
+                    <strong>Major:</strong> Software Development<br />
+                    <strong>Minor:</strong> Cybersecurity<br />
                     <strong>GPA:</strong> 3.81/4.0
                   </p>
                 </div>
               </div>
-      
+
               {/* RIGHT — Text Content */}
               <div className="education-content">
                 {/* Title row with location on the right */}
                 <div className="education-degree-title" style={{ display: 'flex', justifyContent: 'flex-end' }}>
                   <h3 className="education-h3">Bachelor of Information Technology</h3>
                 </div>
-      
+
                 {/* Degree row */}
                 <div className="education-degree-date" style={{ display: 'flex', justifyContent: 'flex-end' }}>
                   <p className="education-p"><strong>September 2025</strong></p>
                 </div>
-      
+
                 {/* Major and Minor - separate for mobile ordering */}
                 <div className="education-major-info" style={{ paddingLeft: '1.2rem' }}>
                   <p className="education-major-p" style={{ marginTop: '0.8rem', marginBottom: 0 }}>
-                    <strong>Major:</strong> Software Development<br/>
-                    <strong>Minor:</strong> Cybersecurity<br/>
+                    <strong>Major:</strong> Software Development<br />
+                    <strong>Minor:</strong> Cybersecurity<br />
                     <strong>GPA:</strong> 3.81/4.0
                   </p>
                 </div>
-      
+
                 {/* Body content */}
-                <ul style={{ paddingLeft: '1.2rem', marginTop: '0.8rem', listStyle: 'none' }}>      
+                <ul style={{ paddingLeft: '1.2rem', marginTop: '0.8rem', listStyle: 'none' }}>
                   {/* Relevant Coursework */}
                   <li className="education-li" style={{ marginBottom: '0.5rem' }}>
                     <strong className="education-strong">Relevant Coursework:</strong>
@@ -298,7 +298,7 @@ const getTrackContent = (trackId: TrackId): ReactNode => {
                       <li>Computer Systems & Networks | IT Project Management</li>
                     </ul>
                   </li>
-      
+
                   {/* Honours & Awards */}
                   <li className="education-li">
                     <strong className="education-strong">Honours & Awards:</strong>
@@ -315,22 +315,22 @@ const getTrackContent = (trackId: TrackId): ReactNode => {
           {/* === Yonsei University === */}
           <section className="education-section">
             <div className="education-container">
-              
+
               {/* LEFT — Institution Image */}
               <div className="education-image-container" style={{ flexShrink: 0 }}>
-                <img 
-                  src="/images/education/yonsei.png" 
-                  alt="Yonsei University" 
+                <img
+                  src="/images/education/yonsei.png"
+                  alt="Yonsei University"
                   draggable={false}
-                  style={{ 
-                    width: '100%', 
-                    height: 'auto', 
+                  style={{
+                    width: '100%',
+                    height: 'auto',
                     borderRadius: '4px',
                     userSelect: 'none',
                     WebkitUserSelect: 'none',
                     MozUserSelect: 'none',
                     msUserSelect: 'none'
-                  }} 
+                  }}
                 />
                 {/* GPA below image - desktop only */}
                 <div className="education-major-info-desktop" style={{ paddingTop: '2.3rem' }}>
@@ -339,19 +339,19 @@ const getTrackContent = (trackId: TrackId): ReactNode => {
                   </p>
                 </div>
               </div>
-      
+
               {/* RIGHT — Text Content */}
               <div className="education-content">
                 {/* Title row with location on the right */}
                 <div className="education-degree-title" style={{ display: 'flex', justifyContent: 'flex-end', flexWrap: 'wrap', gap: '0.5rem' }}>
                   <h3 className="education-h3">College of Computing, Study Abroad</h3>
                 </div>
-      
+
                 {/* Degree row */}
                 <div className="education-degree-date" style={{ display: 'flex', justifyContent: 'flex-end', flexWrap: 'wrap', gap: '0.5rem' }}>
                   <p className="education-p"><strong>Fall Semester 2024</strong></p>
                 </div>
-      
+
                 {/* Body content */}
                 <ul style={{ paddingLeft: '1.2rem', marginTop: '0.8rem', listStyle: 'none' }}>
                   {/* Scholarship Award */}
@@ -361,7 +361,7 @@ const getTrackContent = (trackId: TrackId): ReactNode => {
                       <li>Destination Australia Cheung Kong Exchange Program</li>
                     </ul>
                   </li>
-      
+
                   {/* Activities & Societies */}
                   <li className="education-li">
                     <strong className="education-strong">Activities & Societies:</strong>
@@ -383,22 +383,22 @@ const getTrackContent = (trackId: TrackId): ReactNode => {
           {/* === Coles Group === */}
           <section className="education-section" style={{ borderBottom: '1px solid #A4A4A4' }}>
             <div className="education-container">
-              
+
               {/* LEFT — Company Image */}
               <div className="education-image-container" style={{ flexShrink: 0 }}>
-                <img 
-                  src="/images/work/colesgroup.png" 
-                  alt="Coles Group" 
+                <img
+                  src="/images/work/colesgroup.png"
+                  alt="Coles Group"
                   draggable={false}
-                  style={{ 
-                    width: '100%', 
-                    height: 'auto', 
+                  style={{
+                    width: '100%',
+                    height: 'auto',
                     borderRadius: '4px',
                     userSelect: 'none',
                     WebkitUserSelect: 'none',
                     MozUserSelect: 'none',
                     msUserSelect: 'none'
-                  }} 
+                  }}
                 />
                 {/* Location and Date row below image - desktop only */}
                 <div className="education-major-info-desktop" style={{ paddingTop: '1.7rem' }}>
@@ -406,22 +406,22 @@ const getTrackContent = (trackId: TrackId): ReactNode => {
                   <p className="education-p" style={{ margin: 0, textAlign: 'left', paddingLeft: '1.2rem' }}><strong>January - June 2025</strong></p>
                 </div>
               </div>
-      
+
               {/* RIGHT — Text Content */}
               <div className="education-content" style={{ width: '100%' }}>
                 {/* Title row with role */}
                 <div className="education-degree-title" style={{ display: 'flex', justifyContent: 'flex-end', flexWrap: 'wrap', gap: '0.5rem' }}>
                   <h3 className="education-h3">IT Infrastructure Project Management Intern</h3>
                 </div>
-      
+
                 {/* Location and Date - mobile only */}
                 <div className="rmit-location-mobile rmit-location-mobile-first" style={{ paddingTop: '1rem', paddingBottom: '1rem' }}>
                   <p className="education-p" style={{ margin: 0, marginBottom: '0.3rem', textAlign: 'left', paddingLeft: '1.2rem' }}><strong>Melbourne, Australia</strong></p>
                   <p className="education-p" style={{ margin: 0, textAlign: 'left', paddingLeft: '1.2rem' }}><strong>January 2025 - June 2025</strong></p>
                 </div>
-      
+
                 {/* Body content */}
-                <ul className="work-body-content" style={{ paddingLeft: '1.2rem', listStyle: 'disc', width: '100%' }}>      
+                <ul className="work-body-content" style={{ paddingLeft: '1.2rem', listStyle: 'disc', width: '100%' }}>
                   <li className="education-li" style={{ marginBottom: '0.5rem' }}>
                     Led data analysis for the Lifecycle Cost Management Project, assessing over 12,000 devices to inform multi-year financial strategies for four business units.
                   </li>
@@ -442,22 +442,22 @@ const getTrackContent = (trackId: TrackId): ReactNode => {
           {/* === RMIT University (Research Assistant) === */}
           <section className="education-section">
             <div className="education-container">
-              
+
               {/* LEFT — Company Image */}
               <div className="education-image-container" style={{ flexShrink: 0 }}>
-                <img 
-                  src="/images/work/rmit.svg" 
-                  alt="RMIT University" 
+                <img
+                  src="/images/work/rmit.svg"
+                  alt="RMIT University"
                   draggable={false}
-                  style={{ 
-                    width: '80%', 
-                    height: 'auto', 
+                  style={{
+                    width: '80%',
+                    height: 'auto',
                     borderRadius: '4px',
                     userSelect: 'none',
                     WebkitUserSelect: 'none',
                     MozUserSelect: 'none',
                     msUserSelect: 'none'
-                  }} 
+                  }}
                 />
                 {/* Location and Date row below image for first position */}
                 <div className="education-major-info-desktop" style={{ paddingTop: '1.4rem' }}>
@@ -470,20 +470,20 @@ const getTrackContent = (trackId: TrackId): ReactNode => {
                   <p className="education-p" style={{ margin: 0, textAlign: 'left', paddingLeft: '1.2rem' }}><strong>September - November 2023</strong></p>
                 </div>
               </div>
-      
+
               {/* RIGHT — Text Content */}
               <div className="education-content" style={{ width: '100%' }}>
                 {/* Title row with role */}
                 <div className="education-degree-title" style={{ display: 'flex', justifyContent: 'flex-end', flexWrap: 'wrap', gap: '0.5rem' }}>
                   <h3 className="education-h3">Research Assistant</h3>
                 </div>
-      
+
                 {/* Location and Date for first position - mobile only */}
                 <div className="rmit-location-mobile rmit-location-mobile-first" style={{ paddingTop: '0.8rem' }}>
                   <p className="education-p" style={{ margin: 0, marginBottom: '0.3rem', textAlign: 'left', paddingLeft: '1.2rem' }}><strong>Melbourne, Australia</strong></p>
                   <p className="education-p" style={{ margin: 0, textAlign: 'left', paddingLeft: '1.2rem' }}><strong>July - September 2024</strong></p>
                 </div>
-      
+
                 {/* Body content for first position */}
                 <ul className="work-body-content" style={{ paddingLeft: '1.2rem', paddingTop: '1rem', listStyle: 'disc', width: '100%' }}>
                   <li className="education-li" style={{ marginBottom: '0.5rem' }}>
@@ -584,8 +584,8 @@ const getTrackContent = (trackId: TrackId): ReactNode => {
 
       return (
         <div style={{
-          ...contentStyle, 
-          textAlign: 'left', 
+          ...contentStyle,
+          textAlign: 'left',
           marginTop: '-2rem',
           marginBottom: 0
         }}>
@@ -608,7 +608,7 @@ const getTrackContent = (trackId: TrackId): ReactNode => {
         { id: 'chroma-db', name: 'Chroma DB', category: 'ai/ml' },
         { id: 'pytorch', name: 'PyTorch', category: 'ai/ml' },
         { id: 'numpy', name: 'NumPy', category: 'ai/ml' },
-        
+
         // --- Cloud & DevOps ---
         { id: 'gcp', name: 'GCP', category: 'cloud-devops' },
         { id: 'firebase', name: 'Firebase', category: 'cloud-devops' },
@@ -616,7 +616,7 @@ const getTrackContent = (trackId: TrackId): ReactNode => {
         { id: 'docker', name: 'Docker', category: 'cloud-devops' },
         { id: 'git', name: 'Git', category: 'cloud-devops' },
         { id: 'ubuntu', name: 'Ubuntu/Linux', category: 'cloud-devops' },
-        
+
         // --- Languages ---
         { id: 'python', name: 'Python', category: 'languages' },
         { id: 'java', name: 'Java', category: 'languages' },
@@ -643,7 +643,7 @@ const getTrackContent = (trackId: TrackId): ReactNode => {
         { id: 'full-stack', name: 'Full-Stack Development', category: 'frameworks' },
         { id: 'system-architecture', name: 'System Architecture Design', category: 'frameworks' },
         { id: 'test-automation', name: 'Test Automations', category: 'frameworks' },
-        
+
         // --- Management & Delivery ---
         { id: 'agile-scrum', name: 'Agile/Scrum', category: 'management' },
         { id: 'project-coordination', name: 'Project Coordination', category: 'management' },
@@ -653,11 +653,11 @@ const getTrackContent = (trackId: TrackId): ReactNode => {
       ];
 
       return (
-        <div style={{...contentStyle, textAlign: 'left', width: '100%', height: '100%'}}>
+        <div style={{ ...contentStyle, textAlign: 'left', width: '100%', height: '100%' }}>
           {/* Skills Force Layout */}
-          <div 
+          <div
             className="w-full bg-transparent mb-8 mt-12 sm:mt-10 min-h-[400px] sm:min-h-[400px]"
-            style={{ 
+            style={{
               height: 'auto',
             }}
           >
@@ -668,7 +668,7 @@ const getTrackContent = (trackId: TrackId): ReactNode => {
 
     case 'aiDj':
       return (
-        <div style={{...contentStyle, textAlign: 'center'}} className="!text-center">
+        <div style={{ ...contentStyle, textAlign: 'center' }} className="!text-center">
           <p style={{ paddingTop: '6rem', marginBottom: '3rem', textAlign: 'center' }} className="!text-center">
             The AI DJ is an interactive experience that allows you to explore my portfolio in a conversational way,
             diving deeper into any aspect that interests you.
@@ -681,7 +681,7 @@ const getTrackContent = (trackId: TrackId): ReactNode => {
 
     default:
       return (
-        <div style={{...contentStyle, textAlign: 'left'}}>
+        <div style={{ ...contentStyle, textAlign: 'left' }}>
           <p>Content for this track is coming soon.</p>
         </div>
       );
@@ -691,7 +691,7 @@ const getTrackContent = (trackId: TrackId): ReactNode => {
 export default function AlbumView() {
   // Audio store
   const { setCurrentTrack, play, pause, toggleShuffle, isShuffled, currentTrackId } = useAudioStore();
-  
+
   // Scrolling state
   const [heroHeight, setHeroHeight] = useState(0);
   const [controlsHeight, setControlsHeight] = useState(0);
@@ -706,16 +706,16 @@ export default function AlbumView() {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   // First parallax: Album view to track 1
   const [manualAlbumRevealProgress, setManualAlbumRevealProgress] = useState(0);
-  
+
   // Second parallax: aiDj track to chatbot
   const [chatbotParallaxProgress, setChatbotParallaxProgress] = useState(0);
   const [manualChatbotParallaxProgress, setManualChatbotParallaxProgress] = useState(0);
-  
+
   // Location state
   const [locationText, setLocationText] = useState('Melbourne, Australia');
   const [weatherCurrent, setWeatherCurrent] = useState<WeatherData | null>(null);
   const [, setWeatherDaily] = useState<DailyWeatherData | null>(null);
-  
+
   const mapToWeatherIcon = (w: WeatherData) => {
     const code = w.weatherCode !== undefined ? w.weatherCode : -1;
     const rain = w.rainMm !== undefined ? w.rainMm : 0;
@@ -724,31 +724,31 @@ export default function AlbumView() {
     const wind = w.windSpeed10m !== undefined ? w.windSpeed10m : 0;
     const isExtreme = wind >= 50 || rain >= 20;
     const dayNight = isDay ? 'day' : 'night';
-    
+
     if (code === 0) { return { iconName: isDay ? 'clear-day' : 'clear-night', label: isDay ? 'Clear' : 'Clear night' }; }
     if (code === 1) { return { iconName: isDay ? 'partly-cloudy-day' : 'partly-cloudy-night', label: 'Mostly clear' }; }
     if (code === 2) { return { iconName: isDay ? 'partly-cloudy-day' : 'partly-cloudy-night', label: 'Partly cloudy' }; }
     if (code === 3) { return { iconName: isDay ? 'overcast-day' : 'overcast-night', label: 'Overcast' }; }
     if (code === 45 || code === 48) { return { iconName: isDay ? 'fog-day' : 'fog-night', label: 'Fog' }; }
-    
+
     if (code === 51 || code === 53 || code === 55) {
       if (isExtreme) { return { iconName: `extreme-${dayNight}-drizzle`, label: 'Extreme drizzle' }; }
       if (cloud >= 85) { return { iconName: `overcast-${dayNight}-drizzle`, label: 'Overcast drizzle' }; }
       if (cloud >= 35) { return { iconName: `partly-cloudy-${dayNight}-drizzle`, label: 'Drizzle' }; }
       return { iconName: 'drizzle', label: 'Drizzle' };
     }
-    
+
     if (code === 56 || code === 57) { return { iconName: 'sleet', label: 'Freezing drizzle' }; }
-    
+
     if (code === 61 || code === 63 || code === 65) {
       if (isExtreme) { return { iconName: `extreme-${dayNight}-rain`, label: 'Extreme rain' }; }
       if (cloud >= 85) { return { iconName: `overcast-${dayNight}-rain`, label: 'Overcast rain' }; }
       if (cloud >= 35) { return { iconName: `partly-cloudy-${dayNight}-rain`, label: 'Rain' }; }
       return { iconName: 'rain', label: 'Rain' };
     }
-    
+
     if (code === 66 || code === 67) { return { iconName: 'sleet', label: 'Freezing rain' }; }
-    
+
     if (code === 71 || code === 73 || code === 75 || code === 77) {
       if (isExtreme) { return { iconName: `extreme-${dayNight}-snow`, label: 'Extreme snow' }; }
       if (wind >= 40) { return { iconName: 'wind-snow', label: 'Blowing snow' }; }
@@ -756,49 +756,49 @@ export default function AlbumView() {
       if (cloud >= 35) { return { iconName: `partly-cloudy-${dayNight}-snow`, label: 'Snow' }; }
       return { iconName: 'snow', label: 'Snow' };
     }
-    
+
     if (code === 80 || code === 81 || code === 82) {
       if (isExtreme) { return { iconName: `extreme-${dayNight}-rain`, label: 'Extreme rain showers' }; }
       if (cloud >= 85) { return { iconName: `overcast-${dayNight}-rain`, label: 'Overcast rain showers' }; }
       if (cloud >= 35) { return { iconName: `partly-cloudy-${dayNight}-rain`, label: 'Rain showers' }; }
       return { iconName: 'rain', label: 'Rain showers' };
     }
-    
+
     if (code === 85 || code === 86) {
       if (isExtreme) { return { iconName: `extreme-${dayNight}-snow`, label: 'Extreme snow showers' }; }
       if (cloud >= 85) { return { iconName: `overcast-${dayNight}-snow`, label: 'Overcast snow showers' }; }
       if (cloud >= 35) { return { iconName: `partly-cloudy-${dayNight}-snow`, label: 'Snow showers' }; }
       return { iconName: 'snow', label: 'Snow showers' };
     }
-    
+
     if (code === 95 || code === 96 || code === 99) {
       const hasRain = rain > 0.1;
       const hasSnow = cloud >= 60 && rain < 0.1;
-      
+
       if (isExtreme) {
         if (hasSnow) { return { iconName: `thunderstorms-${dayNight}-extreme-snow`, label: 'Extreme thunderstorms with snow' }; }
         if (hasRain) { return { iconName: `thunderstorms-${dayNight}-extreme-rain`, label: 'Extreme thunderstorms with rain' }; }
         return { iconName: `thunderstorms-${dayNight}-extreme`, label: 'Extreme thunderstorms' };
       }
-      
+
       if (cloud >= 85) {
         if (hasSnow) { return { iconName: `thunderstorms-${dayNight}-overcast-snow`, label: 'Thunderstorms with snow' }; }
         if (hasRain) { return { iconName: `thunderstorms-${dayNight}-overcast-rain`, label: 'Thunderstorms with rain' }; }
         return { iconName: `thunderstorms-${dayNight}-overcast`, label: 'Thunderstorms' };
       }
-      
+
       if (hasSnow) { return { iconName: `thunderstorms-${dayNight}-snow`, label: 'Thunderstorms with snow' }; }
       if (hasRain) { return { iconName: `thunderstorms-${dayNight}-rain`, label: 'Thunderstorms with rain' }; }
       return { iconName: `thunderstorms-${dayNight}`, label: 'Thunderstorms' };
     }
-    
+
     if (code === 96 || code === 99) {
       if (isExtreme) { return { iconName: `extreme-${dayNight}-hail`, label: 'Extreme hail' }; }
       if (cloud >= 85) { return { iconName: `overcast-${dayNight}-hail`, label: 'Overcast hail' }; }
       if (cloud >= 35) { return { iconName: `partly-cloudy-${dayNight}-hail`, label: 'Hail' }; }
       return { iconName: 'hail', label: 'Hail' };
     }
-    
+
     if (rain >= 20) { return { iconName: isDay ? 'extreme-day-rain' : 'extreme-night-rain', label: 'Extreme rain' }; }
     if (rain >= 10) {
       if (cloud >= 85) { return { iconName: `overcast-${dayNight}-rain`, label: 'Heavy rain' }; }
@@ -815,19 +815,19 @@ export default function AlbumView() {
       if (cloud >= 35) { return { iconName: `partly-cloudy-${dayNight}-rain`, label: 'Light rain' }; }
       return { iconName: 'rain', label: 'Light rain' };
     }
-    
+
     if (wind >= 50) { return { iconName: 'wind', label: 'Very windy' }; }
     if (wind >= 35 && cloud >= 60) { return { iconName: 'wind-snow', label: 'Windy with snow' }; }
     if (wind >= 35) { return { iconName: 'wind', label: 'Windy' }; }
-    
+
     if (cloud >= 85) { return { iconName: isDay ? 'overcast-day' : 'overcast-night', label: 'Overcast' }; }
     if (cloud >= 65) { return { iconName: isDay ? 'overcast-day' : 'overcast-night', label: 'Mostly cloudy' }; }
     if (cloud >= 35) { return { iconName: isDay ? 'partly-cloudy-day' : 'partly-cloudy-night', label: 'Partly cloudy' }; }
     if (cloud >= 15) { return { iconName: isDay ? 'partly-cloudy-day' : 'partly-cloudy-night', label: 'Mostly clear' }; }
-    
+
     return { iconName: isDay ? 'clear-day' : 'clear-night', label: isDay ? 'Clear' : 'Clear night' };
   };
-  
+
   const renderWeatherIcon = () => {
     if (!weatherCurrent) return null;
     const { iconName, label } = mapToWeatherIcon(weatherCurrent);
@@ -855,15 +855,15 @@ export default function AlbumView() {
   const maxScrollTopRef = useRef(0);
   const prevScrollTopRef = useRef(0);
   const prevScrollProgressRef = useRef(0);
-  
+
   // First parallax refs: Album view to track 1
   const prevAlbumRevealRef = useRef(0);
   const maxAlbumRevealReachedRef = useRef(0);
-  
+
   // Second parallax refs: aiDj track to chatbot
   const maxChatbotParallaxReachedRef = useRef(0);
   const prevChatbotParallaxProgressRef = useRef(0);
-  
+
   const trackSectionRefs = useRef<(HTMLDivElement | null)[]>([]);
   const trackTitleRefs = useRef<(HTMLElement | null)[]>([]);
 
@@ -873,10 +873,10 @@ export default function AlbumView() {
       const heroH = heroRef.current ? heroRef.current.offsetHeight : 0;
       setHeroHeight(heroH);
     };
-    
+
     const timeoutId = setTimeout(compute, 0);
     window.addEventListener('resize', compute);
-    
+
     const observer = new ResizeObserver(compute);
     const checkAndObserve = () => {
       if (heroRef.current) {
@@ -886,7 +886,7 @@ export default function AlbumView() {
       }
     };
     checkAndObserve();
-    
+
     return () => {
       clearTimeout(timeoutId);
       window.removeEventListener('resize', compute);
@@ -1005,10 +1005,10 @@ export default function AlbumView() {
       const controlsH = controlsRef.current ? controlsRef.current.offsetHeight : 0;
       setControlsHeight(controlsH);
     };
-    
+
     const timeoutId = setTimeout(compute, 0);
     window.addEventListener('resize', compute);
-    
+
     const observer = new ResizeObserver(compute);
     const checkAndObserve = () => {
       if (controlsRef.current) {
@@ -1018,7 +1018,7 @@ export default function AlbumView() {
       }
     };
     checkAndObserve();
-    
+
     return () => {
       clearTimeout(timeoutId);
       window.removeEventListener('resize', compute);
@@ -1041,7 +1041,7 @@ export default function AlbumView() {
     const enableGeolocation = import.meta.env.VITE_ENABLE_GEOLOCATION !== 'false';
     const DEFAULT_LOCATION = 'Melbourne, Australia';
     const MELBOURNE = { lat: -37.8136, lon: 144.9631 };
-    
+
     const fetchWeather = async (latitude: number, longitude: number, locationStr: string) => {
       try {
         const url = "https://api.open-meteo.com/v1/forecast";
@@ -1059,9 +1059,9 @@ export default function AlbumView() {
         const utcOffsetSeconds = primary.utcOffsetSeconds ? primary.utcOffsetSeconds() : 0;
         let currentBlock = primary.current ? primary.current() : null;
         let dailyBlock = primary.daily ? primary.daily() : null;
-        
+
         let finalCurrent = null;
-        
+
         if (currentBlock) {
           const temperature_2m = currentBlock.variables(0);
           const apparent_temperature = currentBlock.variables(1);
@@ -1084,7 +1084,7 @@ export default function AlbumView() {
             };
           }
         }
-        
+
         if (!finalCurrent) {
           const fallbackParams = {
             latitude,
@@ -1122,7 +1122,7 @@ export default function AlbumView() {
             }
           }
         }
-        
+
         let finalDaily = null;
         if (dailyBlock) {
           const timeArrRaw = dailyBlock.time();
@@ -1146,10 +1146,10 @@ export default function AlbumView() {
             };
           }
         }
-        
+
         if (finalCurrent) setWeatherCurrent(finalCurrent);
         if (finalDaily) setWeatherDaily(finalDaily);
-        
+
         if (finalCurrent) {
           const temp = Math.round(finalCurrent.temperatureC);
           // const rainStatus = finalCurrent.rainMm > 0 ? `, ${Math.round(finalCurrent.rainMm)}mm rain` : '';
@@ -1174,17 +1174,17 @@ export default function AlbumView() {
         }
       }
     };
-    
+
     if (!enableGeolocation) {
       fetchWeather(MELBOURNE.lat, MELBOURNE.lon, DEFAULT_LOCATION);
       return;
     }
-    
+
     const fetchLocationAndWeather = async () => {
       try {
         const geoResponse = await api.get<GeoResponse>('/geo');
         const { city, country_name, latitude, longitude } = geoResponse.data;
-        
+
         let locationStr = '';
         if (city && country_name) {
           locationStr = `${city}, ${country_name}`;
@@ -1193,7 +1193,7 @@ export default function AlbumView() {
         } else if (country_name) {
           locationStr = country_name;
         }
-        
+
         if (latitude !== null && longitude !== null) {
           await fetchWeather(latitude, longitude, locationStr);
         } else {
@@ -1205,7 +1205,7 @@ export default function AlbumView() {
         await fetchWeather(MELBOURNE.lat, MELBOURNE.lon, DEFAULT_LOCATION);
       }
     };
-    
+
     fetchWeather(MELBOURNE.lat, MELBOURNE.lon, DEFAULT_LOCATION).finally(() => {
       fetchLocationAndWeather();
     });
@@ -1215,20 +1215,20 @@ export default function AlbumView() {
   useEffect(() => {
     const handleWheel = (e: WheelEvent) => {
       if (!scrollContainerRef.current) return;
-      
+
       const vh = window.innerHeight;
       const revealDistance = vh * 1.5;
       const scrollTop = scrollContainerRef.current.scrollTop;
-      
+
       // ===== FIRST PARALLAX: Album view to track 1 =====
       if (scrollTop < revealDistance) {
         if (manualAlbumRevealProgress < 1 && e.deltaY > 0) {
           e.preventDefault();
-          
+
           setManualAlbumRevealProgress((prev) => {
             const delta = e.deltaY;
             const newProgress = Math.max(0, Math.min(1, prev + delta / revealDistance));
-            
+
             if (newProgress >= 1 && scrollTop < revealDistance) {
               setTimeout(() => {
                 if (scrollContainerRef.current) {
@@ -1236,56 +1236,56 @@ export default function AlbumView() {
                 }
               }, 0);
             }
-            
+
             return newProgress;
           });
         }
         else if (manualAlbumRevealProgress > 0 && e.deltaY < 0) {
           e.preventDefault();
-          
+
           setManualAlbumRevealProgress((prev) => {
             const delta = Math.abs(e.deltaY);
             const newProgress = Math.max(0, Math.min(1, prev - delta / revealDistance));
-            
+
             if (scrollContainerRef.current) {
               const targetScrollTop = newProgress * revealDistance;
               scrollContainerRef.current.scrollTop = targetScrollTop;
             }
-            
+
             return newProgress;
           });
         }
       }
-      
+
       // ===== SECOND PARALLAX: aiDj track to chatbot =====
       const aiDjTrackIndex = TRACKS.findIndex(t => t.id === 'aiDj');
       const aiDjSection = trackSectionRefs.current[aiDjTrackIndex];
-      
+
       if (aiDjSection) {
         const aiDjRect = aiDjSection.getBoundingClientRect();
         const viewportBottom = vh;
         const distanceFromBottom = aiDjRect.bottom - viewportBottom;
         const chatbotParallaxRevealDistance = vh * 1.5;
-        
+
         // Check if we're in the chatbot parallax zone or fully past it
         // Only start parallax AFTER track 6 is completely scrolled past (distanceFromBottom < 0)
         // Continue until we've fully scrolled past the reveal distance (distanceFromBottom >= -chatbotParallaxRevealDistance)
         const isInParallaxZone = distanceFromBottom < 0 && distanceFromBottom >= -chatbotParallaxRevealDistance;
         const isFullyPastParallaxZone = distanceFromBottom < -chatbotParallaxRevealDistance;
-        
+
         if (isInParallaxZone) {
           // Calculate progress: 0 when distanceFromBottom = 0 (just past track 6), 1 when distanceFromBottom = -chatbotParallaxRevealDistance
           const chatbotParallaxScrollPosition = Math.abs(distanceFromBottom);
           const chatbotProgress = Math.max(0, Math.min(1, chatbotParallaxScrollPosition / chatbotParallaxRevealDistance));
-          
+
           if (chatbotProgress < 1 && e.deltaY > 0) {
             // Scrolling down - minimize the background (increase progress to 1)
             e.preventDefault();
-            
+
             setManualChatbotParallaxProgress((prev) => {
               const delta = e.deltaY;
               const newProgress = Math.max(0, Math.min(1, prev + delta / chatbotParallaxRevealDistance));
-              
+
               return newProgress;
             });
             return;
@@ -1293,11 +1293,11 @@ export default function AlbumView() {
           else if (manualChatbotParallaxProgress > 0 && e.deltaY < 0) {
             // Scrolling up - expand the background (decrease progress to 0)
             e.preventDefault();
-            
+
             setManualChatbotParallaxProgress((prev) => {
               const delta = Math.abs(e.deltaY);
               const newProgress = Math.max(0, Math.min(1, prev - delta / chatbotParallaxRevealDistance));
-              
+
               // Update scroll position to transition back to track 6
               // When progress = 1, distanceFromBottom should be -chatbotParallaxRevealDistance
               // When progress = 0, distanceFromBottom should be 0
@@ -1309,11 +1309,11 @@ export default function AlbumView() {
                 const newScrollTop = scrollContainerRef.current.scrollTop + scrollDelta;
                 scrollContainerRef.current.scrollTop = Math.max(0, newScrollTop);
               }
-              
+
               if (newProgress === 0) {
                 maxChatbotParallaxReachedRef.current = 0;
               }
-              
+
               return newProgress;
             });
             return;
@@ -1321,16 +1321,16 @@ export default function AlbumView() {
         } else if (isFullyPastParallaxZone && e.deltaY < 0) {
           // Fully past parallax zone - allow scrolling up to transition back
           e.preventDefault();
-          
+
           setManualChatbotParallaxProgress((prev) => {
             if (prev <= 0) {
               // Already at 0, allow normal scrolling
               return 0;
             }
-            
+
             const delta = Math.abs(e.deltaY);
             const newProgress = Math.max(0, Math.min(1, prev - delta / chatbotParallaxRevealDistance));
-            
+
             // Update scroll position to transition back to track 6
             // When progress = 1, distanceFromBottom should be -chatbotParallaxRevealDistance
             // When progress = 0, distanceFromBottom should be 0
@@ -1342,11 +1342,11 @@ export default function AlbumView() {
               const newScrollTop = scrollContainerRef.current.scrollTop + scrollDelta;
               scrollContainerRef.current.scrollTop = Math.max(0, newScrollTop);
             }
-            
+
             if (newProgress === 0) {
               maxChatbotParallaxReachedRef.current = 0;
             }
-            
+
             return newProgress;
           });
           return;
@@ -1358,7 +1358,7 @@ export default function AlbumView() {
     if (container) {
       container.addEventListener('wheel', handleWheel, { passive: false });
     }
-    
+
     return () => {
       if (container) {
         container.removeEventListener('wheel', handleWheel);
@@ -1376,10 +1376,10 @@ export default function AlbumView() {
         }
       });
     };
-    
+
     updateTitleRefs();
     const timeoutId = setTimeout(updateTitleRefs, 100);
-    
+
     if (contentVisible) {
       const visibleTimeoutId = setTimeout(updateTitleRefs, 200);
       return () => {
@@ -1387,7 +1387,7 @@ export default function AlbumView() {
         clearTimeout(visibleTimeoutId);
       };
     }
-    
+
     return () => clearTimeout(timeoutId);
   }, [contentVisible]);
 
@@ -1397,31 +1397,31 @@ export default function AlbumView() {
 
     const handleScroll = () => {
       if (!scrollContainerRef.current) return;
-      
+
       const scrollTop = scrollContainerRef.current.scrollTop;
       const vh = window.innerHeight;
       const revealDistance = vh * 1.5;
       const prevScrollTop = prevScrollTopRef.current;
       const isScrollingUp = scrollTop < prevScrollTop;
-      
+
       if (scrollTop > maxScrollTopRef.current) {
         maxScrollTopRef.current = scrollTop;
       }
-      
+
       // ===== FIRST PARALLAX: Album view to track 1 =====
       let albumReveal;
-      
+
       const contentScrollMax = scrollContainerRef.current ? scrollContainerRef.current.scrollHeight : 0;
       const maxContentScroll = contentScrollMax - vh - revealDistance;
       const albumShrinkDistance = Math.min(maxContentScroll * 0.1, revealDistance * 0.3);
-      
+
       if (scrollTop < revealDistance) {
         const scrollBasedReveal = Math.max(0, Math.min(1, scrollTop / revealDistance));
-        
+
         if (isScrollingUp) {
           const scrollBack = revealDistance - scrollTop;
           let calculatedReveal;
-          
+
           if (scrollBack >= 0 && scrollBack <= albumShrinkDistance && albumShrinkDistance > 0) {
             calculatedReveal = Math.max(0, Math.min(1, 1 - (scrollBack / albumShrinkDistance)));
           } else if (scrollBack > albumShrinkDistance) {
@@ -1429,7 +1429,7 @@ export default function AlbumView() {
           } else {
             calculatedReveal = 1;
           }
-          
+
           albumReveal = Math.min(calculatedReveal, maxAlbumRevealReachedRef.current);
           setManualAlbumRevealProgress(albumReveal);
         } else {
@@ -1442,16 +1442,16 @@ export default function AlbumView() {
         }
       } else {
         const contentScroll = scrollTop - revealDistance;
-        const currentScrollProgress = maxContentScroll > 0 
-          ? Math.max(0, Math.min(1, contentScroll / maxContentScroll)) 
+        const currentScrollProgress = maxContentScroll > 0
+          ? Math.max(0, Math.min(1, contentScroll / maxContentScroll))
           : 0;
-        
+
         const isOnFirstTrack = currentScrollProgress < 0.1;
-        
+
         if (isScrollingUp && isOnFirstTrack) {
           const scrollBack = revealDistance - scrollTop;
           let calculatedReveal;
-          
+
           if (scrollBack >= 0 && scrollBack <= albumShrinkDistance && albumShrinkDistance > 0) {
             calculatedReveal = Math.max(0, Math.min(1, 1 - (scrollBack / albumShrinkDistance)));
           } else if (scrollBack > albumShrinkDistance) {
@@ -1459,7 +1459,7 @@ export default function AlbumView() {
           } else {
             calculatedReveal = 1;
           }
-          
+
           albumReveal = Math.min(calculatedReveal, maxAlbumRevealReachedRef.current);
         } else if (isOnFirstTrack) {
           albumReveal = 1;
@@ -1467,35 +1467,35 @@ export default function AlbumView() {
           albumReveal = 1;
         }
       }
-      
+
       prevScrollTopRef.current = scrollTop;
-      
+
       if (rafId === null) {
         rafId = requestAnimationFrame(() => {
           // Update first parallax (album reveal)
           setClipPathReveal(albumReveal);
-          
+
           prevAlbumRevealRef.current = albumReveal;
-          
+
           if (albumReveal > maxAlbumRevealReachedRef.current) {
             maxAlbumRevealReachedRef.current = albumReveal;
           }
-          
+
           if (scrollTop === 0) {
             maxAlbumRevealReachedRef.current = 0;
           }
-          
+
           if (albumReveal >= 1 && scrollTop >= revealDistance) {
             setContentVisible(true);
-            
+
             const contentScroll = scrollTop - revealDistance;
             const contentScrollMax = scrollContainerRef.current ? scrollContainerRef.current.scrollHeight : 0;
             const maxContentScroll = contentScrollMax - vh - revealDistance;
-            
-            const newScrollProgress = maxContentScroll > 0 
-              ? Math.max(0, Math.min(1, contentScroll / maxContentScroll)) 
+
+            const newScrollProgress = maxContentScroll > 0
+              ? Math.max(0, Math.min(1, contentScroll / maxContentScroll))
               : 0;
-            
+
             setScrollProgress(newScrollProgress);
             prevScrollProgressRef.current = newScrollProgress;
           } else {
@@ -1557,15 +1557,15 @@ export default function AlbumView() {
             // Second parallax: aiDj track to chatbot
             const aiDjTrackIndex = TRACKS.findIndex(t => t.id === 'aiDj');
             const aiDjRect = rects[aiDjTrackIndex];
-            
+
             if (aiDjRect) {
               const trackBottom = aiDjRect.bottom;
               const viewportBottom = viewportY;
               const distanceFromBottom = trackBottom - viewportBottom;
               const chatbotParallaxRevealDistance = vh * 1.5;
-              
+
               let chatbotParallaxReveal;
-              
+
               // Check if we're in the chatbot parallax zone
               // Only start parallax AFTER track 6 is completely scrolled past (distanceFromBottom < 0)
               // Continue until we've fully scrolled past the reveal distance (distanceFromBottom >= -chatbotParallaxRevealDistance)
@@ -1573,7 +1573,7 @@ export default function AlbumView() {
                 // Calculate progress: 0 when distanceFromBottom = 0 (just past track 6), 1 when distanceFromBottom = -chatbotParallaxRevealDistance
                 const chatbotParallaxScrollPosition = Math.abs(distanceFromBottom);
                 const chatbotScrollBasedReveal = Math.max(0, Math.min(1, chatbotParallaxScrollPosition / chatbotParallaxRevealDistance));
-                
+
                 if (isScrollingUp) {
                   // Scrolling up - expand the background (decrease progress toward 0)
                   // Use manual progress if user is controlling it, otherwise use scroll-based progress
@@ -1601,7 +1601,7 @@ export default function AlbumView() {
                   // When distanceFromBottom reaches 0, progress = 0
                   const chatbotParallaxScrollPosition = Math.abs(distanceFromBottom);
                   const chatbotScrollBasedReveal = Math.max(0, Math.min(1, chatbotParallaxScrollPosition / chatbotParallaxRevealDistance));
-                  
+
                   // Use manual progress if it's less than scroll-based (user is controlling it)
                   if (manualChatbotParallaxProgress < chatbotScrollBasedReveal) {
                     chatbotParallaxReveal = manualChatbotParallaxProgress;
@@ -1623,15 +1623,15 @@ export default function AlbumView() {
                 // Beyond the parallax zone - keep it minimized
                 chatbotParallaxReveal = 1;
               }
-              
+
               if (chatbotParallaxReveal > maxChatbotParallaxReachedRef.current) {
                 maxChatbotParallaxReachedRef.current = chatbotParallaxReveal;
               }
-              
+
               if (distanceFromBottom >= 0) {
                 maxChatbotParallaxReachedRef.current = 0;
               }
-              
+
               setChatbotParallaxProgress(chatbotParallaxReveal);
               prevChatbotParallaxProgressRef.current = chatbotParallaxReveal;
             } else {
@@ -1639,7 +1639,7 @@ export default function AlbumView() {
               maxChatbotParallaxReachedRef.current = 0;
             }
           }
-          
+
           rafId = null;
         });
       }
@@ -1650,7 +1650,7 @@ export default function AlbumView() {
       container.addEventListener('scroll', handleScroll, { passive: true });
       handleScroll();
     }
-    
+
     return () => {
       if (container) {
         container.removeEventListener('scroll', handleScroll);
@@ -1676,18 +1676,18 @@ export default function AlbumView() {
 
   const scrollToTrack = (trackIndex: number) => {
     if (!scrollContainerRef.current) return;
-    
+
     const track = TRACKS[trackIndex];
     if (!track) return;
-    
+
     const vh = viewportHeight || window.innerHeight;
     const revealDistance = vh * 1.5;
-    
+
     setCurrentTrackProgress(0);
     setCurrentTrackIndex(trackIndex);
-    
+
     const titleElement = trackTitleRefs.current[trackIndex];
-    
+
     if (titleElement && scrollContainerRef.current) {
       const titleRect = titleElement.getBoundingClientRect();
       const containerRect = scrollContainerRef.current.getBoundingClientRect();
@@ -1697,11 +1697,11 @@ export default function AlbumView() {
       const offsetFromTop = stickyOffset + 20;
       const targetScrollPosition = titleTopRelativeToContainer - offsetFromTop;
       const finalScrollPosition = Math.max(revealDistance, targetScrollPosition);
-      
+
       const currentScroll = scrollContainerRef.current.scrollTop;
       if (currentScroll < revealDistance) {
         scrollContainerRef.current.scrollTo({ top: revealDistance, behavior: 'smooth' });
-        
+
         setTimeout(() => {
           if (scrollContainerRef.current && titleElement) {
             const newTitleRect = titleElement.getBoundingClientRect();
@@ -1718,7 +1718,7 @@ export default function AlbumView() {
     } else {
       const offset = trackIndex === 0 ? vh * 0.25 : 0;
       const trackScrollPosition = revealDistance + (trackIndex * vh) + offset;
-      
+
       const currentScrollTop = scrollContainerRef.current.scrollTop;
       if (currentScrollTop < revealDistance) {
         scrollContainerRef.current.scrollTo({ top: revealDistance, behavior: 'smooth' });
@@ -1748,7 +1748,7 @@ export default function AlbumView() {
   const totalSections = TRACKS.length + 1;
 
   return (
-    <div 
+    <div
       ref={scrollContainerRef}
       className="h-screen w-screen overflow-y-scroll overflow-x-hidden bg-[#0c0c0c]"
       style={{ scrollBehavior: 'smooth' }}
@@ -1768,8 +1768,8 @@ export default function AlbumView() {
 
       <div ref={announceRef} aria-live="polite" className="sr-only" />
 
-      <div 
-        ref={heroRef} 
+      <div
+        ref={heroRef}
         className="sticky top-0 z-40 w-full bg-gradient-to-b from-[#1f2937] to-[#0c0c0c] flex flex-row items-center gap-1 sm:gap-2 md:gap-2.5 lg:gap-3 px-1.5 sm:px-2.5 md:px-4 lg:px-5 py-1 sm:py-1.5 md:py-2 lg:py-2.5 overflow-hidden max-h-[35vh] md:max-h-[25vh]"
         style={{
           opacity: chatbotParallaxProgress > 0 ? 0 : 1,
@@ -1814,7 +1814,7 @@ export default function AlbumView() {
               {weatherCurrent ? renderWeatherIcon() : null}
             </div>
           </div>
-          
+
           <Shuffle
             tag="p"
             className="text-white/90 mb-0 text-[clamp(7px,2.8vw,9px)] sm:text-[clamp(8px,3vw,10px)] md:text-[10px] lg:text-xs break-words md:truncate md:whitespace-nowrap leading-snug"
@@ -1874,10 +1874,10 @@ export default function AlbumView() {
         </div>
       </div>
 
-      <div 
-        ref={controlsRef} 
-        className="sticky z-40 w-full bg-transparent" 
-        style={{ 
+      <div
+        ref={controlsRef}
+        className="sticky z-40 w-full bg-transparent"
+        style={{
           top: `${heroHeight}px`,
           opacity: chatbotParallaxProgress > 0 ? 0 : 1,
           transition: 'opacity 0.3s ease-out',
@@ -1886,7 +1886,7 @@ export default function AlbumView() {
       >
         <div className="flex items-center gap-1.5 md:gap-2.5 px-3 md:px-6 py-2.5 md:py-4">
           <div className="relative group">
-            <button 
+            <button
               onClick={() => {
                 if (isShuffled) {
                   const randomTrack = TRACKS[Math.floor(Math.random() * TRACKS.length)];
@@ -1909,13 +1909,12 @@ export default function AlbumView() {
           </div>
 
           <div className="relative group">
-            <button 
+            <button
               onClick={() => {
                 toggleShuffle();
               }}
-              className={`flex items-center justify-center w-6 h-6 md:w-8 md:h-8 rounded-full bg-white/5 hover:bg-white/20 transition-colors focus:outline-none ${
-                isShuffled ? 'bg-white/20 text-[#FFCD70]' : 'text-white'
-              }`}
+              className={`flex items-center justify-center w-6 h-6 md:w-8 md:h-8 rounded-full bg-white/5 hover:bg-white/20 transition-colors focus:outline-none ${isShuffled ? 'bg-white/20 text-[#FFCD70]' : 'text-white'
+                }`}
             >
               <FaRandom size={12} className="md:w-3.5 md:h-3.5" />
             </button>
@@ -1935,9 +1934,9 @@ export default function AlbumView() {
         </div>
       </div>
 
-      <div 
+      <div
         className="sticky z-40 bg-transparent w-full overflow-hidden"
-        style={{ 
+        style={{
           top: `${heroHeight + controlsHeight}px`,
           height: `calc(100vh - ${heroHeight + controlsHeight}px)`,
           maxHeight: `calc(100vh - ${heroHeight + controlsHeight}px)`,
@@ -1946,7 +1945,7 @@ export default function AlbumView() {
           pointerEvents: chatbotParallaxProgress > 0 ? 'none' : 'auto'
         }}
       >
-        <div 
+        <div
           className="h-full flex flex-col px-3 md:px-6 max-w-[1600px] mx-auto overflow-y-auto"
           style={{
             paddingTop: '0.125rem',
@@ -2006,7 +2005,7 @@ export default function AlbumView() {
                         alt="AI DJ"
                         className="w-3.5 h-3.5 md:w-4 md:h-4 object-cover rounded flex-shrink-0"
                       />
-                      <h3 className="text-xs md:text-sm font-semibold text-center m-0 leading-none">- {track.title}</h3>                    
+                      <h3 className="text-xs md:text-sm font-semibold text-center m-0 leading-none">- {track.title}</h3>
                     </div>
                   ) : (
                     <>
@@ -2047,19 +2046,19 @@ export default function AlbumView() {
           }}
         />
 
-        <div 
+        <div
           className="relative z-[60]"
           style={{
             minHeight: `${totalSections * 100}vh`,
             opacity: contentVisible ? 1 : 0,
-            transform: contentVisible 
-              ? `translate3d(0, ${(viewportHeight || window.innerHeight) - (scrollProgress * (viewportHeight || window.innerHeight) * 1.5)}px, 0)` 
+            transform: contentVisible
+              ? `translate3d(0, ${(viewportHeight || window.innerHeight) - (scrollProgress * (viewportHeight || window.innerHeight) * 1.5)}px, 0)`
               : `translate3d(0, ${viewportHeight || window.innerHeight}px, 0)`,
-            transition: chatbotParallaxProgress > 0 
+            transition: chatbotParallaxProgress > 0
               ? 'opacity 0.5s cubic-bezier(0.4, 0, 0.2, 1), clip-path 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94)'
               : 'opacity 0.5s cubic-bezier(0.4, 0, 0.2, 1)',
-            willChange: chatbotParallaxProgress > 0 
-              ? 'clip-path' 
+            willChange: chatbotParallaxProgress > 0
+              ? 'clip-path'
               : (contentVisible ? 'transform, opacity' : 'opacity'),
             backgroundColor: 'transparent',
             margin: 0,
@@ -2072,16 +2071,16 @@ export default function AlbumView() {
           }}
         >
           {TRACKS.map((track, index) => (
-            <div 
+            <div
               key={track.id}
               data-track-index={index}
               ref={(el) => {
                 trackSectionRefs.current[index] = el;
               }}
               className="w-full m-0 p-0"
-              style={{ 
-                backgroundColor: '#F5F5F5', 
-                margin: 0, 
+              style={{
+                backgroundColor: '#F5F5F5',
+                margin: 0,
                 padding: 0,
                 minHeight: '100vh',
                 display: 'block',
@@ -2104,9 +2103,8 @@ export default function AlbumView() {
 
       {/* Progress bar table / Mobile hamburger menu */}
       <div
-        className={`fixed top-4 left-4 z-[80] transition-all duration-500 ease-out ${
-          contentVisible ? 'translate-y-0' : 'opacity-0 -translate-y-6 pointer-events-none'
-        }`}
+        className={`fixed top-4 left-4 z-[80] transition-all duration-500 ease-out ${contentVisible ? 'translate-y-0' : 'opacity-0 -translate-y-6 pointer-events-none'
+          }`}
         style={{
           opacity: contentVisible ? (chatbotParallaxProgress > 0 ? 0 : 1) : 0,
           transition: 'opacity 0.5s ease-out, transform 0.5s ease-out',
@@ -2149,9 +2147,8 @@ export default function AlbumView() {
                       setIsMobileMenuOpen(false);
                     }
                   }}
-                  className={`relative min-w-[140px] px-2 py-1 text-left text-white text-[10px] font-semibold rounded-md overflow-hidden transition-transform duration-300 focus:outline-none focus-visible:outline-none focus:ring-0 ring-0 ${
-                    isActive ? 'shadow-lg scale-[1.02]' : 'opacity-80 hover:opacity-100 hover:scale-[1.01]'
-                  }`}
+                  className={`relative min-w-[140px] px-2 py-1 text-left text-white text-[10px] font-semibold rounded-md overflow-hidden transition-transform duration-300 focus:outline-none focus-visible:outline-none focus:ring-0 ring-0 ${isActive ? 'shadow-lg scale-[1.02]' : 'opacity-80 hover:opacity-100 hover:scale-[1.01]'
+                    }`}
                   aria-pressed={isActive}
                 >
                   <span className="relative z-10 drop-shadow-[0_0_6px_rgba(0,0,0,0.6)]">{label}</span>
@@ -2168,9 +2165,9 @@ export default function AlbumView() {
         </div>
       </div>
 
-      <PlayerBar 
-        isVisible={playerBarVisible} 
-        contentVisible={contentVisible} 
+      <PlayerBar
+        isVisible={playerBarVisible}
+        contentVisible={contentVisible}
         clipPathReveal={clipPathReveal}
         onAlbumImageClick={scrollToAlbumView}
         onTrackTitleClick={handleTrackTitleClick}
