@@ -14,7 +14,11 @@ interface Message {
   timestamp: Date
 }
 
-function Chatbot() {
+interface ChatbotProps {
+  isActive?: boolean
+}
+
+function Chatbot({ isActive = false }: ChatbotProps) {
   const location = useLocation()
   const isStandalone = location.pathname === '/chatbot'
   const { frames, metadata, loading: asciiLoading, error } = useAsciiFrames()
@@ -58,15 +62,15 @@ function Chatbot() {
     scrollToBottom()
   }, [messages])
 
-  // Ensure input is focused when in standalone mode
+  // Ensure input is focused when in standalone mode or when active in view
   useEffect(() => {
-    if (isStandalone && inputRef.current && document.activeElement !== inputRef.current) {
+    if ((isStandalone || isActive) && inputRef.current && document.activeElement !== inputRef.current) {
       const timer = setTimeout(() => {
         inputRef.current?.focus()
       }, 200)
       return () => clearTimeout(timer)
     }
-  }, [isStandalone])
+  }, [isStandalone, isActive])
 
   const handleKeyPress = (e: React.KeyboardEvent) => {
     if (e.key === 'Enter') {

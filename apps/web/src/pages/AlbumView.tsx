@@ -8,6 +8,7 @@ import { api } from '../services/api';
 import { fetchWeatherApi } from 'openmeteo';
 import PlayerBar from '../components/player/PlayerBar';
 import { useAudioStore } from '../stores/audioStore';
+import { useUIStore } from '../stores/uiStore';
 import TrackPage, { RAINBOW_COLORS } from '../components/tracks/TrackPage';
 import ProjectCarousel, { type Project } from '../components/projects/ProjectCarousel';
 import SkillsForceLayout, { type Skill } from '../components/skills/SkillsForceLayout';
@@ -710,6 +711,18 @@ export default function AlbumView() {
   // Second parallax: aiDj track to chatbot
   const [chatbotParallaxProgress, setChatbotParallaxProgress] = useState(0);
   const [manualChatbotParallaxProgress, setManualChatbotParallaxProgress] = useState(0);
+
+  // Hide cursor when chatbot is visible
+  const setCursorHidden = useUIStore((state) => state.setCursorHidden);
+
+  useEffect(() => {
+    if (chatbotParallaxProgress >= 0.95) {
+      setCursorHidden(true);
+    } else {
+      setCursorHidden(false);
+    }
+    return () => setCursorHidden(false);
+  }, [chatbotParallaxProgress, setCursorHidden]);
 
   // Location state
   const [locationText, setLocationText] = useState('Melbourne, Australia');
@@ -1763,7 +1776,7 @@ export default function AlbumView() {
           visibility: chatbotParallaxProgress > 0 ? 'visible' : 'hidden'
         }}
       >
-        <Chatbot />
+        <Chatbot isActive={chatbotParallaxProgress >= 0.95} />
       </div>
 
       <div ref={announceRef} aria-live="polite" className="sr-only" />
