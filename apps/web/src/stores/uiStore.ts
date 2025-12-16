@@ -7,6 +7,7 @@ export interface UIState {
   modalContent: string | null;
   currentPage: string;
   isLoading: boolean;
+  isCursorHidden: boolean;
 }
 
 export interface UIActions {
@@ -16,6 +17,7 @@ export interface UIActions {
   closeModal: () => void;
   setCurrentPage: (page: string) => void;
   setLoading: (loading: boolean) => void;
+  setCursorHidden: (hidden: boolean) => void;
 }
 
 export type UIStore = UIState & UIActions;
@@ -27,26 +29,31 @@ const initialState: UIState = {
   modalContent: null,
   currentPage: 'home',
   isLoading: false,
+  isCursorHidden: false,
 };
 
 export const useUIStore = create<UIStore>((set) => ({
   ...initialState,
-  
-  setTheme: (theme: 'light' | 'dark') => 
+
+  setTheme: (theme: 'light' | 'dark') =>
     set({ theme }),
-  
-  toggleNavigation: () => 
+
+  toggleNavigation: () =>
     set((state) => ({ isNavigationOpen: !state.isNavigationOpen })),
-  
-  openModal: (content: string) => 
+
+  openModal: (content: string) =>
     set({ isModalOpen: true, modalContent: content }),
-  
-  closeModal: () => 
+
+  closeModal: () =>
     set({ isModalOpen: false, modalContent: null }),
-  
-  setCurrentPage: (page: string) => 
+
+  setCurrentPage: (page: string) =>
     set({ currentPage: page }),
-  
-  setLoading: (loading: boolean) => 
+
+  setLoading: (loading: boolean) =>
     set({ isLoading: loading }),
+
+  isCursorHidden: false,
+  setCursorHidden: (hidden: boolean) =>
+    set({ isCursorHidden: hidden }),
 }));

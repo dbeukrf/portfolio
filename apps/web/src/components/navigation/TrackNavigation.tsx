@@ -54,7 +54,7 @@ export default function TrackNavigation({ currentTrackId }: TrackNavigationProps
             </svg>
             <span>Back to Album</span>
           </button>
-          
+
           {/* Track Navigation */}
           <div className="flex items-center space-x-4">
             <button
@@ -67,11 +67,14 @@ export default function TrackNavigation({ currentTrackId }: TrackNavigationProps
               </svg>
               <span>Previous</span>
             </button>
-            
-            <span className="text-sm text-text-secondary px-3 py-1 bg-surface-dark rounded-full">
+
+            <span
+              className="text-sm text-text-secondary px-3 py-1 rounded-full"
+              style={{ backgroundColor: '#1f2937' }}
+            >
               {currentIndex >= 0 ? `Track ${TRACKS[currentIndex].number} of ${TRACKS.length}` : ''}
             </span>
-            
+
             <button
               onClick={goToNext}
               disabled={!hasNext}
@@ -92,11 +95,13 @@ export default function TrackNavigation({ currentTrackId }: TrackNavigationProps
               <button
                 key={track.id}
                 onClick={() => goToTrack(track.id)}
-                className={`px-3 py-1 text-sm rounded-full transition-colors ${
-                  track.id === currentTrackId
-                    ? 'bg-primary-500 text-white'
-                    : 'bg-surface-dark text-text-secondary hover:bg-primary-100 hover:text-primary-700'
-                }`}
+                className={`px-3 py-1 text-sm rounded-full transition-colors ${track.id === currentTrackId
+                  ? 'bg-primary-500 text-white'
+                  : 'text-text-secondary hover:bg-primary-100 hover:text-primary-700'
+                  }`}
+                style={{
+                  backgroundColor: track.id === currentTrackId ? undefined : '#1f2937'
+                }}
               >
                 {track.number}. {track.title}
               </button>

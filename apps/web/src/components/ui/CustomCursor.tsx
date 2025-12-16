@@ -1,9 +1,12 @@
 import { useEffect, useRef } from "react";
 
+import { useUIStore } from "../../stores/uiStore";
+
 export default function CustomCursor() {
   const horizRef = useRef<HTMLDivElement>(null);
   const vertRef = useRef<HTMLDivElement>(null);
   const boxRef = useRef<HTMLDivElement>(null);
+  const isCursorHidden = useUIStore((state) => state.isCursorHidden);
 
   const mouseX = useRef(0);
   const mouseY = useRef(0);
@@ -29,7 +32,7 @@ export default function CustomCursor() {
     const m = rgb.match(/\d+/g);
     if (!m) return 0;
     const [r, g, b] = m.map(Number);
-    return 0.2126 * (r/255) + 0.7152 * (g/255) + 0.0722 * (b/255);
+    return 0.2126 * (r / 255) + 0.7152 * (g / 255) + 0.0722 * (b / 255);
   };
 
   useEffect(() => {
@@ -115,36 +118,38 @@ export default function CustomCursor() {
       {/* HORIZONTAL LINE */}
       <div
         ref={horizRef}
-        className="fixed top-0 left-0 pointer-events-none z-[99999]"
+        className="fixed top-0 left-0 pointer-events-none z-[99999] transition-opacity duration-200"
         style={{
           width: "100vw",
           height: "0.5px",
           background: "white",
+          opacity: isCursorHidden ? 0 : 1,
         }}
       />
 
       {/* VERTICAL LINE */}
       <div
         ref={vertRef}
-        className="fixed top-0 left-0 pointer-events-none z-[99999]"
+        className="fixed top-0 left-0 pointer-events-none z-[99999] transition-opacity duration-200"
         style={{
           width: "0.5px",
           height: "100vh",
           background: "white",
+          opacity: isCursorHidden ? 0 : 1,
         }}
       />
 
       {/* CENTER BOX */}
       <div
         ref={boxRef}
-        className="fixed pointer-events-none z-[100000]"
+        className="fixed pointer-events-none z-[100000] transition-opacity duration-200"
         style={{
           width: "6px",
           height: "6px",
           border: "1px solid black",
           background: "hsl(0,100%,50%)",
           animation: "rainbow 3s linear infinite",
-         
+          opacity: isCursorHidden ? 0 : 1,
         }}
       />
 

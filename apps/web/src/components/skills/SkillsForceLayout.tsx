@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState } from 'react';
 import * as d3 from 'd3';
+import { useUIStore } from '../../stores/uiStore';
 
 export interface Skill {
   id: string;
@@ -19,11 +20,11 @@ interface Node extends d3.SimulationNodeDatum {
 }
 
 const CATEGORY_COLORS: Record<string, string> = {
-  'ai/ml': '#FFDDA1', 
-  'cloud-devops': '#FFD151', 
-  languages: '#F8C537', 
-  frameworks: '#EDB230', 
-  management: '#E77728', 
+  'ai/ml': '#FFDDA1',
+  'cloud-devops': '#FFD151',
+  languages: '#F8C537',
+  frameworks: '#EDB230',
+  management: '#E77728',
 };
 
 const CATEGORY_LABELS: Record<string, string> = {
@@ -93,11 +94,11 @@ export default function SkillsForceLayout({
   useEffect(() => {
     const updateDimensions = () => {
       if (!containerRef.current) return;
-      
+
       const containerWidth = containerRef.current.clientWidth;
       const isMobile = containerWidth < 768; // tablet breakpoint
       const isTablet = containerWidth >= 768 && containerWidth < 1024;
-      
+
       if (isMobile) {
         // Mobile: use container width, maximize height using viewport
         const mobileWidth = Math.max(320, containerWidth - 32); // Account for padding
@@ -159,7 +160,7 @@ export default function SkillsForceLayout({
     const currentHeight = dimensions.height;
     const isMobile = currentWidth < 768;
     const isTabletSim = currentWidth >= 768 && currentWidth < 1024;
-    
+
     // Calculate filter space: filterHeight now represents the bottom position of the filter
     // Add a small padding gap on all screen sizes to ensure proper spacing
     const paddingGap = isMobile ? 8 : isTabletSim ? 12 : 16; // Small padding gap between filter and graph on all screen sizes
@@ -170,7 +171,7 @@ export default function SkillsForceLayout({
     const nodes: Node[] = filteredSkills.map((skill) => {
       const savedPos = nodesRef.current.get(skill.id);
       // Adjust radius for mobile
-      const baseRadius = isMobile 
+      const baseRadius = isMobile
         ? Math.max(20, Math.min(40, skill.name.length * 2 + 15))
         : Math.max(30, Math.min(60, skill.name.length * 3 + 20));
       return {
@@ -195,7 +196,7 @@ export default function SkillsForceLayout({
     const graphAreaHeight = currentHeight - filterSpace; // Effective graph area height
     const graphAreaStartY = filterSpace; // Y position where graph area starts
     const graphAreaCenterY = graphAreaStartY + graphAreaHeight / 2; // Center of graph area
-    
+
     const categoryPositions: Record<string, { x: number; y: number }> = {
       ai: { x: currentWidth * 0.25, y: graphAreaStartY + graphAreaHeight * 0.25 },
       cloud: { x: currentWidth * 0.75, y: graphAreaStartY + graphAreaHeight * 0.25 },
@@ -260,8 +261,8 @@ export default function SkillsForceLayout({
             return nodesWithSavedPositions.has(d.id) ? 0.15 : 0.3;
           })
       );
-    
-      // Add gentle drifting movement
+
+    // Add gentle drifting movement
     function driftForce(alpha: number) {
       nodes.forEach((node) => {
         // Ensure velocity exists
@@ -314,6 +315,7 @@ export default function SkillsForceLayout({
             d.fx = d.x;
             d.fy = d.y;
             setDraggedNode(d);
+            useUIStore.getState().setCursorHidden(true);
             d3.select(event.sourceEvent.target).style('cursor', 'grabbing');
           })
           .on('drag', (event, d) => {
@@ -324,7 +326,7 @@ export default function SkillsForceLayout({
             const maxX = currentWidth - radius;
             const minY = filterSpace + radius; // Start below filter area
             const maxY = currentHeight - radius;
-            
+
             d.fx = Math.max(minX, Math.min(maxX, event.x));
             d.fy = Math.max(minY, Math.min(maxY, event.y));
           })
@@ -333,6 +335,7 @@ export default function SkillsForceLayout({
             d.fx = null;
             d.fy = null;
             setDraggedNode(null);
+            useUIStore.getState().setCursorHidden(false);
             d3.select(event.sourceEvent.target).style('cursor', 'grab');
           })
       )
@@ -352,12 +355,12 @@ export default function SkillsForceLayout({
       const nodeGroup = d3.select(this);
       const radius = d.radius;
       // Adjust font size for mobile
-      const fontSize = isMobile 
+      const fontSize = isMobile
         ? Math.max(9, Math.min(12, radius / 2.5))
         : Math.max(10, Math.min(14, radius / 3));
       const textWidth = radius * 1.8; // Max width for text wrapping
       const textHeight = radius * 2; // Max height for text
-      
+
       // Use foreignObject for proper text wrapping
       const foreignObject = nodeGroup
         .append('foreignObject')
@@ -453,7 +456,7 @@ export default function SkillsForceLayout({
   const isTablet = dimensions.width >= 768 && dimensions.width < 1024;
 
   return (
-    <div 
+    <div
       ref={containerRef}
       style={{ width: '100%', height: '100%', position: 'relative' }}
     >
@@ -533,13 +536,13 @@ export default function SkillsForceLayout({
             overflow: 'visible',
           }}
         >
-          <svg 
-            ref={svgRef} 
-            style={{ 
+          <svg
+            ref={svgRef}
+            style={{
               display: 'block',
               width: '100%',
               height: '100%',
-            }} 
+            }}
           />
         </div>
       </div>

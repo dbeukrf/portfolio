@@ -55,16 +55,17 @@ chatbot:
 #052B5D medium dark blue
 
 
-- Langsmith still showing top 10 documents
 - remove the appearance of cursor in chatbot (scrolling must still work)
 - change colour scheme of top left progress table on track pages
-- give an exit button on the player bar so it can disappear
 - invite collaborator functionality still needs to be completed
-- fix cursor not following when interacting with skills graph
 - player bar could have music audio visualisation integrated into its background
 - add some visual effects or elements to the ai dj track to make it look more interesting
 - add audio tracks
 - [optional] add drawing functionality and erasing effect
+
+- Langsmith still showing top 10 documents
+- give an exit button on the player bar so it can disappear
+- fix cursor not following when interacting with skills graph
 
 
 svg spinner icon: https://freesvgicons.com/packs/svg-spinners

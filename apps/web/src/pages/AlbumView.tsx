@@ -2155,7 +2155,7 @@ export default function AlbumView() {
                   <div className="pointer-events-none absolute inset-0 overflow-hidden">
                     <div
                       className="absolute inset-y-0 left-0 transition-all duration-300 ease-out"
-                      style={{ width, opacity: isActive ? 1 : 0, backgroundColor: '#A4A4A4' }}
+                      style={{ width, opacity: isActive ? 1 : 0, backgroundColor: '#1f2937' }}
                     />
                   </div>
                 </button>
