@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState, type ReactNode } from 'react';
 import { TRACKS, type TrackId } from '../data/tracks';
 import { FaLinkedin, FaGithub } from 'react-icons/fa';
-import { FaPlay, FaRandom, FaUserPlus } from 'react-icons/fa';
+import { FaPlay, FaRandom, FaUserPlus, FaCheck } from 'react-icons/fa';
 import { FaMapMarkerAlt, FaBriefcase, FaLanguage, FaCode, FaCircle, FaBars, FaTimes } from 'react-icons/fa';
 import Shuffle from '../components/ui/Shuffle';
 import { api } from '../services/api';
@@ -711,6 +711,17 @@ export default function AlbumView() {
   // Second parallax: aiDj track to chatbot
   const [chatbotParallaxProgress, setChatbotParallaxProgress] = useState(0);
   const [manualChatbotParallaxProgress, setManualChatbotParallaxProgress] = useState(0);
+
+  // Invite collaborators state
+  const [inviteCopied, setInviteCopied] = useState(false);
+
+  const handleInviteClick = () => {
+    navigator.clipboard.writeText(window.location.href);
+    setInviteCopied(true);
+    setTimeout(() => {
+      setInviteCopied(false);
+    }, 2000);
+  };
 
   // Hide cursor when chatbot is visible
   const setCursorHidden = useUIStore((state) => state.setCursorHidden);
@@ -1937,11 +1948,23 @@ export default function AlbumView() {
           </div>
 
           <div className="relative group">
-            <button className="flex items-center justify-center w-6 h-6 md:w-8 md:h-8 rounded-full bg-white/5 hover:bg-white/20 text-white transition-colors">
-              <FaUserPlus size={12} className="md:w-3.5 md:h-3.5" />
+            <button
+              onClick={handleInviteClick}
+              className={`flex items-center justify-center w-6 h-6 md:w-8 md:h-8 rounded-full bg-white/5 hover:bg-white/20 text-white transition-colors focus:outline-none ${inviteCopied ? '!text-green-500' : ''}`}
+            >
+              {inviteCopied ? (
+                <FaCheck size={12} className="md:w-3.5 md:h-3.5" />
+              ) : (
+                <FaUserPlus size={12} className="md:w-3.5 md:h-3.5" />
+              )}
             </button>
             <span className="absolute bottom-full mb-1.5 left-1/2 -translate-x-1/2 bg-black text-white text-[10px] px-1.5 py-0.5 rounded opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap">
-              Invite Collaborator
+              {inviteCopied ? 'Copied!' : 'Invite Collaborator'}
+            </span>
+            <span
+              className={`absolute left-full top-1/2 -translate-y-1/2 ml-2 text-[10px] md:text-xs text-green-500 font-medium whitespace-nowrap transition-all duration-300 ${inviteCopied ? 'opacity-100 translate-x-0' : 'opacity-0 -translate-x-2 pointer-events-none'}`}
+            >
+              Copied URL
             </span>
           </div>
         </div>
