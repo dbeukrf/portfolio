@@ -56,7 +56,6 @@ chatbot:
 
 
 - Langsmith still showing top 10 documents
-- change to blue and yellow colours in the chatbot
 - remove the appearance of cursor in chatbot (scrolling must still work)
 - change colour scheme of top left progress table on track pages
 - give an exit button on the player bar so it can disappear

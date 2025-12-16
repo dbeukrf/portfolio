@@ -14,6 +14,7 @@
 
 
 @layer base {
+
   /* CSS Reset and Base Styles */
   *,
   *::before,
@@ -21,7 +22,8 @@
     box-sizing: border-box;
     margin: 0;
     padding: 0;
-    cursor: none !important; /* Hide default cursor globally */
+    cursor: none !important;
+    /* Hide default cursor globally */
   }
 
   html {
@@ -30,7 +32,8 @@
     -webkit-text-size-adjust: 100%;
     -moz-text-size-adjust: 100%;
     text-size-adjust: 100%;
-    overflow: hidden; /* Hide scrollbar globally */
+    overflow: hidden;
+    /* Hide scrollbar globally */
   }
 
   body {
@@ -45,23 +48,32 @@
     text-rendering: optimizeLegibility;
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
-    overflow: hidden; /* Hide scrollbar globally */
-    cursor: none; /* Hide default cursor */
+    overflow: hidden;
+    /* Hide scrollbar globally */
+    cursor: none;
+    /* Hide default cursor */
   }
 
   /* Text Selection Styling */
   ::selection {
     background-color: #D7FFF1;
-    color: #191B20; /* Dark text when selected (for white text) */
+    color: #191B20;
+    /* Dark text when selected (for white text) */
   }
 
   ::-moz-selection {
     background-color: #D7FFF1;
-    color: #191B20; /* Dark text when selected (for white text) */
+    color: #191B20;
+    /* Dark text when selected (for white text) */
   }
 
   /* Typography Hierarchy */
-  h1, h2, h3, h4, h5, h6 {
+  h1,
+  h2,
+  h3,
+  h4,
+  h5,
+  h6 {
     font-weight: 600;
     line-height: 1.2;
     color: theme('colors.text.primary');
@@ -117,7 +129,10 @@
   }
 
   /* Form Elements */
-  input, textarea, select, button {
+  input,
+  textarea,
+  select,
+  button {
     font-family: inherit;
     font-size: inherit;
   }
@@ -155,6 +170,7 @@
 
   /* Reduced motion support */
   @media (prefers-reduced-motion: reduce) {
+
     *,
     *::before,
     *::after {
@@ -176,14 +192,18 @@
 }
 
 @layer components {
+
   /* Hide all scrollbars globally */
   * {
-    scrollbar-width: none; /* Firefox */
-    -ms-overflow-style: none; /* Internet Explorer 10+ */
+    scrollbar-width: none;
+    /* Firefox */
+    -ms-overflow-style: none;
+    /* Internet Explorer 10+ */
   }
 
   *::-webkit-scrollbar {
-    display: none; /* WebKit browsers */
+    display: none;
+    /* WebKit browsers */
   }
 
   /* Button Components */

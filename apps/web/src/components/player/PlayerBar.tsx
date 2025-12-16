@@ -1,5 +1,5 @@
 import { useEffect, useRef, useCallback } from 'react';
-import { FaPlay, FaPause, FaStepBackward, FaStepForward, FaRandom, FaRedo, FaVolumeUp, FaVolumeMute } from 'react-icons/fa';
+import { FaPlay, FaPause, FaStepBackward, FaStepForward, FaRandom, FaRedo, FaVolumeUp, FaVolumeMute, FaTimes } from 'react-icons/fa';
 import { useAudioStore } from '../../stores/audioStore';
 import { TRACKS } from '../../data/tracks';
 
@@ -9,9 +9,10 @@ interface PlayerBarProps {
   clipPathReveal?: number;
   onAlbumImageClick?: () => void;
   onTrackTitleClick?: (trackId: string) => void;
+  onClose?: () => void;
 }
 
-export default function PlayerBar({ isVisible, contentVisible, clipPathReveal: _clipPathReveal = 0, onAlbumImageClick, onTrackTitleClick }: PlayerBarProps) {
+export default function PlayerBar({ isVisible, contentVisible, clipPathReveal: _clipPathReveal = 0, onAlbumImageClick, onTrackTitleClick, onClose }: PlayerBarProps) {
   const audioRef = useRef<HTMLAudioElement>(null);
   const {
     currentTrackId,
@@ -174,29 +175,29 @@ export default function PlayerBar({ isVisible, contentVisible, clipPathReveal: _
 
   const progressPercent = duration > 0 ? (currentTime / duration) * 100 : 0;
   const displayVolume = isMuted ? 0 : volume;
-  
+
   // Player bar visibility logic:
   // - Show in album view when play is clicked (isVisible = true, contentVisible = false, clipPathReveal < 1)
   // - During reveal phase, keep player bar visible but behind parallax background (z-50)
   // - Parallax background overlaps the player bar during reveal (clipPathReveal increasing)
   // - Fade in on track views after parallax background reveals (isVisible = true, contentVisible = true)
   // - On track views, player bar is z-[100] to be above parallax (z-50) and track content (z-60)
-  
+
   // Player bar should always be visible when isVisible is true
   // During reveal phase, it stays visible but is behind parallax (z-40 < z-50)
   // On track views, it fades in and is on top (z-[100] > z-50)
   const shouldShow = isVisible;
   const isOnTrackView = contentVisible;
-  
+
   // Determine opacity: fade in when reaching track view, otherwise stay visible
   // During reveal phase, keep it visible (parallax will cover it visually)
   // When track view appears, fade in to full opacity
   // Only show on track view if isVisible is true
   const opacity = isOnTrackView && shouldShow ? 100 : (shouldShow ? 100 : 0);
   const zIndex = isOnTrackView && shouldShow ? 100 : (shouldShow ? 40 : 100);
-  
+
   return (
-    <div 
+    <div
       className={`fixed bottom-0 left-0 right-0 bg-[#000000] border-t border-white/10 px-1.5 md:px-3 py-1 md:py-1.5 transition-all duration-500 pointer-events-auto`}
       style={{
         opacity: opacity / 100,
@@ -225,7 +226,7 @@ export default function PlayerBar({ isVisible, contentVisible, clipPathReveal: _
             onClick={onAlbumImageClick}
           />
           <div className="min-w-0">
-            <div 
+            <div
               className="text-white text-[10px] md:text-xs font-medium truncate cursor-pointer hover:underline transition-all"
               onClick={() => onTrackTitleClick?.(currentTrack.id)}
             >
@@ -243,11 +244,10 @@ export default function PlayerBar({ isVisible, contentVisible, clipPathReveal: _
             <div className="relative group">
               <button
                 onClick={toggleShuffle}
-                className={`p-1 md:p-1.5 transition-colors focus:outline-none ${
-                  isShuffled 
-                    ? 'text-[#FFCD70] hover:text-[#FFCD70]' 
+                className={`p-1 md:p-1.5 transition-colors focus:outline-none ${isShuffled
+                    ? 'text-[#FFCD70] hover:text-[#FFCD70]'
                     : 'text-white/70 hover:text-white'
-                }`}
+                  }`}
                 aria-label="Shuffle"
               >
                 <FaRandom className="w-2.5 h-2.5 md:w-3.5 md:h-3.5" />
@@ -315,11 +315,10 @@ export default function PlayerBar({ isVisible, contentVisible, clipPathReveal: _
             <div className="relative group">
               <button
                 onClick={toggleLoop}
-                className={`p-1 md:p-1.5 transition-colors focus:outline-none ${
-                  isLooping 
-                    ? 'text-[#FFCD70] hover:text-[#FFCD70]' 
+                className={`p-1 md:p-1.5 transition-colors focus:outline-none ${isLooping
+                    ? 'text-[#FFCD70] hover:text-[#FFCD70]'
                     : 'text-white/70 hover:text-white'
-                }`}
+                  }`}
                 aria-label="Repeat"
               >
                 <FaRedo className="w-2.5 h-2.5 md:w-3.5 md:h-3.5" />
@@ -390,6 +389,23 @@ export default function PlayerBar({ isVisible, contentVisible, clipPathReveal: _
             }}
             aria-label="Volume"
           />
+
+          {/* Close Button */}
+          {onClose && (
+            <div className="relative group ml-1 md:ml-3 border-l border-white/20 pl-2 md:pl-4">
+              <button
+                onClick={onClose}
+                className="p-1 md:p-1.5 text-white/50 hover:text-red-400 transition-colors focus:outline-none"
+                aria-label="Close player"
+              >
+                <FaTimes className="w-3 h-3 md:w-4 md:h-4" />
+              </button>
+              {/* Tooltip */}
+              <span className="absolute bottom-full mb-1.5 right-0 bg-black text-white text-[10px] px-1.5 py-0.5 rounded opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap pointer-events-none">
+                Close player
+              </span>
+            </div>
+          )}
         </div>
       </div>
     </div>

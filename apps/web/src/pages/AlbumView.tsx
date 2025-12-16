@@ -2171,6 +2171,7 @@ export default function AlbumView() {
         clipPathReveal={clipPathReveal}
         onAlbumImageClick={scrollToAlbumView}
         onTrackTitleClick={handleTrackTitleClick}
+        onClose={handleAlbumImageClick}
       />
     </div>
   );
