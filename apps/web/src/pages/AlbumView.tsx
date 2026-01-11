@@ -13,6 +13,7 @@ import TrackPage, { RAINBOW_COLORS } from '../components/tracks/TrackPage';
 import ProjectCarousel, { type Project } from '../components/projects/ProjectCarousel';
 import SkillsForceLayout, { type Skill } from '../components/skills/SkillsForceLayout';
 import Chatbot from './Chatbot';
+import TypingText from '../components/ui/TypingText';
 import './AlbumView.css';
 
 interface WeatherData {
@@ -412,7 +413,7 @@ const getTrackContent = (trackId: TrackId): ReactNode => {
               <div className="education-content" style={{ width: '100%' }}>
                 {/* Title row with role */}
                 <div className="education-degree-title" style={{ display: 'flex', justifyContent: 'flex-end', flexWrap: 'wrap', gap: '0.5rem' }}>
-                  <h3 className="education-h3">IT Infrastructure Project Management Intern</h3>
+                  <h3 className="education-h3">Technology Infrastructure Project Management Intern</h3>
                 </div>
 
                 {/* Location and Date - mobile only */}
@@ -675,7 +676,7 @@ const getTrackContent = (trackId: TrackId): ReactNode => {
             diving deeper into any aspect that interests you.
           </p>
           <p style={{ textAlign: 'center' }} className="!text-center">
-            Continue scrolling to discover the terminal-style chatbot.
+            <TypingText text="Scroll for more..." speed={100} />
           </p>
         </div>
       );
@@ -1856,7 +1857,7 @@ export default function AlbumView() {
         <div className="flex flex-col items-end justify-center gap-0.5 sm:gap-0.5 md:gap-1 text-white text-[8px] sm:text-[9px] md:text-[10px] lg:text-xs sm:flex-shrink-0 relative z-10 max-w-[40%] sm:max-w-none">
           <div className="flex flex-col items-end space-y-0 sm:space-y-0 md:space-y-0.5">
             <Shuffle tag="span" className="text-[8px] sm:text-[9px] md:text-[10px] truncate max-w-full" text="beuk.diego@gmail.com" duration={0.35} triggerOnHover triggerOnce threshold={0} rootMargin="0px" textAlign="right" />
-            <Shuffle tag="span" className="text-[8px] sm:text-[9px] md:text-[10px] truncate max-w-full" text="+61 448 092 338" duration={0.35} triggerOnHover triggerOnce threshold={0} rootMargin="0px" textAlign="right" />
+            <Shuffle tag="span" className="text-[8px] sm:text-[9px] md:text-[10px] truncate max-w-full" text="+61 XXX XXX XXX" duration={0.35} triggerOnHover triggerOnce threshold={0} rootMargin="0px" textAlign="right" />
           </div>
 
           <div className="flex space-x-1 sm:space-x-1.5 md:space-x-2 lg:space-x-2.5">
